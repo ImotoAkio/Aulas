@@ -5,8 +5,8 @@
       <li class="nav-item nav-profile">
         <a href="#" class="nav-link">
           <div class="nav-profile-image">
-            <img src="../assets/images/faces/face1.jpg" alt="profile" />
-            <span class="login-status online"></span>
+            <img src="/aulas/assets/images/faces/face1.jpg" alt="profile">
+             <span class="login-status online"></span>
             <!--change to offline or busy as needed-->
           </div>
           <div class="nav-profile-text d-flex flex-column">
@@ -45,6 +45,25 @@
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="collapse" href="#icons" aria-expanded="false" aria-controls="icons">
           <span class="menu-title">Cadastros</span>
+          <i class="mdi mdi-contacts menu-icon"></i>
+        </a>
+        <div class="collapse" id="icons">
+          <ul class="nav flex-column sub-menu">
+            <li class="nav-item">
+              <a class="nav-link" href="cad/professor.php">Professor</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="cad/aluno.php">Aluno</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="cad/secretario.php">Secretario</a>
+            </li>
+          </ul>
+        </div>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="collapse" href="#icons" aria-expanded="false" aria-controls="icons">
+          <span class="menu-title">Declarações</span>
           <i class="mdi mdi-contacts menu-icon"></i>
         </a>
         <div class="collapse" id="icons">

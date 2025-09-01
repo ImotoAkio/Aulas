@@ -1,6 +1,6 @@
 <?php
 session_start();
-require '../partials/db.php';
+require 'partials/db.php';
 if (!isset($_SESSION['usuario_id'])) {
   header('Location: login.php');
   exit;
@@ -69,11 +69,11 @@ if (!$plano) {
 <body>
   <div class="container-scroller">
     <!-- partial:../partials/_navbar.html -->
-<?php include '../partials/_navbar.php'; ?>
+<?php include 'partials/_navbar.php'; ?>
     <!-- partial -->
     <div class="container-fluid page-body-wrapper">
-      <!-- partial:../partials/_sidebar.html -->
-<?php include '../partials/_sidebar.php'; ?>
+      <!-- partial:partials/_sidebar.html -->
+<?php include 'partials/_sidebar.php'; ?>
       <!-- partial -->
       <div class="main-panel">
         <div class="content-wrapper">
@@ -174,7 +174,7 @@ if (!$plano) {
           </div>
         </div>
 
-        <?php include '../partials/_footer.php'; ?>
+        <?php include 'partials/_footer.php'; ?>
 
         <div class="modal fade" id="revisaoModal<?= $plano['id'] ?>" tabindex="-1" aria-labelledby="exampleModalLabel"
           aria-hidden="true">

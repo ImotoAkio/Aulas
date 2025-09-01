@@ -1,6 +1,6 @@
 <?php
 session_start();
-require '../partials/db.php';
+require 'partials/db.php';
 
 if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo'] != 'coordenador') {
   header('Location: ../login.php');
@@ -48,19 +48,19 @@ $planos = $stmt->fetchAll();
   <!-- End plugin css for this page -->
   <!-- inject:css -->
   <!-- endinject -->
-  <!-- Layout styles -->
-  <link rel="stylesheet" href="../assets/css/style.css">
-  <!-- End layout styles -->
-  <link rel="shortcut icon" href="../assets/images/favicon.png" />
+              <!-- Layout styles -->
+        <link rel="stylesheet" href="../assets/css/style.css">
+        <!-- End layout styles -->
+    <link rel="shortcut icon" href="../assets/images/favicon.png" />
 </head>
 
 <body>
   <div class="container-scroller">
 
 
-    <?php include '../partials/_navbar.php'; ?> <!-- Barra de navegação-->
+    <?php include 'partials/_navbar.php'; ?> <!-- Barra de navegação-->
 
-    <?php include '../partials/_sidebar.php'; ?> <!-- Barra lateral-->
+    <?php include 'partials/_sidebar.php'; ?> <!-- Barra lateral-->
     <!-- partial -->
     <div class="main-panel">
       <div class="content-wrapper">
@@ -115,7 +115,7 @@ $planos = $stmt->fetchAll();
       </div>
       <!-- content-wrapper ends -->
       <!-- partial:../../partials/_footer.html -->
-<?php include '../partials/_footer.php'; ?>
+        <?php include 'partials/_footer.php'; ?>
       <!-- partial -->
     </div>
     <!-- main-panel ends -->
@@ -129,12 +129,12 @@ $planos = $stmt->fetchAll();
   <!-- Plugin js for this page -->
   <!-- End plugin js for this page -->
   <!-- inject:js -->
-  <script src="../assets/js/off-canvas.js"></script>
-  <script src="../assets/js/misc.js"></script>
-  <script src="../assets/js/settings.js"></script>
-  <script src="../assets/js/todolist.js"></script>
-  <script src="../assets/js/jquery.cookie.js"></script>
-  <!-- endinject -->
+      <script src="../assets/js/off-canvas.js"></script>
+    <script src="../assets/js/misc.js"></script>
+            <script src="../assets/js/settings.js"></script>
+        <script src="../assets/js/todolist.js"></script>
+        <script src="../assets/js/jquery.cookie.js"></script>
+        <!-- endinject -->
   <!-- Custom js for this page -->
   <!-- End custom js for this page -->
 </body>

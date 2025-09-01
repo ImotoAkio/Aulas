@@ -14,7 +14,12 @@ session_start();
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-include('../partials/db.php'); // Inclui o arquivo de conexão com o banco de dados
+include('partials/db.php'); // Inclui o arquivo de conexão com o banco de dados
+
+// Verificar se a conexão foi estabelecida
+if (!isset($pdo)) {
+    die("Erro: Não foi possível conectar ao banco de dados.");
+}
 
 // Verifica se o usuário está logado e se é um professor
 if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo'] != 'professor') {
@@ -70,8 +75,8 @@ try {
     <link rel="stylesheet" href="../assets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.css">
     <!-- End plugin css for this page -->
     <!-- inject:css -->
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <!-- End layout styles -->
+            <link rel="stylesheet" href="../assets/css/style.css">
+        <!-- End layout styles -->
     <link rel="shortcut icon" href="../assets/images/favicon.png" />
     <style>
         .alert-danger {
@@ -183,10 +188,10 @@ try {
     <!-- inject:js -->
     <script src="../assets/js/off-canvas.js"></script>
     <script src="../assets/js/misc.js"></script>
-    <script src="../assets/js/settings.js"></script>
-    <script src="../assets/js/todolist.js"></script>
-    <script src="../assets/js/jquery.cookie.js"></script>
-    <!-- endinject -->
+            <script src="../assets/js/settings.js"></script>
+        <script src="../assets/js/todolist.js"></script>
+        <script src="../assets/js/jquery.cookie.js"></script>
+        <!-- endinject -->
     <!-- Custom js for this page -->
     <script src="../assets/js/dashboard.js"></script>
     <!-- End custom js for this page -->

@@ -16,7 +16,7 @@
 session_start(); // Inicia a sessão
 
 // Inclui o arquivo de conexão com o banco de dados
-include('../partials/db.php');
+include('partials/db.php');
 
 // Verifica se o usuário está logado e se é um coordenador
 if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo'] != 'coordenador') {
@@ -222,8 +222,8 @@ if (isset($_SESSION['feedback_message'])) {
     <!-- inject:css -->
     <link rel="stylesheet" href="../assets/css/style.css">
     <!-- endinject -->
-    <!-- Layout styles -->
-    <link rel="shortcut icon" href="../assets/images/favicon.png" />
+            <!-- Layout styles -->
+        <link rel="shortcut icon" href="../assets/images/favicon.png" />
     <style>
         /* Estilos para as mensagens de feedback */
         .feedback-message-container {
@@ -288,11 +288,11 @@ if (isset($_SESSION['feedback_message'])) {
   <body>
     <div class="container-scroller">
       <!-- partial:../partials/_navbar.html -->
-      <?php include('../partials/_navbar.php'); ?>
+      <?php include('partials/_navbar.php'); ?>
       <!-- partial -->
       <div class="container-fluid page-body-wrapper">
-        <!-- partial:../partials/_sidebar.html -->
-        <?php include('../partials/_sidebar.php'); ?>
+        <!-- partial:partials/_sidebar.html -->
+        <?php include('partials/_sidebar.php'); ?>
         <!-- partial -->
         <div class="main-panel">
           <div class="content-wrapper">
@@ -424,7 +424,7 @@ if (isset($_SESSION['feedback_message'])) {
           </div>
           <!-- content-wrapper ends -->
           <!-- partial:../partials/_footer.html -->
-          <?php include('../partials/_footer.php'); ?>
+          <?php include('partials/_footer.php'); ?>
           <!-- partial -->
         </div>
         <!-- main-panel ends -->
@@ -442,10 +442,10 @@ if (isset($_SESSION['feedback_message'])) {
     <!-- inject:js -->
     <script src="../assets/js/off-canvas.js"></script>
     <script src="../assets/js/misc.js"></script>
-    <script src="../assets/js/settings.js"></script>
-    <script src="../assets/js/todolist.js"></script>
-    <script src="../assets/js/jquery.cookie.js"></script>
-    <!-- endinject -->
+            <script src="../assets/js/settings.js"></script>
+        <script src="../assets/js/todolist.js"></script>
+        <script src="../assets/js/jquery.cookie.js"></script>
+        <!-- endinject -->
     <!-- Custom js for this page -->
     <script src="../assets/js/file-upload.js"></script>
     <script src="../assets/js/typeahead.js"></script>

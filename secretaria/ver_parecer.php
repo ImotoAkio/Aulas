@@ -14,7 +14,7 @@
  */
 
 session_start(); // Inicia a sessão - DEVE SER A PRIMEIRA COSA NO ARQUIVO
-require_once '../partials/db.php'; // Inclui o arquivo de conexão com o banco de dados
+require_once 'partials/db.php'; // Inclui o arquivo de conexão com o banco de dados
 
 // Verifica se o usuário está logado e se é um coordenador ou secretaria
 if (!isset($_SESSION['usuario_id']) || ($_SESSION['tipo'] != 'coordenador' && $_SESSION['tipo'] != 'secretaria')) {

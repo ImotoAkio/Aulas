@@ -1,6 +1,6 @@
 <?php
 session_start();
-include('../partials/db.php');
+include('partials/db.php');
 
 // Verify user is logged in and is a coordinator
 if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo'] != 'coordenador') {
@@ -94,9 +94,9 @@ if (!empty($turma_id) && !empty($disciplina_id)) {
 
 <body>
     <div class="container-scroller">
-        <?php include '../partials/_navbar.php'; ?>
+        <?php include 'partials/_navbar.php'; ?>
         <div class="container-fluid page-body-wrapper">
-            <?php include '../partials/_sidebar.php'; ?>
+            <?php include 'partials/_sidebar.php'; ?>
             <div class="main-panel">
                 <div class="content-wrapper">
                     <div class="page-header">
@@ -199,7 +199,7 @@ if (!empty($turma_id) && !empty($disciplina_id)) {
 
                         </div>
                     </div>
-                    <?php include '../partials/_footer.php'; ?>
+                    <?php include 'partials/_footer.php'; ?>
                 </div>
             </div>
         </div>

@@ -33,7 +33,7 @@
 // 'require' é usado porque o script não pode funcionar sem elas.
 require __DIR__ . '/../../fpdf/fpdf.php';
 require __DIR__ . '/../../fpdi/src/autoload.php'; // Carrega a biblioteca para usar templates
-require_once __DIR__ . '/../config/database.php';    // Inclui a conexão com o banco de dados ($pdo)
+require_once __DIR__ . '/../../config/database.php';    // Inclui a conexão com o banco de dados ($pdo)
 
 // Informa ao PHP que usaremos a classe 'Fpdi' do namespace 'setasign\Fpdi'.
 // Isso nos permite escrever 'new Fpdi()' em vez do nome completo da classe.

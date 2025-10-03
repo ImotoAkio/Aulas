@@ -1,22 +1,22 @@
 <?php
 // Garantir que as funções estejam disponíveis
 if (!function_exists('getPageUrl')) {
-    require_once __DIR__ . '/../config/database.php';
+    require_once __DIR__ . '/../../config/database.php';
 }
 
 session_start();
-require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../../config/database.php';
 
 // Verificar se o usuário está logado e é coordenador
 if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo'] != 'coordenador') {
-    require_once __DIR__ . '/../config/database.php';
+    require_once __DIR__ . '/../../config/database.php';
     redirectTo('login.php');
     exit();
 }
 
 // Verificar se há mensagem de sucesso
 if (!isset($_SESSION['sucesso_cadastro'])) {
-    require_once __DIR__ . '/../config/database.php';
+    require_once __DIR__ . '/../../config/database.php';
     redirectTo('secretaria/index.php');
     exit();
 }

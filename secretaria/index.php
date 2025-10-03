@@ -1,10 +1,7 @@
 <?php
 include 'partials/db.php';
-try {
-  // Conexão PDO
-  $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
-  $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // Define o modo de erro para lançar exceções
 
+try {
   // Query SQL para contar planos de aula pendentes
   $sql = "SELECT COUNT(*) AS total_pendente FROM planos_aula WHERE status = 'pendente'";
 
@@ -29,7 +26,6 @@ try {
   // Em caso de erro na conexão ou na query
   echo "Erro: " . $e->getMessage();
 }
-
 ?>
 
 ?>

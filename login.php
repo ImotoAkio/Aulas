@@ -5,11 +5,10 @@ include('secretaria/partials/db.php');
 // Verificar se já está logado
 if (isset($_SESSION['usuario_id'])) {
     if ($_SESSION['tipo'] === 'aluno') {
-        header('Location: aluno/index.php');
+        redirectTo('aluno/index.php');
     } else {
-        header('Location: secretaria/index.php');
+        redirectTo('secretaria/index.php');
     }
-    exit();
 }
 
 $erro = '';
@@ -38,11 +37,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['tipo'] = $usuario['tipo'];
                 
                 if ($usuario['tipo'] === 'coordenador') {
-                    header('Location: secretaria/index.php');
+                    redirectTo('secretaria/index.php');
                 } else {
-                    header('Location: professor/index.php');
+                    redirectTo('professor/index.php');
                 }
-                exit();
             } else {
                 // Tentar login como aluno
                 $stmt = $pdo->prepare("
@@ -63,8 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['aluno_turma'] = $aluno['turma_nome'];
                     $_SESSION['aluno_ano_letivo'] = $aluno['ano_letivo'];
                     
-                    header('Location: aluno/index.php');
-                    exit();
+                    redirectTo('aluno/index.php');
                 } else {
                     $erro = 'CPF ou senha incorretos.';
                 }

@@ -25,8 +25,7 @@ if (ini_get("session.use_cookies")) {
 // Finalmente, destrói a sessão
 session_destroy();
 
-// Redireciona o usuário para a página de login
-header('Location: ../login.php'); // Ajuste o caminho se a página de login não estiver no diretório raiz
-exit(); // Garante que nenhum outro código seja executado após o redirecionamento
-
+// Redireciona o usuário para a página de login usando função centralizada
+require_once __DIR__ . '/../config/database.php';
+redirectTo('login.php');
 ?>

@@ -4,7 +4,8 @@ include('partials/db.php');
 
 // Verify user is logged in and is a coordinator
 if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo'] != 'coordenador') {
-    header('Location: login.php');
+    require_once __DIR__ . '/../config/database.php';
+    redirectTo('login.php');
     exit();
 }
 

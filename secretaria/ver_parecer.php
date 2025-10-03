@@ -18,7 +18,8 @@ require_once 'partials/db.php'; // Inclui o arquivo de conexão com o banco de d
 
 // Verifica se o usuário está logado e se é um coordenador ou secretaria
 if (!isset($_SESSION['usuario_id']) || ($_SESSION['tipo'] != 'coordenador' && $_SESSION['tipo'] != 'secretaria')) {
-    header('Location: ../login.php'); // Redireciona para a página de login se não for coordenador ou secretaria
+    require_once __DIR__ . '/../config/database.php';
+    redirectTo('login.php'); // Redireciona para a página de login se não for coordenador ou secretaria
     exit();
 }
 

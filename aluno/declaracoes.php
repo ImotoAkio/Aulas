@@ -4,7 +4,8 @@ include('../secretaria/partials/db.php');
 
 // Verificar se o usuário está logado e é aluno
 if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo'] !== 'aluno') {
-    header('Location: ../../login.php');
+    require_once __DIR__ . '/../config/database.php';
+    redirectTo('login.php');
     exit();
 }
 
@@ -23,12 +24,14 @@ try {
     
     if (!$aluno) {
         session_destroy();
-        header('Location: ../../login.php');
+        require_once __DIR__ . '/../config/database.php';
+    redirectTo('login.php');
         exit();
     }
 } catch (PDOException $e) {
     error_log("Erro ao buscar dados do aluno: " . $e->getMessage());
-    header('Location: ../../login.php');
+    require_once __DIR__ . '/../config/database.php';
+    redirectTo('login.php');
     exit();
 }
 
@@ -47,8 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'finalidade' => $finalidade
         ];
         
-        header('Location: gerar_declaracao.php');
-        exit();
+        require_once __DIR__ . '/../config/database.php';
+        redirectTo('aluno/gerar_declaracao.php');
     }
 }
 ?>

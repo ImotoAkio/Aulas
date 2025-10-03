@@ -4,7 +4,8 @@ include('../partials/db.php');
 
 // Verificar se o usuário está logado e é coordenador
 if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo'] != 'coordenador') {
-    header('Location: ../../login.php');
+    require_once __DIR__ . '/../config/database.php';
+    redirectTo('login.php');
     exit();
 }
 

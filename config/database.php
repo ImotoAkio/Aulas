@@ -16,6 +16,50 @@ define('DB_CHARSET', 'utf8');
 define('PDO_ERRMODE', PDO::ERRMODE_EXCEPTION);
 define('PDO_FETCH_MODE', PDO::FETCH_ASSOC);
 
+// Função para detectar ambiente e corrigir caminhos
+function getBaseUrl() {
+    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'];
+    $scriptName = $_SERVER['SCRIPT_NAME'];
+    
+    // Detecta se está em produção (baseado no domínio)
+    $isProduction = strpos($host, 'colegiorosadesharom.com.br') !== false;
+    
+    if ($isProduction) {
+        // Em produção, usar caminho raiz
+        return $protocol . '://' . $host . '/';
+    } else {
+        // Em desenvolvimento local, detectar o diretório base
+        $pathParts = explode('/', trim(dirname($scriptName), '/'));
+        $basePath = '';
+        
+        // Se estiver em uma subpasta (como /aulas/), incluir no caminho
+        if (in_array('aulas', $pathParts)) {
+            $basePath = '/aulas/';
+        } else {
+            $basePath = '/';
+        }
+        
+        return $protocol . '://' . $host . $basePath;
+    }
+}
+
+// Função para redirecionamento com caminho correto
+function redirectTo($path) {
+    $baseUrl = getBaseUrl();
+    
+    // Remove barra inicial se existir para evitar duplicação
+    $path = ltrim($path, '/');
+    
+    // Se o caminho já contém o domínio completo, usar como está
+    if (strpos($path, 'http') === 0) {
+        header('Location: ' . $path);
+    } else {
+        header('Location: ' . $baseUrl . $path);
+    }
+    exit();
+}
+
 try {
     $pdo = new PDO(
         "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET, 

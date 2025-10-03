@@ -20,6 +20,28 @@ define('DB_PASS', '');                    // Senha
 define('DB_CHARSET', 'utf8');             // Charset
 ```
 
+## Sistema de Redirecionamento Inteligente
+
+O sistema agora inclui funções automáticas para detectar o ambiente e corrigir caminhos:
+
+### Funções Disponíveis:
+- `getBaseUrl()` - Detecta automaticamente se está em produção ou desenvolvimento
+- `redirectTo($path)` - Redireciona com caminho correto para o ambiente atual
+
+### Detecção Automática:
+- **Produção**: Detecta domínio `colegiorosadesharom.com.br` e usa caminho raiz
+- **Desenvolvimento**: Detecta pasta `/aulas/` e ajusta caminhos automaticamente
+
+### Exemplo de Uso:
+```php
+// Em vez de:
+header('Location: login.php');
+
+// Use:
+require_once __DIR__ . '/config/database.php';
+redirectTo('login.php');
+```
+
 ## Arquivos Atualizados
 
 Todos os arquivos de conexão foram unificados para usar a configuração centralizada:
@@ -28,12 +50,16 @@ Todos os arquivos de conexão foram unificados para usar a configuração centra
 - `secretaria/partials/db.php`
 - `professor/partials/db.php`
 
+**Todos os redirecionamentos foram corrigidos automaticamente** para funcionar tanto em desenvolvimento quanto em produção.
+
 ## Vantagens
 
 ✅ **Deploy Simplificado**: Alterar apenas um arquivo para configurar o banco  
 ✅ **Manutenção Centralizada**: Todas as configurações em um local  
 ✅ **Consistência**: Mesmas configurações em todo o sistema  
 ✅ **Segurança**: Configurações isoladas em arquivo específico  
+✅ **Redirecionamento Inteligente**: Funciona automaticamente em qualquer ambiente  
+✅ **Zero Configuração**: Detecta ambiente automaticamente  
 
 ## Como Usar
 
@@ -43,3 +69,9 @@ include 'db.php'; // ou o caminho apropriado
 ```
 
 A variável `$pdo` estará disponível automaticamente com todas as configurações aplicadas.
+
+### Para Redirecionamentos:
+```php
+require_once __DIR__ . '/config/database.php';
+redirectTo('caminho/destino.php');
+```

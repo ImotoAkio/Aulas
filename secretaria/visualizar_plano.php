@@ -2,7 +2,8 @@
 session_start();
 require 'partials/db.php';
 if (!isset($_SESSION['usuario_id'])) {
-  header('Location: login.php');
+  require_once __DIR__ . '/../config/database.php';
+    redirectTo('login.php');
   exit;
 }
 

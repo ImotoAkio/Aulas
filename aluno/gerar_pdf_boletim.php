@@ -13,7 +13,8 @@ include('../secretaria/partials/db.php');
 
 // Verificar se o usuário está logado e é aluno
 if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo'] !== 'aluno') {
-    header('Location: ../../login.php');
+    require_once __DIR__ . '/../config/database.php';
+    redirectTo('login.php');
     exit();
 }
 

@@ -16,7 +16,7 @@ if (ini_get("session.use_cookies")) {
 // Destruir a sessão
 session_destroy();
 
-// Redirecionar para a página de login
-header('Location: login.php');
-exit();
+// Redirecionar para a página de login usando função centralizada
+require_once __DIR__ . '/config/database.php';
+redirectTo('login.php');
 ?>

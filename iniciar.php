@@ -5,7 +5,8 @@
 session_start();
 if(!isset($_SESSION['usuario_id'])) {
     // Se não estiver logado, redireciona para a página de login
-    header('Location: login.php');
+    require_once __DIR__ . '/config/database.php';
+    redirectTo('login.php');
     exit();
 }
 

@@ -20,7 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // Verifica se o professor está logado
 if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo'] != 'professor') {
     $_SESSION['feedback_message'] = ['type' => 'error', 'text' => 'Você precisa estar logado como professor para salvar pareceres.'];
-    header('Location: ../login.php');
+    require_once __DIR__ . '/../config/database.php';
+    redirectTo('login.php');
     exit();
 }
 

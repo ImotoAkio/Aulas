@@ -20,7 +20,8 @@ include('partials/db.php');
 
 // Verifica se o usuário está logado e se é um coordenador
 if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo'] != 'coordenador') {
-    header('Location: ../login.php'); // Redireciona para a página de login se não for coordenador
+    require_once __DIR__ . '/../config/database.php';
+    redirectTo('login.php'); // Redireciona para a página de login se não for coordenador
     exit();
 }
 

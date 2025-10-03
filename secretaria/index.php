@@ -43,21 +43,20 @@ try {
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Rosa de Sharom | Echo Edu</title>
   <!-- plugins:css -->
-  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/mdi/css/materialdesignicons.min.css"); ?>"
-  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/ti-icons/css/themify-icons.css"); ?>"
-  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/css/vendor.bundle.base.css"); ?>"
-  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/font-awesome/css/font-awesome.min.css"); ?>"
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/mdi/css/materialdesignicons.min.css"); ?>">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/ti-icons/css/themify-icons.css"); ?>">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/css/vendor.bundle.base.css"); ?>">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/font-awesome/css/font-awesome.min.css"); ?>">
   <!-- endinject -->
   <!-- Plugin css for this page -->
-  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/font-awesome/css/font-awesome.min.css" />
-  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.css"); ?>"
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.css"); ?>">
   <!-- End plugin css for this page -->
   <!-- inject:css -->
   <!-- endinject -->
               <!-- Layout styles -->
-        <link rel="stylesheet" href="<?php echo getAssetUrl("assets/css/style.css"); ?>"
+        <link rel="stylesheet" href="<?php echo getAssetUrl("assets/css/style.css"); ?>">
         <!-- End layout styles -->
-    <link rel="shortcut icon" href="<?php echo getAssetUrl("assets/images/favicon.png" />
+    <link rel="shortcut icon" href="<?php echo getAssetUrl("assets/images/favicon.png"); ?>">
 </head>
 
 <body>
@@ -92,7 +91,7 @@ try {
             style="cursor: pointer;">
             <div class="card bg-gradient-danger card-img-holder text-white">
               <div class="card-body">
-                <img src="<?php echo getAssetUrl("assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
+                <img src="<?php echo getAssetUrl("assets/images/dashboard/circle.svg"); ?>" class="card-img-absolute" alt="circle-image" />
                 <h4 class="font-weight-normal mb-3">Planos de Aula <i class="mdi mdi-chart-line mdi-24px float-end"></i>
                 </h4>
                 <h2 class="mb-5"> <?php echo $total_pendente; ?> Planos para revisão</h2>
@@ -106,7 +105,7 @@ try {
             style="cursor: pointer;">
             <div class="card bg-gradient-info card-img-holder text-white">
               <div class="card-body">
-                <img src="<?php echo getAssetUrl("assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
+                <img src="<?php echo getAssetUrl("assets/images/dashboard/circle.svg"); ?>" class="card-img-absolute" alt="circle-image" />
                 <h4 class="font-weight-normal mb-3">Notas<i class="mdi mdi-bookmark-outline mdi-24px float-end"></i>
                 </h4>
                 <h2 class="mb-5">Visualizar Boletim Escolar</h2>
@@ -119,7 +118,7 @@ try {
             style="cursor: pointer;">
             <div class="card bg-gradient-success card-img-holder text-white">
               <div class="card-body">
-                <img src="<?php echo getAssetUrl("assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
+                <img src="<?php echo getAssetUrl("assets/images/dashboard/circle.svg"); ?>" class="card-img-absolute" alt="circle-image" />
                 <h4 class="font-weight-normal mb-3">Parecer Pedagógico <i
                     class="mdi mdi-diamond mdi-24px float-end"></i>
                 </h4>

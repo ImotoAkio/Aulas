@@ -91,10 +91,10 @@ if (isset($_SESSION['feedback_message'])) {
     <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/select2-bootstrap-theme/select2-bootstrap.min.css"); ?>"
     <!-- End plugin css for this page -->
     <!-- inject:css -->
-    <link rel="stylesheet" href="<?php echo getAssetUrl("assets/css/style.css"); ?>"
+    <link rel="stylesheet" href="<?php echo getAssetUrl("assets/css/style.css"); ?>">
     <!-- endinject -->
     <!-- Layout styles -->
-    <link rel="shortcut icon" href="<?php echo getAssetUrl("assets/images/favicon.png" />
+    <link rel="shortcut icon" href="<?php echo getAssetUrl("assets/images/favicon.png"); ?>">
     <style>
         /* Estilos para as mensagens de feedback */
         .feedback-message-container {

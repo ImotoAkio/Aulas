@@ -141,9 +141,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/css/vendor.bundle.base.css"); ?>"
     <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/font-awesome/css/font-awesome.min.css"); ?>"
     <!-- inject:css -->
-    <link rel="stylesheet" href="<?php echo getAssetUrl("assets/css/style.css"); ?>"
+    <link rel="stylesheet" href="<?php echo getAssetUrl("assets/css/style.css"); ?>">
     <!-- Layout styles -->
-    <link rel="shortcut icon" href="<?php echo getAssetUrl("assets/images/favicon.png" />
+    <link rel="shortcut icon" href="<?php echo getAssetUrl("assets/images/favicon.png"); ?>">
     <style>
         .alert {
             padding: 1rem;

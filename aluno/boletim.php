@@ -141,9 +141,9 @@ if (!empty($medias_gerais)) {
   <!-- inject:css -->
   <!-- endinject -->
   <!-- Layout styles -->
-  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/css/style.css"); ?>"
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/css/style.css"); ?>">
   <!-- End layout styles -->
-  <link rel="shortcut icon" href="<?php echo getAssetUrl("assets/images/favicon.png" />
+  <link rel="shortcut icon" href="<?php echo getAssetUrl("assets/images/favicon.png"); ?>">
 </head>
 
 <body>

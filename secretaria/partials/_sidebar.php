@@ -1,3 +1,9 @@
+<?php
+// Garantir que as funções estejam disponíveis
+if (!function_exists('getPageUrl')) {
+    require_once __DIR__ . '/../../config/database.php';
+}
+?>
 <div class="container-fluid page-body-wrapper">
   <!-- partial:partials/_sidebar.html -->
   <nav class="sidebar sidebar-offcanvas" id="sidebar">
@@ -17,7 +23,7 @@
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/aulas/secretaria/index.php">
+        <a class="nav-link" href="<?php echo getPageUrl('secretaria/index.php'); ?>">
           <span class="menu-title">Página Inicial</span>
           <i class="mdi mdi-home menu-icon"></i>
         </a>
@@ -31,13 +37,13 @@
         <div class="collapse" id="ui-basic">
           <ul class="nav flex-column sub-menu">
             <li class="nav-item">
-              <a class="nav-link" href="/aulas/secretaria/planos.php">Planos de Aula</a>
+              <a class="nav-link" href="<?php echo getPageUrl(\"secretaria/planos.php\"); ?>">Planos de Aula</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/aulas/secretaria/notas.php">Notas</a>
+              <a class="nav-link" href="<?php echo getPageUrl(\"secretaria/notas.php\"); ?>">Notas</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/aulas/secretaria/parecer.php">Parecer Pedagógico</a>
+              <a class="nav-link" href="<?php echo getPageUrl(\"secretaria/parecer.php\"); ?>">Parecer Pedagógico</a>
             </li>
           </ul>
         </div>
@@ -50,25 +56,25 @@
         <div class="collapse" id="cadastros">
           <ul class="nav flex-column sub-menu">
             <li class="nav-item">
-              <a class="nav-link" href="/aulas/secretaria/cad/professor.php">Professor</a>
+              <a class="nav-link" href="<?php echo getPageUrl(\"secretaria/cad/professor.php\"); ?>">Professor</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/aulas/secretaria/cad/aluno.php">Aluno</a>
+              <a class="nav-link" href="<?php echo getPageUrl(\"secretaria/cad/aluno.php\"); ?>">Aluno</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/aulas/secretaria/cad/listar_alunos.php">Listar Alunos</a>
+              <a class="nav-link" href="<?php echo getPageUrl(\"secretaria/cad/listar_alunos.php\"); ?>">Listar Alunos</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/aulas/secretaria/cad/secretario.php">Secretário</a>
+              <a class="nav-link" href="<?php echo getPageUrl(\"secretaria/cad/secretario.php\"); ?>">Secretário</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/aulas/secretaria/cad/disciplinas.php">Disciplinas</a>
+              <a class="nav-link" href="<?php echo getPageUrl(\"secretaria/cad/disciplinas.php\"); ?>">Disciplinas</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/aulas/secretaria/cad/turmas.php">Turmas</a>
+              <a class="nav-link" href="<?php echo getPageUrl(\"secretaria/cad/turmas.php\"); ?>">Turmas</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/aulas/secretaria/cad/sincronizar_nomes.php">Sincronizar Nomes</a>
+              <a class="nav-link" href="<?php echo getPageUrl(\"secretaria/cad/sincronizar_nomes.php\"); ?>">Sincronizar Nomes</a>
             </li>
           </ul>
         </div>
@@ -81,10 +87,10 @@
         <div class="collapse" id="declaracoes">
           <ul class="nav flex-column sub-menu">
             <li class="nav-item">
-              <a class="nav-link" href="/aulas/secretaria/declaracoes/professor.php">Professor</a>
+              <a class="nav-link" href="<?php echo getPageUrl(\"secretaria/declaracoes/professor.php\"); ?>">Professor</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/aulas/secretaria/declaracoes/aluno.php">Vínculo - Aluno</a>
+              <a class="nav-link" href="<?php echo getPageUrl(\"secretaria/declaracoes/aluno.php\"); ?>">Vínculo - Aluno</a>
             </li>
           </ul>
         </div>

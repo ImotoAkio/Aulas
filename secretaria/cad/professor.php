@@ -186,23 +186,23 @@ try {
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Cadastrar Professor</title>
   <!-- plugins:css -->
-  <link rel="stylesheet" href="../../assets/vendors/mdi/css/materialdesignicons.min.css">
-  <link rel="stylesheet" href="../../assets/vendors/ti-icons/css/themify-icons.css">
-  <link rel="stylesheet" href="../../assets/vendors/css/vendor.bundle.base.css">
-  <link rel="stylesheet" href="../../assets/vendors/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/mdi/css/materialdesignicons.min.css"); ?>">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/ti-icons/css/themify-icons.css"); ?>">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/css/vendor.bundle.base.css"); ?>">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/font-awesome/css/font-awesome.min.css"); ?>">
   <!-- endinject -->
   <!-- Plugin css for this page -->
-  <link rel="stylesheet" href="../../assets/vendors/select2/select2.min.css">
-  <link rel="stylesheet" href="../../assets/vendors/select2-bootstrap-theme/select2-bootstrap.min.css">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/select2/select2.min.css"); ?>">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/select2-bootstrap-theme/select2-bootstrap.min.css"); ?>">
   <!-- DataTables CSS via CDN -->
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css">
   <!-- End plugin css for this page -->
   <!-- inject:css -->
   <!-- endinject -->
               <!-- Layout styles -->
-        <link rel="stylesheet" href="../../assets/css/style.css">
+        <link rel="stylesheet" href="<?php echo getAssetUrl("assets/css/style.css"); ?>">
         <!-- End layout styles -->
-    <link rel="shortcut icon" href="../../assets/images/favicon.png" />
+    <link rel="shortcut icon" href="<?php echo getAssetUrl("assets/images/favicon.png"); ?>" />
   <style>
     .step-indicator {
       display: flex;
@@ -803,28 +803,28 @@ try {
   <!-- jQuery primeiro -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <!-- plugins:js -->
-  <script src="../../assets/vendors/js/vendor.bundle.base.js"></script>
+  <script src="<?php echo getAssetUrl("assets/vendors/js/vendor.bundle.base.js"); ?>"></script>
   <!-- endinject -->
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
   <!-- Plugin js for this page -->
-  <script src="../../assets/vendors/select2/select2.min.js"></script>
-  <script src="../../assets/vendors/typeahead.js/typeahead.bundle.min.js"></script>
+  <script src="<?php echo getAssetUrl("assets/vendors/select2/select2.min.js"); ?>"></script>
+  <script src="<?php echo getAssetUrl("assets/vendors/typeahead.js/typeahead.bundle.min.js"); ?>"></script>
   <!-- DataTables via CDN -->
   <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
   <!-- End plugin js for this page -->
   <!-- inject:js -->
-      <script src="../../assets/js/off-canvas.js"></script>
-    <script src="../../assets/js/misc.js"></script>
-            <script src="../../assets/js/settings.js"></script>
-        <script src="../../assets/js/todolist.js"></script>
-        <script src="../../assets/js/jquery.cookie.js"></script>
+      <script src="<?php echo getAssetUrl("assets/js/off-canvas.js"); ?>"></script>
+    <script src="<?php echo getAssetUrl("assets/js/misc.js"); ?>"></script>
+            <script src="<?php echo getAssetUrl("assets/js/settings.js"); ?>"></script>
+        <script src="<?php echo getAssetUrl("assets/js/todolist.js"); ?>"></script>
+        <script src="<?php echo getAssetUrl("assets/js/jquery.cookie.js"); ?>"></script>
         <!-- endinject -->
   <!-- Custom js for this page -->
-  <script src="../../assets/js/file-upload.js"></script>
-  <script src="../../assets/js/typeahead.js"></script>
-  <script src="../../assets/js/select2.js"></script>
+  <script src="<?php echo getAssetUrl("assets/js/file-upload.js"); ?>"></script>
+  <script src="<?php echo getAssetUrl("assets/js/typeahead.js"); ?>"></script>
+  <script src="<?php echo getAssetUrl("assets/js/select2.js"); ?>"></script>
   <!-- End custom js for this page -->
 
      <script>

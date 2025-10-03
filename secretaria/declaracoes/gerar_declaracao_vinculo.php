@@ -35,8 +35,8 @@ $data_extenso = strftime('%d de %B de %Y', strtotime($data_emissao));
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Declaração de Vínculo - <?= htmlspecialchars($aluno['nome_completo']) ?></title>
-  <link rel="stylesheet" href="../../assets/vendors/mdi/css/materialdesignicons.min.css">
-  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/mdi/css/materialdesignicons.min.css"); ?>">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/css/style.css"); ?>">
   <style>
     @media print {
       .no-print {
@@ -150,7 +150,7 @@ $data_extenso = strftime('%d de %B de %Y', strtotime($data_emissao));
       <button class="btn-print" onclick="window.print()">
         <i class="mdi mdi-printer"></i> Imprimir Declaração
       </button>
-      <button class="btn-back" onclick="window.location.href='aluno.php'">
+      <button class="btn-back" onclick="window.location.href='<?php echo getPageUrl("secretaria/declaracoes/aluno.php"); ?>'">
         <i class="mdi mdi-arrow-left"></i> Voltar
       </button>
     </div>
@@ -160,7 +160,7 @@ $data_extenso = strftime('%d de %B de %Y', strtotime($data_emissao));
     <!-- Cabeçalho -->
          <div class="cabecalho">
        <div class="logo">
-         <img src="../../assets/images/logo.png" alt="Logo" style="height: 60px; margin-bottom: 15px;">
+         <img src="<?php echo getAssetUrl("assets/images/logo.png"); ?>" alt="Logo" style="height: 60px; margin-bottom: 15px;">
          <div style="font-size: 24px; font-weight: bold; color: #333; margin-bottom: 10px;">COLÉGIO ROSA DE SHAROM</div>
        </div>
        <div class="titulo">DECLARAÇÃO DE VÍNCULO ESCOLAR</div>

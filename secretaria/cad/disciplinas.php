@@ -26,12 +26,12 @@ try {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Gerenciar Disciplinas</title>
-  <link rel="stylesheet" href="../../assets/vendors/mdi/css/materialdesignicons.min.css">
-  <link rel="stylesheet" href="../../assets/vendors/ti-icons/css/themify-icons.css">
-  <link rel="stylesheet" href="../../assets/vendors/css/vendor.bundle.base.css">
-  <link rel="stylesheet" href="../../assets/vendors/font-awesome/css/font-awesome.min.css">
-  <link rel="stylesheet" href="../../assets/css/style.css">
-  <link rel="shortcut icon" href="../../assets/images/favicon.png" />
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/mdi/css/materialdesignicons.min.css"); ?>">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/ti-icons/css/themify-icons.css"); ?>">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/css/vendor.bundle.base.css"); ?>">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/font-awesome/css/font-awesome.min.css"); ?>">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/css/style.css"); ?>">
+  <link rel="shortcut icon" href="<?php echo getAssetUrl("assets/images/favicon.png"); ?>" />
 </head>
 
 <body>
@@ -174,11 +174,11 @@ try {
     </div>
   </div>
 
-  <script src="../../assets/vendors/js/vendor.bundle.base.js"></script>
+  <script src="<?php echo getAssetUrl("assets/vendors/js/vendor.bundle.base.js"); ?>"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="../../assets/js/off-canvas.js"></script>
-  <script src="../../assets/js/misc.js"></script>
+  <script src="<?php echo getAssetUrl("assets/js/off-canvas.js"); ?>"></script>
+  <script src="<?php echo getAssetUrl("assets/js/misc.js"); ?>"></script>
 
   <script>
     function editarDisciplina(id, nome) {

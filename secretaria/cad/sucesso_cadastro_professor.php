@@ -16,7 +16,8 @@ if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo'] != 'coordenador') {
 
 // Verificar se há mensagem de sucesso
 if (!isset($_SESSION['sucesso_cadastro'])) {
-    header('Location: ../index.php');
+    require_once __DIR__ . '/../config/database.php';
+    redirectTo('secretaria/index.php');
     exit();
 }
 
@@ -31,8 +32,8 @@ unset($_SESSION['sucesso_cadastro']);
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Sucesso - Cadastro de Professor</title>
-  <link rel="stylesheet" href="../../assets/vendors/mdi/css/materialdesignicons.min.css">
-              <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/mdi/css/materialdesignicons.min.css"); ?>">
+              <link rel="stylesheet" href="<?php echo getAssetUrl("assets/css/style.css"); ?>">
         <style>
     body {
       margin: 0;

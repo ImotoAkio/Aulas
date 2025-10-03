@@ -353,8 +353,7 @@ try {
     }
     
     function downloadParecer(parecerId) {
-      // Simular download (em uma implementação real, seria via AJAX)
-      alert('Funcionalidade de download será implementada em breve!');
+      window.open('download_parecer.php?id=' + parecerId, '_blank');
     }
     
     function imprimirParecer() {

@@ -12,7 +12,7 @@ error_reporting(E_ALL);
 
 require('../../fpdf/fpdf.php');
 require('../../fpdi/src/autoload.php');
-include('../../partials/db.php');
+include('../partials/db.php');
 
 use setasign\Fpdi\Fpdi;
 

@@ -256,17 +256,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     document.getElementById('cpf').addEventListener('input', function(e) {
       let value = e.target.value;
       
-      // Se contém @, é email - não aplicar máscara
+      // Se contém @, é email - não aplicar máscara e permitir letras
       if (value.includes('@')) {
         return;
       }
       
-      // Se não contém @, aplicar máscara de CPF
-      value = value.replace(/\D/g, '');
-      if (value.length <= 11) {
-        value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-        e.target.value = value;
+      // Se contém letras e não tem @, pode ser início de email - não aplicar máscara
+      if (/[a-zA-Z]/.test(value) && !value.includes('@')) {
+        return;
       }
+      
+      // Se contém apenas números, aplicar máscara de CPF
+      if (/^\d+$/.test(value.replace(/\D/g, ''))) {
+        value = value.replace(/\D/g, '');
+        if (value.length <= 11) {
+          value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+          e.target.value = value;
+        }
+      }
+    });
+    
+    // Permitir que o usuário digite letras livremente
+    document.getElementById('cpf').addEventListener('keypress', function(e) {
+      // Permitir todas as teclas (letras, números, símbolos)
+      return true;
     });
   </script>
 </body>

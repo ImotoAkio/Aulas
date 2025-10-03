@@ -58,7 +58,32 @@ foreach ($notas as $nota) {
             'notas' => []
         ];
     }
-    $disciplinas_notas[$disciplina]['notas'][$nota['unidade']] = $nota;
+    
+    // Criar estrutura de notas por unidade baseada na estrutura real da tabela
+    if (!isset($disciplinas_notas[$disciplina]['notas'][1]) && $nota['media_1'] !== null) {
+        $disciplinas_notas[$disciplina]['notas'][1] = [
+            'nota' => $nota['media_1'],
+            'unidade' => 1
+        ];
+    }
+    if (!isset($disciplinas_notas[$disciplina]['notas'][2]) && $nota['media_2'] !== null) {
+        $disciplinas_notas[$disciplina]['notas'][2] = [
+            'nota' => $nota['media_2'],
+            'unidade' => 2
+        ];
+    }
+    if (!isset($disciplinas_notas[$disciplina]['notas'][3]) && $nota['media_3'] !== null) {
+        $disciplinas_notas[$disciplina]['notas'][3] = [
+            'nota' => $nota['media_3'],
+            'unidade' => 3
+        ];
+    }
+    if (!isset($disciplinas_notas[$disciplina]['notas'][4]) && $nota['media_4'] !== null) {
+        $disciplinas_notas[$disciplina]['notas'][4] = [
+            'nota' => $nota['media_4'],
+            'unidade' => 4
+        ];
+    }
 }
 
 // Calcular médias
@@ -67,8 +92,9 @@ foreach ($disciplinas_notas as $disciplina => $dados) {
     $soma_notas = 0;
     $count_notas = 0;
     
+    // Calcular média baseada na estrutura real da tabela
     foreach ($dados['notas'] as $unidade => $nota) {
-        if ($nota['nota'] !== null) {
+        if ($nota['nota'] !== null && $nota['nota'] > 0) {
             $soma_notas += $nota['nota'];
             $count_notas++;
         }
@@ -86,6 +112,7 @@ $media_geral = 0;
 if (!empty($medias_gerais)) {
     $media_geral = round(array_sum($medias_gerais) / count($medias_gerais), 1);
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -103,7 +130,7 @@ if (!empty($medias_gerais)) {
   <link rel="stylesheet" href="../assets/vendors/font-awesome/css/font-awesome.min.css">
   <!-- endinject -->
   <!-- Plugin css for this page -->
-  <link rel="stylesheet" href="../assets/vendors/chart.js/Chart.min.css">
+  <!-- Chart.js não requer CSS separado -->
   <!-- End plugin css for this page -->
   <!-- inject:css -->
   <!-- endinject -->
@@ -143,9 +170,6 @@ if (!empty($medias_gerais)) {
                     <div class="col-md-4 text-right">
                       <button type="button" class="btn btn-gradient-primary" onclick="gerarPDF()">
                         <i class="mdi mdi-file-pdf"></i> Gerar PDF
-                      </button>
-                      <button type="button" class="btn btn-outline-info" onclick="imprimirBoletim()">
-                        <i class="mdi mdi-printer"></i> Imprimir
                       </button>
                     </div>
                   </div>
@@ -337,7 +361,7 @@ if (!empty($medias_gerais)) {
   <script src="../assets/vendors/js/vendor.bundle.base.js"></script>
   <!-- endinject -->
   <!-- Plugin js for this page -->
-  <script src="../assets/vendors/chart.js/Chart.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- End plugin js for this page -->
   <!-- inject:js -->
   <script src="../assets/js/off-canvas.js"></script>
@@ -349,9 +373,17 @@ if (!empty($medias_gerais)) {
     var disciplinas = <?= json_encode(array_keys($disciplinas_notas)) ?>;
     var medias = <?= json_encode(array_values($medias_gerais)) ?>;
     
-    // Criar gráfico
-    var ctx = document.getElementById('graficoDesempenho').getContext('2d');
-    var grafico = new Chart(ctx, {
+    // Aguardar o Chart.js carregar
+    document.addEventListener('DOMContentLoaded', function() {
+      // Verificar se Chart está disponível
+      if (typeof Chart === 'undefined') {
+        console.error('Chart.js não foi carregado corretamente');
+        return;
+      }
+      
+      // Criar gráfico
+      var ctx = document.getElementById('graficoDesempenho').getContext('2d');
+      var grafico = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: disciplinas,
@@ -385,13 +417,10 @@ if (!empty($medias_gerais)) {
         }
       }
     });
+    });
     
     function gerarPDF() {
-      alert('Funcionalidade de geração de PDF será implementada em breve!');
-    }
-    
-    function imprimirBoletim() {
-      window.print();
+      window.open('gerar_pdf_boletim.php', '_blank');
     }
   </script>
 </body>

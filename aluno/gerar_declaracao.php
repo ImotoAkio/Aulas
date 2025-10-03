@@ -158,8 +158,8 @@ $titulo = $titulos[$tipo] ?? 'DECLARAÇÃO';
     <!-- Cabeçalho -->
          <div class="cabecalho">
        <div class="logo">
-         <img src="../assets/images/logo.png" alt="Logo" style="height: 60px; margin-bottom: 15px;">
          <div style="font-size: 24px; font-weight: bold; color: #333; margin-bottom: 10px;">COLÉGIO ROSA DE SHAROM</div>
+         <div style="font-size: 12px; color: #666;">Estabelecimento de Ensino</div>
        </div>
        <div class="titulo"><?= $titulo ?></div>
        <div class="subtitulo">Documento Oficial</div>

@@ -203,6 +203,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <!-- plugins:js -->
   <script src="../../assets/vendors/js/vendor.bundle.base.js"></script>
   <!-- endinject -->
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
   <!-- Plugin js for this page -->
   <script src="../../assets/vendors/select2/select2.min.js"></script>
   <script src="../../assets/vendors/typeahead.js/typeahead.bundle.min.js"></script>

@@ -12,6 +12,37 @@ $aluno_id = $_SESSION['usuario_id'];
 $mensagem = '';
 $tipo_mensagem = '';
 
+// Criar tabela de senhas personalizadas se não existir
+try {
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS senhas_personalizadas (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            aluno_id INT NOT NULL,
+            senha_hash VARCHAR(255) NOT NULL,
+            data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            ativo BOOLEAN DEFAULT TRUE,
+            FOREIGN KEY (aluno_id) REFERENCES alunos(id) ON DELETE CASCADE,
+            UNIQUE KEY unique_aluno_ativo (aluno_id, ativo)
+        )
+    ");
+} catch (PDOException $e) {
+    error_log("Erro ao criar tabela de senhas: " . $e->getMessage());
+}
+
+// Buscar senha atual do aluno
+$senha_personalizada = null;
+try {
+    $stmt = $pdo->prepare("
+        SELECT senha_hash FROM senhas_personalizadas 
+        WHERE aluno_id = ? AND ativo = TRUE
+    ");
+    $stmt->execute([$aluno_id]);
+    $senha_personalizada = $stmt->fetchColumn();
+} catch (PDOException $e) {
+    error_log("Erro ao buscar senha personalizada: " . $e->getMessage());
+}
+
 // Processar formulário de alteração de senha
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $senha_atual = $_POST['senha_atual'] ?? '';
@@ -19,8 +50,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $confirmar_senha = $_POST['confirmar_senha'] ?? '';
     
     try {
-        // Validar senha atual
-        if ($senha_atual !== 'CRS2025') {
+        // Verificar senha atual
+        $senha_atual_correta = false;
+        
+        if ($senha_personalizada) {
+            // Verificar senha personalizada
+            $senha_atual_correta = password_verify($senha_atual, $senha_personalizada);
+        } else {
+            // Verificar senha padrão
+            $senha_atual_correta = ($senha_atual === 'CRS2025');
+        }
+        
+        if (!$senha_atual_correta) {
             throw new Exception("Senha atual incorreta.");
         }
         
@@ -38,21 +79,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         // Verificar se a nova senha não é a mesma da atual
-        if ($nova_senha === 'CRS2025') {
+        if ($senha_personalizada && password_verify($nova_senha, $senha_personalizada)) {
             throw new Exception("A nova senha não pode ser igual à senha atual.");
         }
         
-        // Atualizar a senha no banco de dados
-        // Como os alunos usam senha fixa, vamos armazenar a nova senha em um campo específico
-        // ou criar uma tabela de senhas personalizadas
+        if (!$senha_personalizada && $nova_senha === 'CRS2025') {
+            throw new Exception("A nova senha não pode ser igual à senha atual.");
+        }
         
-        // Por enquanto, vamos apenas mostrar uma mensagem de sucesso
-        // Em uma implementação completa, você criaria uma tabela para senhas personalizadas
+        // Hash da nova senha
+        $nova_senha_hash = password_hash($nova_senha, PASSWORD_DEFAULT);
         
-        $mensagem = "Senha alterada com sucesso! Sua nova senha é: " . htmlspecialchars($nova_senha);
+        // Atualizar ou inserir nova senha
+        $pdo->beginTransaction();
+        
+        // Desativar senha anterior se existir
+        if ($senha_personalizada) {
+            $stmt = $pdo->prepare("
+                UPDATE senhas_personalizadas 
+                SET ativo = FALSE 
+                WHERE aluno_id = ? AND ativo = TRUE
+            ");
+            $stmt->execute([$aluno_id]);
+        }
+        
+        // Inserir nova senha
+        $stmt = $pdo->prepare("
+            INSERT INTO senhas_personalizadas (aluno_id, senha_hash) 
+            VALUES (?, ?)
+        ");
+        $stmt->execute([$aluno_id, $nova_senha_hash]);
+        
+        $pdo->commit();
+        
+        $mensagem = "Senha alterada com sucesso!";
         $tipo_mensagem = "success";
         
+        // Atualizar flag de senha personalizada
+        $senha_personalizada = $nova_senha_hash;
+        
     } catch (Exception $e) {
+        if (isset($pdo)) {
+            $pdo->rollBack();
+        }
         $mensagem = $e->getMessage();
         $tipo_mensagem = "danger";
     }
@@ -120,7 +189,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                  placeholder="Digite sua senha atual" required>
                           <small class="form-text text-muted">
                             <i class="mdi mdi-information"></i> 
-                            Senha padrão: CRS2025
+                            <?php if ($senha_personalizada): ?>
+                              Digite sua senha personalizada
+                            <?php else: ?>
+                              Senha padrão: CRS2025
+                            <?php endif; ?>
                           </small>
                         </div>
                       </div>

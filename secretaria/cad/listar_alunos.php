@@ -59,6 +59,51 @@ foreach ($alunos as $aluno) {
   <link rel="stylesheet" href="../../assets/css/style.css">
   <!-- End layout styles -->
   <link rel="shortcut icon" href="../../assets/images/favicon.png" />
+  
+  <style>
+    .table td {
+      vertical-align: middle;
+    }
+    .btn-group .btn {
+      margin-right: 2px;
+    }
+    .btn-group .btn:last-child {
+      margin-right: 0;
+    }
+    .badge {
+      font-size: 0.75rem;
+    }
+    .table tbody tr:hover {
+      background-color: rgba(0,0,0,0.05);
+    }
+    
+    /* Estilos para a barra de pesquisa */
+    .input-group-text {
+      background-color: #f8f9fa;
+      border-color: #ced4da;
+    }
+    
+    #buscarAluno {
+      border-left: none;
+    }
+    
+    #buscarAluno:focus {
+      border-color: #80bdff;
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    
+    #limparBusca {
+      border-left: none;
+    }
+    
+    #limparBusca:hover {
+      background-color: #e9ecef;
+    }
+    
+    #contadorResultados {
+      font-weight: 500;
+    }
+  </style>
 </head>
 
 <body>
@@ -168,19 +213,41 @@ foreach ($alunos as $aluno) {
             <div class="col-lg-12 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
-                  <h4 class="card-title">Lista de Alunos</h4>
-                  <p class="card-description">Gerencie os cadastros dos alunos. Clique em "Editar" para completar informações faltantes.</p>
+                  <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                      <h4 class="card-title">Lista de Alunos</h4>
+                      <p class="card-description">Gerencie os cadastros dos alunos. Clique em "Editar" para completar informações faltantes.</p>
+                    </div>
+                    <div class="d-flex align-items-center">
+                      <div class="input-group" style="width: 300px;">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">
+                            <i class="mdi mdi-magnify"></i>
+                          </span>
+                        </div>
+                        <input type="text" class="form-control" id="buscarAluno" placeholder="Buscar por nome, CPF ou turma...">
+                        <div class="input-group-append">
+                          <button class="btn btn-outline-secondary" type="button" id="limparBusca" title="Limpar busca">
+                            <i class="mdi mdi-close"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Contador de resultados -->
+                  <div class="mb-3">
+                    <small class="text-muted">
+                      <span id="contadorResultados"><?= $total_alunos ?></span> aluno(s) encontrado(s)
+                    </small>
+                  </div>
                   
                   <div class="table-responsive">
                     <table class="table table-striped" id="tabelaAlunos">
                       <thead>
                         <tr>
-                          <th>ID</th>
                           <th>Nome</th>
                           <th>Turma</th>
-                          <th>Ano Letivo</th>
-                          <th>CPF</th>
-                          <th>Data Nasc.</th>
                           <th>Status</th>
                           <th>Ações</th>
                         </tr>
@@ -188,43 +255,63 @@ foreach ($alunos as $aluno) {
                       <tbody>
                         <?php foreach ($alunos as $aluno): ?>
                           <tr>
-                            <td><?= $aluno['id'] ?></td>
                             <td>
-                              <?= htmlspecialchars($aluno['nome_completo'] ?: $aluno['nome']) ?>
-                              <?php if (empty($aluno['nome_completo'])): ?>
-                                <span class="badge badge-warning">Nome antigo</span>
-                              <?php endif; ?>
+                              <div class="d-flex align-items-center">
+                                <div class="mr-3">
+                                  <i class="mdi mdi-account-circle text-primary" style="font-size: 24px;"></i>
+                                </div>
+                                <div>
+                                  <h6 class="mb-0"><?= htmlspecialchars($aluno['nome_completo'] ?: $aluno['nome']) ?></h6>
+                                  <small class="text-muted">
+                                    <?php if (!empty($aluno['cpf'])): ?>
+                                      CPF: <?= htmlspecialchars($aluno['cpf']) ?>
+                                    <?php else: ?>
+                                      CPF não informado
+                                    <?php endif; ?>
+                                  </small>
+                                </div>
+                              </div>
                             </td>
-                            <td><?= htmlspecialchars($aluno['turma_nome'] ?? 'Sem turma') ?></td>
-                            <td><?= htmlspecialchars($aluno['ano_letivo'] ?? 'N/A') ?></td>
                             <td>
-                              <?php if (!empty($aluno['cpf'])): ?>
-                                <?= htmlspecialchars($aluno['cpf']) ?>
-                              <?php else: ?>
-                                <span class="text-muted">Não informado</span>
-                              <?php endif; ?>
-                            </td>
-                            <td>
-                              <?php if (!empty($aluno['data_nascimento'])): ?>
-                                <?= date('d/m/Y', strtotime($aluno['data_nascimento'])) ?>
-                              <?php else: ?>
-                                <span class="text-muted">Não informado</span>
-                              <?php endif; ?>
+                              <div>
+                                <span class="font-weight-bold"><?= htmlspecialchars($aluno['turma_nome'] ?? 'Sem turma') ?></span>
+                                <br>
+                                <small class="text-muted"><?= htmlspecialchars($aluno['ano_letivo'] ?? 'N/A') ?></small>
+                              </div>
                             </td>
                             <td>
                               <?php if (!empty($aluno['nome_completo']) && !empty($aluno['data_nascimento']) && !empty($aluno['cpf'])): ?>
-                                <span class="badge badge-success">Completo</span>
+                                <span class="badge badge-success">
+                                  <i class="mdi mdi-check-circle"></i> Completo
+                                </span>
                               <?php else: ?>
-                                <span class="badge badge-warning">Incompleto</span>
+                                <span class="badge badge-warning">
+                                  <i class="mdi mdi-alert"></i> Incompleto
+                                </span>
+                              <?php endif; ?>
+                              <?php if (empty($aluno['nome_completo'])): ?>
+                                <br><small class="text-muted">Nome antigo</small>
                               <?php endif; ?>
                             </td>
                             <td>
-                              <a href="editar_aluno.php?id=<?= $aluno['id'] ?>" class="btn btn-primary btn-sm">
-                                <i class="mdi mdi-pencil"></i> Editar
-                              </a>
-                              <a href="visualizar_aluno.php?id=<?= $aluno['id'] ?>" class="btn btn-info btn-sm">
-                                <i class="mdi mdi-eye"></i> Visualizar
-                              </a>
+                              <div class="btn-group" role="group">
+                                <a href="editar_aluno.php?id=<?= $aluno['id'] ?>" 
+                                   class="btn btn-outline-primary btn-sm" 
+                                   title="Editar">
+                                  <i class="mdi mdi-pencil"></i>
+                                </a>
+                                <a href="visualizar_aluno.php?id=<?= $aluno['id'] ?>" 
+                                   class="btn btn-outline-info btn-sm" 
+                                   title="Visualizar">
+                                  <i class="mdi mdi-eye"></i>
+                                </a>
+                                <a href="excluir_aluno.php?id=<?= $aluno['id'] ?>" 
+                                   class="btn btn-outline-danger btn-sm" 
+                                   title="Excluir"
+                                   onclick="return confirm('Tem certeza que deseja excluir este aluno?')">
+                                  <i class="mdi mdi-delete"></i>
+                                </a>
+                              </div>
                             </td>
                           </tr>
                         <?php endforeach; ?>
@@ -253,12 +340,17 @@ foreach ($alunos as $aluno) {
     <!-- page-body-wrapper ends -->
   </div>
   <!-- container-scroller -->
+  <!-- jQuery primeiro -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <!-- plugins:js -->
   <script src="../../assets/vendors/js/vendor.bundle.base.js"></script>
   <!-- endinject -->
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
   <!-- Plugin js for this page -->
-  <script src="../../assets/vendors/datatables/jquery.dataTables.js"></script>
-  <script src="../../assets/vendors/datatables/dataTables.bootstrap4.js"></script>
+  <!-- DataTables via CDN -->
+  <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
   <!-- End plugin js for this page -->
   <!-- inject:js -->
   <script src="../../assets/js/off-canvas.js"></script>
@@ -272,15 +364,189 @@ foreach ($alunos as $aluno) {
   <!-- End custom js for this page -->
 
   <script>
+    // Aguardar carregamento completo da página
     $(document).ready(function() {
-      $('#tabelaAlunos').DataTable({
-        "language": {
-          "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Portuguese-Brasil.json"
-        },
-        "pageLength": 25,
-        "order": [[1, "asc"]]
-      });
+      console.log('Página carregada, inicializando...');
+      
+      // Verificar se jQuery está funcionando
+      if (typeof $ === 'undefined') {
+        console.error('jQuery não carregado!');
+        // Usar busca fallback
+        buscaFallback();
+        return;
+      }
+      
+      // Verificar se DataTable está disponível
+      if (typeof $.fn.DataTable === 'undefined') {
+        console.error('DataTable não carregado!');
+        // Usar busca fallback
+        buscaFallback();
+        return;
+      }
+      
+      console.log('jQuery e DataTable carregados, inicializando tabela...');
+      
+      try {
+        // Inicializar DataTable
+        var table = $('#tabelaAlunos').DataTable({
+          "language": {
+            "sEmptyTable": "Nenhum registro encontrado",
+            "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+            "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+            "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+            "sInfoPostFix": "",
+            "sInfoThousands": ".",
+            "sLengthMenu": "_MENU_ resultados por página",
+            "sLoadingRecords": "Carregando...",
+            "sProcessing": "Processando...",
+            "sZeroRecords": "Nenhum registro encontrado",
+            "sSearch": "Pesquisar:",
+            "oPaginate": {
+              "sNext": "Próximo",
+              "sPrevious": "Anterior",
+              "sFirst": "Primeiro",
+              "sLast": "Último"
+            },
+            "oAria": {
+              "sSortAscending": ": Ordenar colunas de forma ascendente",
+              "sSortDescending": ": Ordenar colunas de forma descendente"
+            }
+          },
+          "pageLength": 20,
+          "order": [[0, "asc"]],
+          "columnDefs": [
+            { "orderable": false, "targets": 3 } // Desabilitar ordenação na coluna de ações
+          ],
+          "responsive": true,
+          "dom": '<"top"f>rt<"bottom"lip><"clear">',
+          "lengthMenu": [[10, 20, 50, 100], [10, 20, 50, 100]]
+        });
+        
+        console.log('DataTable inicializado com sucesso');
+        
+        // Função de busca personalizada
+        function buscarAlunos(termo) {
+          console.log('Buscando por:', termo);
+          
+          if (termo.length === 0) {
+            // Se não há termo, mostrar todos
+            table.search('').draw();
+          } else {
+            // Buscar em todas as colunas (nome, CPF, turma)
+            table.search(termo).draw();
+          }
+          
+          // Atualizar contador de resultados
+          var totalFiltrado = table.rows({search: 'applied'}).count();
+          $('#contadorResultados').text(totalFiltrado);
+          
+          // Mostrar mensagem se não houver resultados
+          if (totalFiltrado === 0 && termo.length > 0) {
+            $('#contadorResultados').html('<span class="text-warning">Nenhum aluno encontrado para "' + termo + '"</span>');
+          }
+          
+          console.log('Resultados encontrados:', totalFiltrado);
+        }
+        
+        // Event listener para o campo de busca
+        $('#buscarAluno').on('keyup', function() {
+          var termo = $(this).val();
+          buscarAlunos(termo);
+        });
+        
+        // Event listener para o botão limpar
+        $('#limparBusca').on('click', function() {
+          console.log('Limpando busca...');
+          $('#buscarAluno').val('');
+          buscarAlunos('');
+          $('#buscarAluno').focus();
+        });
+        
+        // Event listener para Enter no campo de busca
+        $('#buscarAluno').on('keypress', function(e) {
+          if (e.which === 13) { // Enter
+            e.preventDefault();
+            buscarAlunos($(this).val());
+          }
+        });
+        
+        // Atualizar contador quando a tabela for redimensionada
+        table.on('draw', function() {
+          var totalFiltrado = table.rows({search: 'applied'}).count();
+          $('#contadorResultados').text(totalFiltrado);
+        });
+        
+        // Focar no campo de busca quando a página carregar
+        setTimeout(function() {
+          $('#buscarAluno').focus();
+          console.log('Campo de busca focado');
+        }, 500);
+        
+        console.log('Event listeners configurados');
+        
+      } catch (error) {
+        console.error('Erro ao inicializar DataTable:', error);
+        // Usar busca fallback
+        buscaFallback();
+      }
     });
+    
+    // Fallback: Busca JavaScript vanilla caso DataTable falhe
+    function buscaFallback() {
+      console.log('Usando busca fallback...');
+      
+      const campoBusca = document.getElementById('buscarAluno');
+      const contador = document.getElementById('contadorResultados');
+      const tabela = document.getElementById('tabelaAlunos');
+      
+      if (!campoBusca || !tabela) {
+        console.error('Elementos não encontrados para busca fallback');
+        return;
+      }
+      
+      const tbody = tabela.getElementsByTagName('tbody')[0];
+      if (!tbody) {
+        console.error('Tbody não encontrado');
+        return;
+      }
+      
+      const linhas = tbody.getElementsByTagName('tr');
+      
+      campoBusca.addEventListener('keyup', function() {
+        const termo = this.value.toLowerCase();
+        let totalVisivel = 0;
+        
+        for (let i = 0; i < linhas.length; i++) {
+          const linha = linhas[i];
+          const texto = linha.textContent.toLowerCase();
+          
+          if (texto.includes(termo)) {
+            linha.style.display = '';
+            totalVisivel++;
+          } else {
+            linha.style.display = 'none';
+          }
+        }
+        
+        contador.textContent = totalVisivel;
+        
+        if (totalVisivel === 0 && termo.length > 0) {
+          contador.innerHTML = '<span class="text-warning">Nenhum aluno encontrado para "' + termo + '"</span>';
+        }
+      });
+      
+      // Botão limpar
+      const botaoLimpar = document.getElementById('limparBusca');
+      if (botaoLimpar) {
+        botaoLimpar.addEventListener('click', function() {
+          campoBusca.value = '';
+          campoBusca.dispatchEvent(new Event('keyup'));
+          campoBusca.focus();
+        });
+      }
+      
+      console.log('Busca fallback configurada');
+    }
   </script>
 </body>
 

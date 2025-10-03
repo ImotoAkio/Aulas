@@ -22,7 +22,7 @@
 // Inclui a biblioteca FPDF. Adapte o caminho se necessário.
 require('../../fpdf/fpdf.php');
 require('../../fpdi/src/autoload.php'); // Biblioteca FPDI para usar templates PDF
-include('../../partials/db.php');
+include('../partials/db.php');
 
 use setasign\Fpdi\Fpdi;
 

@@ -60,7 +60,35 @@ foreach ($notas as $nota) {
         ];
     }
     
-    $media = ($nota['media_1'] + $nota['media_2'] + $nota['media_3'] + $nota['media_4']) / 4;
+    // Calcular média baseada na estrutura correta da tabela
+    $soma_notas = 0;
+    $count_notas = 0;
+    
+    // Verificar se existem campos de média individuais
+    if (isset($nota['media_1']) && $nota['media_1'] !== null) {
+        $soma_notas += $nota['media_1'];
+        $count_notas++;
+    }
+    if (isset($nota['media_2']) && $nota['media_2'] !== null) {
+        $soma_notas += $nota['media_2'];
+        $count_notas++;
+    }
+    if (isset($nota['media_3']) && $nota['media_3'] !== null) {
+        $soma_notas += $nota['media_3'];
+        $count_notas++;
+    }
+    if (isset($nota['media_4']) && $nota['media_4'] !== null) {
+        $soma_notas += $nota['media_4'];
+        $count_notas++;
+    }
+    
+    // Se não há campos de média individuais, usar o campo 'nota'
+    if ($count_notas === 0 && isset($nota['nota']) && $nota['nota'] !== null) {
+        $soma_notas = $nota['nota'];
+        $count_notas = 1;
+    }
+    
+    $media = $count_notas > 0 ? $soma_notas / $count_notas : 0;
     $medias_disciplinas[$disciplina]['medias'][] = $media;
 }
 
@@ -70,7 +98,9 @@ $total_disciplinas = count($medias_disciplinas);
 if ($total_disciplinas > 0) {
     $soma_medias = 0;
     foreach ($medias_disciplinas as $disciplina => $dados) {
-        $soma_medias += array_sum($dados['medias']) / count($dados['medias']);
+        if (!empty($dados['medias'])) {
+            $soma_medias += array_sum($dados['medias']) / count($dados['medias']);
+        }
     }
     $media_geral = $soma_medias / $total_disciplinas;
 }

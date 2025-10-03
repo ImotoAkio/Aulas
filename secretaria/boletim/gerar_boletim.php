@@ -33,7 +33,7 @@
 // 'require' é usado porque o script não pode funcionar sem elas.
 require('../../fpdf/fpdf.php');
 require('../../fpdi/src/autoload.php'); // Carrega a biblioteca para usar templates
-include('../../partials/db.php');    // Inclui a conexão com o banco de dados ($pdo)
+include('../partials/db.php');    // Inclui a conexão com o banco de dados ($pdo)
 
 // Informa ao PHP que usaremos a classe 'Fpdi' do namespace 'setasign\Fpdi'.
 // Isso nos permite escrever 'new Fpdi()' em vez do nome completo da classe.

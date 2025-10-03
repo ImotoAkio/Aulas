@@ -30,7 +30,7 @@
             </a>
           </li>
           <li class="nav-item dropdown">
-            <a class="nav-link count-indicator dropdown-toggle" id="messageDropdown" href="#" data-bs-toggle="dropdown"
+            <a class="nav-link count-indicator dropdown-toggle" id="messageDropdown" href="#" data-toggle="dropdown"
               aria-expanded="false">
               <i class="mdi mdi-email-outline"></i>
               <span class="count-symbol bg-warning"></span>
@@ -56,7 +56,7 @@
           </li>
           <li class="nav-item dropdown">
             <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#"
-              data-bs-toggle="dropdown">
+              data-toggle="dropdown">
               <i class="mdi mdi-bell-outline"></i>
               <span class="count-symbol bg-danger"></span>
             </a>
@@ -83,7 +83,7 @@
             </div>
           </li>
           <li class="nav-item nav-logout d-none d-lg-block">
-            <a class="nav-link" href="logout.php">
+            <a class="nav-link" href="/aulas/logout.php">
               <i class="mdi mdi-power"></i>
             </a>
           </li>

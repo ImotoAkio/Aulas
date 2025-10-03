@@ -23,7 +23,7 @@
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
+        <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
           <span class="menu-title">Pedagógico</span>
           <i class="menu-arrow"></i>
           <i class="mdi mdi-crosshairs-gps menu-icon"></i>
@@ -43,7 +43,7 @@
         </div>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="collapse" href="#cadastros" aria-expanded="false" aria-controls="cadastros">
+        <a class="nav-link" data-toggle="collapse" href="#cadastros" aria-expanded="false" aria-controls="cadastros">
           <span class="menu-title">Cadastros</span>
           <i class="mdi mdi-contacts menu-icon"></i>
         </a>
@@ -61,11 +61,20 @@
             <li class="nav-item">
               <a class="nav-link" href="/aulas/secretaria/cad/secretario.php">Secretário</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/aulas/secretaria/cad/disciplinas.php">Disciplinas</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/aulas/secretaria/cad/turmas.php">Turmas</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/aulas/secretaria/cad/sincronizar_nomes.php">Sincronizar Nomes</a>
+            </li>
           </ul>
         </div>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="collapse" href="#declaracoes" aria-expanded="false" aria-controls="declaracoes">
+        <a class="nav-link" data-toggle="collapse" href="#declaracoes" aria-expanded="false" aria-controls="declaracoes">
           <span class="menu-title">Declarações</span>
           <i class="mdi mdi-file-document menu-icon"></i>
         </a>

@@ -204,12 +204,16 @@ if (!empty($turma_id) && !empty($disciplina_id)) {
             </div>
         </div>
         <script src="../assets/vendors/js/vendor.bundle.base.js"></script>
+        <!-- jQuery -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
         <script src="../assets/js/off-canvas.js"></script>
         <script src="../assets/js/misc.js"></script>
         <script src="../assets/js/settings.js"></script>
         <script src="../assets/js/todolist.js"></script>
         <script src="../assets/js/jquery.cookie.js"></script>
-        <script><script>
+        <script>
                 const ctx = document.getElementById('graficoMedias').getContext('2d');
                 new Chart(ctx, {
                     type: 'bar',

@@ -51,9 +51,6 @@
             <li class="nav-item">
               <a class="nav-link" href="declaracoes.php">Gerar Declarações</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="historico.php">Histórico Escolar</a>
-            </li>
           </ul>
         </div>
       </li>
@@ -75,7 +72,7 @@
         </div>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="../../logout.php">
+        <a class="nav-link" href="../logout.php">
           <span class="menu-title">Sair</span>
           <i class="mdi mdi-logout menu-icon"></i>
         </a>

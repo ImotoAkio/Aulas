@@ -74,31 +74,43 @@
         <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
           <h6 class="p-3 mb-0">Notificações</h6>
           <div class="dropdown-divider"></div>
-          <a class="dropdown-item preview-item">
+          <a class="dropdown-item preview-item" href="notas.php">
             <div class="preview-thumbnail">
               <div class="preview-icon bg-success">
-                <i class="mdi mdi-calendar"></i>
+                <i class="mdi mdi-chart-line"></i>
               </div>
             </div>
             <div class="preview-item-content d-flex align-items-start flex-column justify-content-center">
-              <h6 class="preview-subject font-weight-normal mb-1">Nova nota lançada</h6>
-              <p class="text-gray ellipsis mb-0"> Matemática - 1ª Unidade </p>
+              <h6 class="preview-subject font-weight-normal mb-1">Suas Notas</h6>
+              <p class="text-gray ellipsis mb-0">Acompanhe seu desempenho acadêmico</p>
             </div>
           </a>
           <div class="dropdown-divider"></div>
-          <a class="dropdown-item preview-item">
+          <a class="dropdown-item preview-item" href="pareceres.php">
             <div class="preview-thumbnail">
-              <div class="preview-icon bg-warning">
+              <div class="preview-icon bg-info">
                 <i class="mdi mdi-file-document"></i>
               </div>
             </div>
             <div class="preview-item-content d-flex align-items-start flex-column justify-content-center">
-              <h6 class="preview-subject font-weight-normal mb-1">Parecer disponível</h6>
-              <p class="text-gray ellipsis mb-0"> Professor João - 2ª Unidade </p>
+              <h6 class="preview-subject font-weight-normal mb-1">Pareceres Pedagógicos</h6>
+              <p class="text-gray ellipsis mb-0">Avaliações dos professores</p>
             </div>
           </a>
           <div class="dropdown-divider"></div>
-          <h6 class="p-3 mb-0 text-center">Ver todas as notificações</h6>
+          <a class="dropdown-item preview-item" href="declaracoes.php">
+            <div class="preview-thumbnail">
+              <div class="preview-icon bg-warning">
+                <i class="mdi mdi-certificate"></i>
+              </div>
+            </div>
+            <div class="preview-item-content d-flex align-items-start flex-column justify-content-center">
+              <h6 class="preview-subject font-weight-normal mb-1">Declarações</h6>
+              <p class="text-gray ellipsis mb-0">Gere seus documentos escolares</p>
+            </div>
+          </a>
+          <div class="dropdown-divider"></div>
+          <h6 class="p-3 mb-0 text-center">Acesse o menu lateral para mais opções</h6>
         </div>
       </li>
       <li class="nav-item nav-logout d-none d-lg-block">

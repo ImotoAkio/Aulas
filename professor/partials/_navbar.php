@@ -83,7 +83,7 @@
             </div>
           </li>
           <li class="nav-item nav-logout d-none d-lg-block">
-            <a class="nav-link" href="logout.php">
+            <a class="nav-link" href="/aulas/logout.php">
               <i class="mdi mdi-power"></i>
             </a>
           </li>

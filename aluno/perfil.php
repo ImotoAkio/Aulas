@@ -454,6 +454,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       
       // Máscara para telefones
       $('input[name="telefone1"], input[name="telefone2"]').mask('(00) 00000-0000');
+      
+      // Validação de CPF (se necessário)
+      $('input[name="cpf"]').mask('000.000.000-00');
+      
+      // Validação de RG
+      $('input[name="rg"]').mask('00.000.000-0');
     });
   </script>
 </body>

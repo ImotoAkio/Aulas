@@ -1,3 +1,9 @@
+<?php
+// Garantir que a função getBaseUrl() esteja disponível
+if (!function_exists('getBaseUrl')) {
+    require_once __DIR__ . '/../../config/database.php';
+}
+?>
 <nav class="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
   <style>
     .nav-profile-img {
@@ -61,7 +67,7 @@
             <i class="mdi mdi-account me-2"></i> Meu Perfil
           </a>
           <div class="dropdown-divider"></div>
-          <a class="dropdown-item" href="../logout.php">
+          <a class="dropdown-item" href="<?php echo getBaseUrl(); ?>logout.php">
             <i class="mdi mdi-logout me-2"></i> Sair
           </a>
         </div>
@@ -114,7 +120,7 @@
         </div>
       </li>
       <li class="nav-item nav-logout d-none d-lg-block">
-        <a class="nav-link" href="../logout.php">
+        <a class="nav-link" href="<?php echo getBaseUrl(); ?>logout.php">
           <i class="mdi mdi-power"></i>
         </a>
       </li>

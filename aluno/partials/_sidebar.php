@@ -1,3 +1,9 @@
+<?php
+// Garantir que a função getBaseUrl() esteja disponível
+if (!function_exists('getBaseUrl')) {
+    require_once __DIR__ . '/../../config/database.php';
+}
+?>
   <!-- partial:partials/_sidebar.html -->
   <nav class="sidebar sidebar-offcanvas" id="sidebar">
     <ul class="nav">
@@ -72,7 +78,7 @@
         </div>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="../logout.php">
+        <a class="nav-link" href="<?php echo getBaseUrl(); ?>logout.php">
           <span class="menu-title">Sair</span>
           <i class="mdi mdi-logout menu-icon"></i>
         </a>

@@ -20,7 +20,7 @@ if (!isset($_SESSION['usuario'])) {
             <ul>
                 <li><a href="index.php">Início</a></li>
                 <li><a href="aulas.php">Aulas</a></li>
-                <li><a href="logout.php">Sair</a></li>
+                <li><a href="<?php echo getBaseUrl(); ?>logout.php">Sair</a></li>
             </ul>
         </nav>
     </header>

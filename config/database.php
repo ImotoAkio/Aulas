@@ -44,20 +44,24 @@ function getBaseUrl() {
     }
 }
 
-// Função para redirecionamento com caminho correto
-function redirectTo($path) {
+// Função para gerar URL de assets
+function getAssetUrl($path) {
     $baseUrl = getBaseUrl();
     
-    // Remove barra inicial se existir para evitar duplicação
+    // Remove barra inicial se existir
     $path = ltrim($path, '/');
     
     // Se o caminho já contém o domínio completo, usar como está
     if (strpos($path, 'http') === 0) {
-        header('Location: ' . $path);
-    } else {
-        header('Location: ' . $baseUrl . $path);
+        return $path;
     }
-    exit();
+    
+    return $baseUrl . $path;
+}
+
+// Função para gerar URL de páginas
+function getPageUrl($path) {
+    return getAssetUrl($path);
 }
 
 try {

@@ -2,7 +2,7 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-include('../../partials/db.php'); // Conexão com o banco
+require_once __DIR__ . '/../../config/database.php'; // Conexão com o banco
 
 $aluno_id = filter_input(INPUT_GET, 'aluno_id', FILTER_VALIDATE_INT);
 $periodo = filter_input(INPUT_GET, 'periodo', FILTER_SANITIZE_FULL_SPECIAL_CHARS);

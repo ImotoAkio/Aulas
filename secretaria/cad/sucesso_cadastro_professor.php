@@ -1,6 +1,11 @@
 <?php
+// Garantir que as funções estejam disponíveis
+if (!function_exists('getPageUrl')) {
+    require_once __DIR__ . '/../config/database.php';
+}
+
 session_start();
-include('../partials/db.php');
+require_once __DIR__ . '/../config/database.php';
 
 // Verificar se o usuário está logado e é coordenador
 if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo'] != 'coordenador') {
@@ -191,7 +196,7 @@ unset($_SESSION['sucesso_cadastro']);
       modal.classList.add('fade-out');
       
       setTimeout(() => {
-        window.location.href = '../index.php';
+        window.location.href = '<?php echo getPageUrl("secretaria/index.php"); ?>';
       }, 300);
     }
 

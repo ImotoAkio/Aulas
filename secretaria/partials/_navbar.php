@@ -49,7 +49,7 @@ if (!function_exists('getBaseUrl')) {
               <div class="dropdown-divider"></div>
               <a class="dropdown-item preview-item">
                 <div class="preview-thumbnail">
-                  <img src="../assets/images/faces/face3.jpg" alt="image" class="profile-pic">
+                  <img src="<?php echo getAssetUrl("assets/images/faces/face3.jpg" alt="image" class="profile-pic">
                 </div>
                 <div class="preview-item-content d-flex align-items-start flex-column justify-content-center">
                   <h6 class="preview-subject ellipsis mb-1 font-weight-normal">PEm breve uma nova funcionalidade aqui!</h6>

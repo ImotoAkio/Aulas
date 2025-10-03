@@ -1,6 +1,11 @@
 <?php
+// Garantir que as funções estejam disponíveis
+if (!function_exists('getAssetUrl')) {
+    require_once __DIR__ . '/../config/database.php';
+}
+
 session_start();
-include('../secretaria/partials/db.php');
+require_once __DIR__ . '/../config/database.php';
 
 // Verificar se o usuário está logado e é aluno
 if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo'] !== 'aluno') {
@@ -48,8 +53,8 @@ $titulo = $titulos[$tipo] ?? 'DECLARAÇÃO';
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title><?= $titulo ?> - <?= htmlspecialchars($aluno['nome_completo'] ?: $aluno['nome']) ?></title>
-  <link rel="stylesheet" href="../assets/vendors/mdi/css/materialdesignicons.min.css">
-  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/mdi/css/materialdesignicons.min.css"); ?>"
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/css/style.css"); ?>"
   <style>
     @media print {
       .no-print { display: none !important; }

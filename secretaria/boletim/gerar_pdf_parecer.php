@@ -20,9 +20,9 @@
 // --- FIM DA CONFIGURACAO DE ERROS ---
 
 // Inclui a biblioteca FPDF. Adapte o caminho se necessário.
-require('../../fpdf/fpdf.php');
-require('../../fpdi/src/autoload.php'); // Biblioteca FPDI para usar templates PDF
-include('../partials/db.php');
+require __DIR__ . '/../../fpdf/fpdf.php';
+require __DIR__ . '/../../fpdi/src/autoload.php'; // Biblioteca FPDI para usar templates PDF
+require_once __DIR__ . '/../config/database.php';
 
 use setasign\Fpdi\Fpdi;
 

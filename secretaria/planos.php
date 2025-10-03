@@ -1,4 +1,9 @@
 <?php
+// Garantir que as funções estejam disponíveis
+if (!function_exists('getAssetUrl')) {
+    require_once __DIR__ . '/../config/database.php';
+}
+
 session_start();
 require 'partials/db.php';
 
@@ -40,19 +45,19 @@ $planos = $stmt->fetchAll();
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Planos de Aula</title>
   <!-- plugins:css -->
-  <link rel="stylesheet" href="../assets/vendors/mdi/css/materialdesignicons.min.css">
-  <link rel="stylesheet" href="../assets/vendors/ti-icons/css/themify-icons.css">
-  <link rel="stylesheet" href="../assets/vendors/css/vendor.bundle.base.css">
-  <link rel="stylesheet" href="../assets/vendors/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/mdi/css/materialdesignicons.min.css"); ?>"
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/ti-icons/css/themify-icons.css"); ?>"
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/css/vendor.bundle.base.css"); ?>"
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/font-awesome/css/font-awesome.min.css"); ?>"
   <!-- endinject -->
   <!-- Plugin css for this page -->
   <!-- End plugin css for this page -->
   <!-- inject:css -->
   <!-- endinject -->
               <!-- Layout styles -->
-        <link rel="stylesheet" href="../assets/css/style.css">
+        <link rel="stylesheet" href="<?php echo getAssetUrl("assets/css/style.css"); ?>"
         <!-- End layout styles -->
-    <link rel="shortcut icon" href="../assets/images/favicon.png" />
+    <link rel="shortcut icon" href="<?php echo getAssetUrl("assets/images/favicon.png" />
 </head>
 
 <body>
@@ -125,7 +130,7 @@ $planos = $stmt->fetchAll();
   </div>
   <!-- container-scroller -->
   <!-- plugins:js -->
-  <script src="../assets/vendors/js/vendor.bundle.base.js"></script>
+  <script src="<?php echo getAssetUrl("assets/vendors/js/vendor.bundle.base.js"); ?>"</script>
   <!-- endinject -->
   <!-- jQuery -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -134,11 +139,11 @@ $planos = $stmt->fetchAll();
   <!-- Plugin js for this page -->
   <!-- End plugin js for this page -->
   <!-- inject:js -->
-      <script src="../assets/js/off-canvas.js"></script>
-    <script src="../assets/js/misc.js"></script>
-            <script src="../assets/js/settings.js"></script>
-        <script src="../assets/js/todolist.js"></script>
-        <script src="../assets/js/jquery.cookie.js"></script>
+      <script src="<?php echo getAssetUrl("assets/js/off-canvas.js"); ?>"</script>
+    <script src="<?php echo getAssetUrl("assets/js/misc.js"); ?>"</script>
+            <script src="<?php echo getAssetUrl("assets/js/settings.js"); ?>"</script>
+        <script src="<?php echo getAssetUrl("assets/js/todolist.js"); ?>"</script>
+        <script src="<?php echo getAssetUrl("assets/js/jquery.cookie.js"); ?>"</script>
         <!-- endinject -->
   <!-- Custom js for this page -->
   <!-- End custom js for this page -->

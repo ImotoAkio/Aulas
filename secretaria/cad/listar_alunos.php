@@ -1,6 +1,11 @@
 <?php
+// Garantir que as funções estejam disponíveis
+if (!function_exists('getPageUrl')) {
+    require_once __DIR__ . '/../config/database.php';
+}
+
 session_start();
-include('../partials/db.php');
+require_once __DIR__ . '/../config/database.php';
 
 // Verificar se o usuário está logado e é coordenador
 if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo'] != 'coordenador') {
@@ -122,7 +127,7 @@ foreach ($alunos as $aluno) {
             <h3 class="page-title"> Listar Alunos </h3>
             <nav aria-label="breadcrumb">
               <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="../index.php">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href='<?php echo getPageUrl("secretaria/index.php"); ?>'>Dashboard</a></li>
                 <li class="breadcrumb-item"><a href="#">Cadastros</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Listar Alunos</li>
               </ol>

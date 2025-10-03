@@ -1,6 +1,11 @@
 <?php
+// Garantir que as funções estejam disponíveis
+if (!function_exists('getPageUrl')) {
+    require_once __DIR__ . '/../config/database.php';
+}
+
 session_start();
-include('../partials/db.php');
+require_once __DIR__ . '/../config/database.php';
 
 // Verificar se o usuário está logado e é coordenador
 if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo'] != 'coordenador') {
@@ -58,17 +63,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Adicionar Turma - Rosa de Sharom</title>
   <!-- plugins:css -->
-  <link rel="stylesheet" href="../../assets/vendors/mdi/css/materialdesignicons.min.css">
-  <link rel="stylesheet" href="../../assets/vendors/ti-icons/css/themify-icons.css">
-  <link rel="stylesheet" href="../../assets/vendors/css/vendor.bundle.base.css">
-  <link rel="stylesheet" href="../../assets/vendors/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="<?php echo getAssetUrl('assets/vendors/mdi/css/materialdesignicons.min.css'); ?>">
+  <link rel="stylesheet" href="<?php echo getAssetUrl('assets/vendors/ti-icons/css/themify-icons.css'); ?>">
+  <link rel="stylesheet" href="<?php echo getAssetUrl('assets/vendors/css/vendor.bundle.base.css'); ?>">
+  <link rel="stylesheet" href="<?php echo getAssetUrl('assets/vendors/font-awesome/css/font-awesome.min.css'); ?>">
   <!-- endinject -->
   <!-- inject:css -->
   <!-- endinject -->
   <!-- Layout styles -->
-  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="<?php echo getAssetUrl('assets/css/style.css'); ?>">
   <!-- End layout styles -->
-  <link rel="shortcut icon" href="../../assets/images/favicon.png" />
+  <link rel="shortcut icon" href="<?php echo getAssetUrl('assets/images/favicon.png'); ?>" />
 </head>
 
 <body>
@@ -86,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <h3 class="page-title">Adicionar Turma</h3>
             <nav aria-label="breadcrumb">
               <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="../index.php">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href='<?php echo getPageUrl("secretaria/index.php"); ?>'>Dashboard</a></li>
                 <li class="breadcrumb-item"><a href="turmas.php">Turmas</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Adicionar</li>
               </ol>
@@ -180,18 +185,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </div>
   <!-- container-scroller -->
   <!-- plugins:js -->
-  <script src="../../assets/vendors/js/vendor.bundle.base.js"></script>
+  <script src="<?php echo getAssetUrl('assets/vendors/js/vendor.bundle.base.js'); ?>"></script>
   <!-- endinject -->
   <!-- jQuery -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
   <!-- inject:js -->
-  <script src="../../assets/js/off-canvas.js"></script>
-  <script src="../../assets/js/misc.js"></script>
-  <script src="../../assets/js/settings.js"></script>
-  <script src="../../assets/js/todolist.js"></script>
-  <script src="../../assets/js/jquery.cookie.js"></script>
+  <script src="<?php echo getAssetUrl('assets/js/off-canvas.js'); ?>"></script>
+  <script src="<?php echo getAssetUrl('assets/js/misc.js'); ?>"></script>
+  <script src="<?php echo getAssetUrl('assets/js/settings.js'); ?>"></script>
+  <script src="<?php echo getAssetUrl('assets/js/todolist.js'); ?>"></script>
+  <script src="<?php echo getAssetUrl('assets/js/jquery.cookie.js'); ?>"></script>
   <!-- endinject -->
 </body>
 

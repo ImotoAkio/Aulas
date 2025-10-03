@@ -10,9 +10,9 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-require('../../fpdf/fpdf.php');
-require('../../fpdi/src/autoload.php');
-include('../partials/db.php');
+require __DIR__ . '/../../fpdf/fpdf.php';
+require __DIR__ . '/../../fpdi/src/autoload.php';
+require_once __DIR__ . '/../config/database.php';
 
 use setasign\Fpdi\Fpdi;
 

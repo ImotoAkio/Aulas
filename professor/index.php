@@ -1,4 +1,9 @@
 <?php
+// Garantir que as funções estejam disponíveis
+if (!function_exists('getAssetUrl')) {
+    require_once __DIR__ . '/../config/database.php';
+}
+
 /**
  * professor/index.php
  *
@@ -67,18 +72,18 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Dashboard do Professor</title>
     <!-- plugins:css -->
-    <link rel="stylesheet" href="../assets/vendors/mdi/css/materialdesignicons.min.css">
-    <link rel="stylesheet" href="../assets/vendors/ti-icons/css/themify-icons.css">
-    <link rel="stylesheet" href="../assets/vendors/css/vendor.bundle.base.css">
-    <link rel="stylesheet" href="../assets/vendors/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/mdi/css/materialdesignicons.min.css"); ?>"
+    <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/ti-icons/css/themify-icons.css"); ?>"
+    <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/css/vendor.bundle.base.css"); ?>"
+    <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/font-awesome/css/font-awesome.min.css"); ?>"
     <!-- endinject -->
     <!-- Plugin css for this page -->
-    <link rel="stylesheet" href="../assets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.css"); ?>"
     <!-- End plugin css for this page -->
     <!-- inject:css -->
-            <link rel="stylesheet" href="../assets/css/style.css">
+            <link rel="stylesheet" href="<?php echo getAssetUrl("assets/css/style.css"); ?>"
         <!-- End layout styles -->
-    <link rel="shortcut icon" href="../assets/images/favicon.png" />
+    <link rel="shortcut icon" href="<?php echo getAssetUrl("assets/images/favicon.png" />
     <style>
         .alert-danger {
             color: #721c24;
@@ -121,7 +126,7 @@ try {
                     <div class="col-md-4 stretch-card grid-margin" onclick="window.location.href='planos.php'" style="cursor: pointer;">
                         <div class="card bg-gradient-danger card-img-holder text-white">
                             <div class="card-body">
-                                <img src="../assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
+                                <img src="<?php echo getAssetUrl("assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
                                 <h4 class="font-weight-normal mb-3">Planos de Aula <i class="mdi mdi-chart-line mdi-24px float-end"></i>
                                 </h4>
                                 <h2 class="mb-5"><?php echo $total_planos_pendentes; ?> Planos para revisão</h2>
@@ -133,7 +138,7 @@ try {
                     <div class="col-md-4 stretch-card grid-margin" onclick="window.location.href='notas.php'" style="cursor: pointer;">
                         <div class="card bg-gradient-info card-img-holder text-white">
                             <div class="card-body">
-                                <img src="../assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
+                                <img src="<?php echo getAssetUrl("assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
                                 <h4 class="font-weight-normal mb-3">Notas<i
                                     class="mdi mdi-bookmark-outline mdi-24px float-end"></i>
                                 </h4>
@@ -146,7 +151,7 @@ try {
                     <div class="col-md-4 stretch-card grid-margin" onclick="window.location.href='parecer.php'" style="cursor: pointer;">
                         <div class="card bg-gradient-success card-img-holder text-white">
                             <div class="card-body">
-                                <img src="../assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
+                                <img src="<?php echo getAssetUrl("assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
                                 <h4 class="font-weight-normal mb-3">Parecer Pedagógico <i class="mdi mdi-diamond mdi-24px float-end"></i>
                                 </h4>
                                 <h2 class="mb-5"><?php echo $total_pareceres_pendentes; ?> Pareceres pendentes</h2>
@@ -180,21 +185,21 @@ try {
     </div>
     <!-- container-scroller -->
     <!-- plugins:js -->
-    <script src="../assets/vendors/js/vendor.bundle.base.js"></script>
+    <script src="<?php echo getAssetUrl("assets/vendors/js/vendor.bundle.base.js"); ?>"</script>
     <!-- endinject -->
     <!-- Plugin js for this page -->
-    <script src="../assets/vendors/chart.js/chart.umd.js"></script>
-    <script src="../assets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
+    <script src="<?php echo getAssetUrl("assets/vendors/chart.js/chart.umd.js"); ?>"</script>
+    <script src="<?php echo getAssetUrl("assets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.js"); ?>"</script>
     <!-- End plugin js for this page -->
     <!-- inject:js -->
-    <script src="../assets/js/off-canvas.js"></script>
-    <script src="../assets/js/misc.js"></script>
-            <script src="../assets/js/settings.js"></script>
-        <script src="../assets/js/todolist.js"></script>
-        <script src="../assets/js/jquery.cookie.js"></script>
+    <script src="<?php echo getAssetUrl("assets/js/off-canvas.js"); ?>"</script>
+    <script src="<?php echo getAssetUrl("assets/js/misc.js"); ?>"</script>
+            <script src="<?php echo getAssetUrl("assets/js/settings.js"); ?>"</script>
+        <script src="<?php echo getAssetUrl("assets/js/todolist.js"); ?>"</script>
+        <script src="<?php echo getAssetUrl("assets/js/jquery.cookie.js"); ?>"</script>
         <!-- endinject -->
     <!-- Custom js for this page -->
-    <script src="../assets/js/dashboard.js"></script>
+    <script src="<?php echo getAssetUrl("assets/js/dashboard.js"); ?>"</script>
     <!-- End custom js for this page -->
 </body>
 

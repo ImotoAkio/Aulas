@@ -14,8 +14,8 @@
  */
 
 // --- CONFIGURAÇÃO E DEPENDÊNCIAS ---
-require('../../fpdf/fpdf.php');
-require('../../fpdi/src/autoload.php');
+require __DIR__ . '/../../fpdf/fpdf.php';
+require __DIR__ . '/../../fpdi/src/autoload.php';
 require('../../partials/db.php'); // O caminho do seu arquivo de conexão pode ser diferente
 
 use setasign\Fpdi\Fpdi;

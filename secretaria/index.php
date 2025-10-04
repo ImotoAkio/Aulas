@@ -149,7 +149,7 @@ try {
   </div>
   <!-- container-scroller -->
   <!-- plugins:js -->
-  <script src="<?php echo getAssetUrl("assets/vendors/js/vendor.bundle.base.js"); ?>"</script>
+  <script src="<?php echo getAssetUrl("assets/vendors/js/vendor.bundle.base.js"); ?>"></script>
   <!-- endinject -->
   <!-- jQuery -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -160,11 +160,11 @@ try {
   <script src="<?php echo getAssetUrl("assets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.js"); ?>"</script>
   <!-- End plugin js for this page -->
   <!-- inject:js -->
-      <script src="<?php echo getAssetUrl("assets/js/off-canvas.js"); ?>"</script>
-    <script src="<?php echo getAssetUrl("assets/js/misc.js"); ?>"</script>
-            <script src="<?php echo getAssetUrl("assets/js/settings.js"); ?>"</script>
-        <script src="<?php echo getAssetUrl("assets/js/todolist.js"); ?>"</script>
-        <script src="<?php echo getAssetUrl("assets/js/jquery.cookie.js"); ?>"</script>
+      <script src="<?php echo getAssetUrl("assets/js/off-canvas.js"); ?>"></script>
+    <script src="<?php echo getAssetUrl("assets/js/misc.js"); ?>"></script>
+            <script src="<?php echo getAssetUrl("assets/js/settings.js"); ?>"></script>
+        <script src="<?php echo getAssetUrl("assets/js/todolist.js"); ?>"></script>
+        <script src="<?php echo getAssetUrl("assets/js/jquery.cookie.js"); ?>"></script>
         <!-- endinject -->
   <!-- Custom js for this page -->
   <script src="<?php echo getAssetUrl("assets/js/dashboard.js"); ?>"</script>

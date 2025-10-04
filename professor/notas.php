@@ -101,12 +101,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             ':media' => $media
         ]);
     } else {
-        $stmt_update = $pdo->prepare("UPDATE notas SET $media_column = :media WHERE aluno_id = :aluno_id AND turma_id = :turma_id AND disciplina_id = :disciplina_id");
+        // Inclui a unidade no WHERE para atualizar apenas o registro correto
+        $stmt_update = $pdo->prepare("UPDATE notas SET $media_column = :media WHERE aluno_id = :aluno_id AND turma_id = :turma_id AND disciplina_id = :disciplina_id AND unidade = :unidade");
         $stmt_update->execute([
             ':media' => $media,
             ':aluno_id' => $aluno_id,
             ':turma_id' => $turma_id,
-            ':disciplina_id' => $disciplina_id
+            ':disciplina_id' => $disciplina_id,
+            ':unidade' => $unidade
         ]);
     }
 
@@ -221,6 +223,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                         <?php
                                         $aluno_id = $aluno_id_get ?? $result_alunos[0]['id'];
                                         $aluno = current(array_filter($result_alunos, fn($a) => $a['id'] == $aluno_id));
+                                        // Buscar média existente para pré-preencher os campos
+                                        $media_col_prefill = "media_" . (int)$unidade;
+                                        $stmt_media_existente = $pdo->prepare("SELECT $media_col_prefill AS media FROM notas WHERE aluno_id = :aluno_id AND turma_id = :turma_id AND disciplina_id = :disciplina_id AND unidade = :unidade");
+                                        $stmt_media_existente->execute([
+                                            ':aluno_id' => $aluno_id,
+                                            ':turma_id' => $turma_id,
+                                            ':disciplina_id' => $disciplina_id,
+                                            ':unidade' => $unidade
+                                        ]);
+                                        $media_existente_row = $stmt_media_existente->fetch(PDO::FETCH_ASSOC);
+                                        $nota_prefill = isset($media_existente_row['media']) && $media_existente_row['media'] !== null ? (float)$media_existente_row['media'] : '';
                                         ?>
                                         <div class="card mb-3">
                                             <div class="card-header">
@@ -252,21 +265,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <?php elseif ($is_primeiro_ano || $is_extracurricular): ?>
             <div class="form-group">
                 <label>Nota 1</label>
-                <input type="number" name="nota_1" class="form-control" step="0.01" min="0" max="10" required>
+                <input type="number" name="nota_1" class="form-control" step="0.01" min="0" max="10" value="<?= htmlspecialchars($nota_prefill) ?>" required>
             </div>
             <div class="form-group">
                 <label>Nota 2</label>
-                <input type="number" name="nota_2" class="form-control" step="0.01" min="0" max="10" required>
+                <input type="number" name="nota_2" class="form-control" step="0.01" min="0" max="10" value="<?= htmlspecialchars($nota_prefill) ?>" required>
             </div>
 
         <?php else: ?>
             <div class="form-group">
                 <label>Nota 1</label>
-                <input type="number" name="nota_1" class="form-control" step="0.01" min="0" max="10" required>
+                <input type="number" name="nota_1" class="form-control" step="0.01" min="0" max="10" value="<?= htmlspecialchars($nota_prefill) ?>" required>
             </div>
             <div class="form-group">
                 <label>Nota 2</label>
-                <input type="number" name="nota_2" class="form-control" step="0.01" min="0" max="10" required>
+                <input type="number" name="nota_2" class="form-control" step="0.01" min="0" max="10" value="<?= htmlspecialchars($nota_prefill) ?>" required>
             </div>
         <?php endif; ?>
 
@@ -308,6 +321,53 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                             </div>
                                             <button type="submit" class="btn btn-primary">Continuar</button>
                                         </form>
+                                    <?php endif; ?>
+
+                                    <?php if ($turma_id && $disciplina_id && $unidade): ?>
+                                        <hr>
+                                        <?php
+                                        // Obter o nome da turma selecionada para exibir no título
+                                        $selected_turma_name = '';
+                                        foreach ($result_turmas as $t) {
+                                            if ((int)$t['id'] === (int)$turma_id) {
+                                                $selected_turma_name = $t['nome'];
+                                                break;
+                                            }
+                                        }
+                                        ?>
+                                        <h5>Alunos da turma <?= htmlspecialchars($selected_turma_name ?: 'N/A') ?> - Unidade <?= (int)$unidade ?></h5>
+                                        <?php
+                                        $media_col_list = "media_" . (int)$unidade;
+                                        $stmt_lista = $pdo->prepare("SELECT a.id, a.nome, n.$media_col_list AS media FROM alunos a LEFT JOIN notas n ON n.aluno_id = a.id AND n.turma_id = :turma_id AND n.disciplina_id = :disciplina_id AND n.unidade = :unidade WHERE a.turma_id = :turma_id ORDER BY a.nome");
+                                        $stmt_lista->execute([
+                                            ':turma_id' => $turma_id,
+                                            ':disciplina_id' => $disciplina_id,
+                                            ':unidade' => $unidade
+                                        ]);
+                                        $lista_alunos = $stmt_lista->fetchAll(PDO::FETCH_ASSOC);
+                                        ?>
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Aluno</th>
+                                                        <th>Média</th>
+                                                        <th>Ações</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php foreach ($lista_alunos as $la): ?>
+                                                        <tr>
+                                                            <td><?= htmlspecialchars($la['nome']) ?></td>
+                                                            <td><?= $la['media'] !== null ? htmlspecialchars(number_format((float)$la['media'], 2, ',', '.')) : '-' ?></td>
+                                                            <td>
+                                                                <a class="btn btn-sm btn-outline-primary" href="notas.php?turma_id=<?= (int)$turma_id ?>&disciplina_id=<?= (int)$disciplina_id ?>&unidade=<?= (int)$unidade ?>&aluno_id=<?= (int)$la['id'] ?>">Editar</a>
+                                                            </td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     <?php endif; ?>
 
                                     

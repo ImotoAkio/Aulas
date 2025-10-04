@@ -6,8 +6,12 @@ include('secretaria/partials/db.php');
 if (isset($_SESSION['usuario_id'])) {
     if ($_SESSION['tipo'] === 'aluno') {
         redirectTo('aluno/index.php');
-    } else {
+    } elseif ($_SESSION['tipo'] === 'coordenador') {
         redirectTo('secretaria/index.php');
+    } elseif ($_SESSION['tipo'] === 'financeiro') {
+        redirectTo('financeiro/index.php');
+    } else {
+        redirectTo('professor/index.php');
     }
 }
 
@@ -38,6 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 if ($usuario['tipo'] === 'coordenador') {
                     redirectTo('secretaria/index.php');
+                } elseif ($usuario['tipo'] === 'financeiro') {
+                    redirectTo('financeiro/index.php');
                 } else {
                     redirectTo('professor/index.php');
                 }

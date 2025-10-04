@@ -76,12 +76,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $nota_2 = (float)$_POST['nota_2'];
         $media = ($nota_1 + $nota_2) / 2;
     } 
-    // CASO 3: Para todas as outras disciplinas, calcula a média de 3 notas.
+    // CASO 3: Para todas as outras disciplinas, calcula a média de 2 notas (ajuste solicitado).
     else {
         $nota_1 = (float)$_POST['nota_1'];
         $nota_2 = (float)$_POST['nota_2'];
-        $nota_3 = (float)$_POST['nota_3'];
-        $media = ($nota_1 + $nota_2 + $nota_3) / 3;
+        $media = ($nota_1 + $nota_2) / 2;
     }
 
     $stmt_check = $pdo->prepare("SELECT * FROM notas WHERE aluno_id = :aluno_id AND turma_id = :turma_id AND disciplina_id = :disciplina_id AND unidade = :unidade");
@@ -268,10 +267,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="form-group">
                 <label>Nota 2</label>
                 <input type="number" name="nota_2" class="form-control" step="0.01" min="0" max="10" required>
-            </div>
-            <div class="form-group">
-                <label>Nota 3</label>
-                <input type="number" name="nota_3" class="form-control" step="0.01" min="0" max="10" required>
             </div>
         <?php endif; ?>
 

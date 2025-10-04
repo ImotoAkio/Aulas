@@ -74,6 +74,9 @@ if (!function_exists('getPageUrl')) {
               <a class="nav-link" href="<?php echo getPageUrl('secretaria/cad/turmas.php'); ?>">Turmas</a>
             </li>
             <li class="nav-item">
+              <a class="nav-link" href="<?php echo getPageUrl('secretaria/cad/financeiro.php'); ?>">Usuário Financeiro</a>
+            </li>
+            <li class="nav-item">
               <a class="nav-link" href="<?php echo getPageUrl('secretaria/cad/sincronizar_nomes.php'); ?>">Sincronizar Nomes</a>
             </li>
           </ul>

@@ -53,7 +53,18 @@ function getAssetUrl($path) {
 
 // Função para gerar URL de páginas
 function getPageUrl($path) {
-    return getAssetUrl($path);
+    if (!isset($_SERVER['HTTP_HOST'])) {
+        return $path;
+    }
+    
+    $baseUrl = getBaseUrl();
+    $path = ltrim($path, '/');
+    
+    if (strpos($path, 'http') === 0) {
+        return $path;
+    }
+    
+    return $baseUrl . $path;
 }
 
 // Função para redirecionamento com caminho correto
@@ -82,5 +93,11 @@ try {
 } catch (PDOException $e) {
     error_log("Erro na conexão com o banco de dados: " . $e->getMessage());
     die("Erro na conexão com o banco de dados. Verifique as configurações.");
+}
+
+// Função para obter conexão PDO
+function getConnection() {
+    global $pdo;
+    return $pdo;
 }
 ?>

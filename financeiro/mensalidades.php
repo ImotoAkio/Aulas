@@ -12,6 +12,55 @@ if (!isset($_SESSION['usuario_id']) || ($_SESSION['tipo'] ?? '') !== 'financeiro
 $erro = '';
 $sucesso = '';
 
+// Gerar mensalidade individual
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['acao'] ?? '') === 'gerar_individual') {
+  $aluno_id = (int)($_POST['aluno_id'] ?? 0);
+  $competencia = trim($_POST['competencia_individual'] ?? '');
+  $valor_original = (float)($_POST['valor_original'] ?? 0);
+  $desconto = (float)($_POST['desconto'] ?? 0);
+  $acrescimos = (float)($_POST['acrescimos'] ?? 0);
+  $vencimento = $_POST['vencimento_individual'] ?? '';
+  $observacoes = trim($_POST['observacoes'] ?? '');
+
+  if ($aluno_id <= 0 || $competencia === '' || $valor_original <= 0 || $vencimento === '') {
+    $erro = 'Informe aluno, competência, valor original e vencimento.';
+  } else {
+    $valor_final = $valor_original - $desconto + $acrescimos;
+    if ($valor_final < 0) {
+      $erro = 'Valor final não pode ser negativo.';
+    } else {
+      try {
+        // Verificar se já existe mensalidade para este aluno/competência
+        $stmtCheck = $pdo->prepare("SELECT 1 FROM mensalidades WHERE aluno_id = :a AND competencia = :c");
+        $stmtCheck->execute([':a' => $aluno_id, ':c' => $competencia]);
+        
+        if ($stmtCheck->fetch()) {
+          $erro = 'Já existe mensalidade para este aluno na competência informada.';
+        } else {
+          $stmtIns = $pdo->prepare(
+            "INSERT INTO mensalidades (aluno_id, competencia, valor_original, desconto, acrescimos, valor_final, vencimento, observacoes, status)
+             VALUES (:a, :c, :vo, :desc, :acr, :vf, :venc, :obs, 'gerada')"
+          );
+          $stmtIns->execute([
+            ':a' => $aluno_id,
+            ':c' => $competencia,
+            ':vo' => $valor_original,
+            ':desc' => $desconto,
+            ':acr' => $acrescimos,
+            ':vf' => $valor_final,
+            ':venc' => $vencimento,
+            ':obs' => $observacoes
+          ]);
+          $sucesso = 'Mensalidade individual gerada com sucesso!';
+        }
+      } catch (Throwable $e) {
+        error_log('Erro gerar mensalidade individual: ' . $e->getMessage());
+        $erro = 'Falha ao gerar mensalidade individual.';
+      }
+    }
+  }
+}
+
 // Gerar mensalidades em lote
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['acao'] ?? '') === 'gerar') {
   $competencia = trim($_POST['competencia'] ?? ''); // YYYY-MM
@@ -76,9 +125,10 @@ try { $turmas = $pdo->query("SELECT id, nome FROM turmas ORDER BY nome")->fetchA
 // Query lista
 $mensalidades = [];
 try {
-  $sql = "SELECT m.id, m.aluno_id, a.nome AS aluno_nome, a.turma_id, m.competencia, m.valor_final, m.vencimento, m.status
+  $sql = "SELECT m.id, m.aluno_id, a.nome AS aluno_nome, a.turma_id, t.nome as turma_nome, m.competencia, m.valor_original, m.desconto, m.acrescimos, m.valor_final, m.vencimento, m.status, m.observacoes
           FROM mensalidades m
           JOIN alunos a ON a.id = m.aluno_id
+          LEFT JOIN turmas t ON t.id = a.turma_id
           WHERE 1=1";
   $params = [];
   if ($f_comp !== '') { $sql .= " AND m.competencia = :c"; $params[':c'] = $f_comp; }
@@ -121,7 +171,68 @@ try {
 
           <div class="card mb-3">
             <div class="card-body">
-              <h4 class="card-title">Gerar Mensalidades</h4>
+              <h4 class="card-title">Gerar Mensalidade Individual</h4>
+              <form class="row g-3" method="post" action="mensalidades.php">
+                <input type="hidden" name="acao" value="gerar_individual">
+                <div class="col-md-4">
+                  <label class="form-label">Aluno</label>
+                  <select name="aluno_id" class="form-control" required>
+                    <option value="">Selecione um aluno</option>
+                    <?php 
+                    try {
+                      $stmtAlunos = $pdo->query("SELECT a.id, a.nome, t.nome as turma_nome FROM alunos a LEFT JOIN turmas t ON t.id = a.turma_id ORDER BY a.nome");
+                      $alunos = $stmtAlunos->fetchAll(PDO::FETCH_ASSOC);
+                      foreach ($alunos as $aluno): 
+                    ?>
+                      <option value="<?php echo (int)$aluno['id']; ?>">
+                        <?php echo htmlspecialchars($aluno['nome']); ?>
+                        <?php if ($aluno['turma_nome']): ?>
+                          (<?php echo htmlspecialchars($aluno['turma_nome']); ?>)
+                        <?php endif; ?>
+                      </option>
+                    <?php 
+                      endforeach;
+                    } catch (Throwable $e) {}
+                    ?>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Competência</label>
+                  <input type="month" name="competencia_individual" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Vencimento</label>
+                  <input type="date" name="vencimento_individual" class="form-control" required>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Valor Original (R$)</label>
+                  <input type="number" name="valor_original" step="0.01" min="0" class="form-control" required>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Desconto (R$)</label>
+                  <input type="number" name="desconto" step="0.01" min="0" class="form-control" value="0">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Acréscimos (R$)</label>
+                  <input type="number" name="acrescimos" step="0.01" min="0" class="form-control" value="0">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Valor Final (R$)</label>
+                  <input type="text" class="form-control" readonly style="background-color: #f8f9fa;">
+                  <small class="text-muted">Calculado automaticamente</small>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Observações</label>
+                  <textarea name="observacoes" class="form-control" rows="2" placeholder="Ex: Bolsa de 50%, desconto por pagamento antecipado, etc."></textarea>
+                </div>
+                <div class="col-12">
+                  <button class="btn btn-gradient-success" type="submit">Gerar Mensalidade Individual</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="card mb-3">
               <form class="row g-3" method="post" action="mensalidades.php">
                 <input type="hidden" name="acao" value="gerar">
                 <div class="col-md-3">
@@ -188,24 +299,46 @@ try {
                   <thead>
                     <tr>
                       <th>Aluno</th>
+                      <th>Turma</th>
                       <th>Competência</th>
                       <th>Vencimento</th>
+                      <th>Valor Original</th>
+                      <th>Desconto</th>
+                      <th>Acréscimos</th>
+                      <th>Valor Final</th>
                       <th>Status</th>
-                      <th>Valor</th>
+                      <th>Observações</th>
                     </tr>
                   </thead>
                   <tbody>
                     <?php foreach ($mensalidades as $m): ?>
                       <tr>
                         <td><?php echo htmlspecialchars($m['aluno_nome']); ?></td>
+                        <td><?php echo htmlspecialchars($m['turma_nome'] ?? '-'); ?></td>
                         <td><?php echo htmlspecialchars($m['competencia']); ?></td>
                         <td><?php echo htmlspecialchars($m['vencimento']); ?></td>
-                        <td><?php echo htmlspecialchars($m['status']); ?></td>
-                        <td>R$ <?php echo number_format((float)$m['valor_final'], 2, ',', '.'); ?></td>
+                        <td>R$ <?php echo number_format((float)$m['valor_original'], 2, ',', '.'); ?></td>
+                        <td>R$ <?php echo number_format((float)$m['desconto'], 2, ',', '.'); ?></td>
+                        <td>R$ <?php echo number_format((float)$m['acrescimos'], 2, ',', '.'); ?></td>
+                        <td><strong>R$ <?php echo number_format((float)$m['valor_final'], 2, ',', '.'); ?></strong></td>
+                        <td>
+                          <span class="badge badge-<?php 
+                            echo match($m['status']) {
+                              'paga' => 'success',
+                              'pendente' => 'warning', 
+                              'atrasada' => 'danger',
+                              'cancelada' => 'secondary',
+                              default => 'info'
+                            };
+                          ?>">
+                            <?php echo htmlspecialchars($m['status']); ?>
+                          </span>
+                        </td>
+                        <td><?php echo htmlspecialchars($m['observacoes'] ?? '-'); ?></td>
                       </tr>
                     <?php endforeach; ?>
                     <?php if (!$mensalidades): ?>
-                      <tr><td colspan="5">Nenhum registro.</td></tr>
+                      <tr><td colspan="10">Nenhum registro.</td></tr>
                     <?php endif; ?>
                   </tbody>
                 </table>
@@ -225,6 +358,36 @@ try {
   <script src="<?php echo getAssetUrl('assets/js/settings.js'); ?>"></script>
   <script src="<?php echo getAssetUrl('assets/js/todolist.js'); ?>"></script>
   <script src="<?php echo getAssetUrl('assets/js/jquery.cookie.js'); ?>"></script>
+  
+  <script>
+    // Calcular valor final automaticamente
+    function calcularValorFinal() {
+      const valorOriginal = parseFloat(document.querySelector('input[name="valor_original"]').value) || 0;
+      const desconto = parseFloat(document.querySelector('input[name="desconto"]').value) || 0;
+      const acrescimos = parseFloat(document.querySelector('input[name="acrescimos"]').value) || 0;
+      
+      const valorFinal = valorOriginal - desconto + acrescimos;
+      const campoValorFinal = document.querySelector('input[name="valor_original"]').closest('.row').querySelector('input[readonly]');
+      
+      if (campoValorFinal) {
+        campoValorFinal.value = valorFinal.toFixed(2).replace('.', ',');
+      }
+    }
+    
+    // Adicionar event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+      const campos = ['valor_original', 'desconto', 'acrescimos'];
+      campos.forEach(function(campo) {
+        const input = document.querySelector('input[name="' + campo + '"]');
+        if (input) {
+          input.addEventListener('input', calcularValorFinal);
+        }
+      });
+      
+      // Calcular inicialmente
+      calcularValorFinal();
+    });
+  </script>
 </body>
 </html>
 

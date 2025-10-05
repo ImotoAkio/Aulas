@@ -127,14 +127,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Meus Dados - Rosa de Sharom</title>
   <!-- plugins:css -->
-  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/css/vendor.bundle.base.css"); ?>"
-  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/mdi/css/materialdesignicons.min.css"); ?>"
-  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/ti-icons/css/themify-icons.css"); ?>"
-  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/font-awesome/css/font-awesome.min.css"); ?>"
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/css/vendor.bundle.base.css"); ?>">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/mdi/css/materialdesignicons.min.css"); ?>">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/ti-icons/css/themify-icons.css"); ?>">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/font-awesome/css/font-awesome.min.css"); ?>">
   <!-- endinject -->
   <!-- Plugin css for this page -->
-  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/select2/select2.min.css"); ?>"
-  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/select2-bootstrap-theme/select2-bootstrap.min.css"); ?>"
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/select2/select2.min.css"); ?>">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/select2-bootstrap-theme/select2-bootstrap.min.css"); ?>">
   <!-- End plugin css for this page -->
   <!-- inject:css -->
   <!-- endinject -->
@@ -439,17 +439,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <!-- container-scroller -->
 
   <!-- plugins:js -->
-  <script src="<?php echo getAssetUrl("assets/vendors/js/vendor.bundle.base.js"); ?>"</script>
+  <script src="<?php echo getAssetUrl("assets/vendors/js/vendor.bundle.base.js"); ?>"></script>
   <!-- endinject -->
   <!-- Plugin js for this page -->
-  <script src="<?php echo getAssetUrl("assets/vendors/select2/select2.min.js"); ?>"</script>
+  <script src="<?php echo getAssetUrl("assets/vendors/select2/select2.min.js"); ?>"></script>
   <!-- End plugin js for this page -->
   <!-- inject:js -->
-  <script src="<?php echo getAssetUrl("assets/js/off-canvas.js"); ?>"</script>
-  <script src="<?php echo getAssetUrl("assets/js/misc.js"); ?>"</script>
+  <script src="<?php echo getAssetUrl("assets/js/off-canvas.js"); ?>"></script>
+  <script src="<?php echo getAssetUrl("assets/js/misc.js"); ?>"></script>
   <!-- endinject -->
   <!-- Custom js for this page -->
-  <script src="<?php echo getAssetUrl("assets/js/file-upload.js"); ?>"</script>
+  <script src="<?php echo getAssetUrl("assets/js/file-upload.js"); ?>"></script>
   <!-- End custom js for this page -->
   
   <script>

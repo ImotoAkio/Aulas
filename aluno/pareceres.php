@@ -77,10 +77,10 @@ try {
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Pareceres Pedagógicos - Rosa de Sharom</title>
   <!-- plugins:css -->
-  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/css/vendor.bundle.base.css"); ?>"
-  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/mdi/css/materialdesignicons.min.css"); ?>"
-  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/ti-icons/css/themify-icons.css"); ?>"
-  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/font-awesome/css/font-awesome.min.css"); ?>"
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/css/vendor.bundle.base.css"); ?>">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/mdi/css/materialdesignicons.min.css"); ?>">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/ti-icons/css/themify-icons.css"); ?>">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/font-awesome/css/font-awesome.min.css"); ?>">
   <!-- endinject -->
   <!-- inject:css -->
   <!-- endinject -->
@@ -248,11 +248,11 @@ try {
   </div>
 
   <!-- plugins:js -->
-  <script src="<?php echo getAssetUrl("assets/vendors/js/vendor.bundle.base.js"); ?>"</script>
+  <script src="<?php echo getAssetUrl("assets/vendors/js/vendor.bundle.base.js"); ?>"></script>
   <!-- endinject -->
   <!-- inject:js -->
-  <script src="<?php echo getAssetUrl("assets/js/off-canvas.js"); ?>"</script>
-  <script src="<?php echo getAssetUrl("assets/js/misc.js"); ?>"</script>
+  <script src="<?php echo getAssetUrl("assets/js/off-canvas.js"); ?>"></script>
+  <script src="<?php echo getAssetUrl("assets/js/misc.js"); ?>"></script>
   <!-- endinject -->
   
   <script>
@@ -369,7 +369,7 @@ try {
         <html>
           <head>
             <title>Parecer Pedagógico</title>
-            <link rel="stylesheet" href="<?php echo getAssetUrl("assets/css/style.css"); ?>"
+            <link rel="stylesheet" href="<?php echo getAssetUrl("assets/css/style.css"); ?>">
             <style>
               body { font-family: Arial, sans-serif; }
               .parecer-content { padding: 20px; }

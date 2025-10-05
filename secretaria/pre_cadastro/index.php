@@ -9,6 +9,48 @@ if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['tipo'], ['coordenado
 
 $pdo = getConnection();
 
+// Processar aprovação direta
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao'])) {
+    if ($_POST['acao'] === 'aprovar_direto') {
+        $aluno_id = (int)($_POST['aluno_id'] ?? 0);
+        
+        if ($aluno_id > 0) {
+            try {
+                $pdo->beginTransaction();
+                
+                // Verificar se o aluno está com status 'completo'
+                $stmt = $pdo->prepare("SELECT status_cadastro FROM alunos WHERE id = ?");
+                $stmt->execute([$aluno_id]);
+                $aluno = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                if ($aluno && $aluno['status_cadastro'] === 'completo') {
+                    // Atualizar status do aluno para aprovado
+                    $stmt = $pdo->prepare("UPDATE alunos SET status_cadastro = 'aprovado' WHERE id = ?");
+                    $stmt->execute([$aluno_id]);
+                    
+                    // Atualizar status no controle
+                    $stmt = $pdo->prepare("UPDATE pre_cadastros_controle SET status = 'aprovado' WHERE aluno_id = ?");
+                    $stmt->execute([$aluno_id]);
+                    
+                    $pdo->commit();
+                    
+                    $sucesso = "Pré-cadastro aprovado com sucesso! O aluno está oficialmente matriculado.";
+                } else {
+                    $pdo->rollBack();
+                    $erro = "Erro: Aluno não encontrado ou status inválido para aprovação.";
+                }
+                
+            } catch (PDOException $e) {
+                $pdo->rollBack();
+                $erro = "Erro ao aprovar pré-cadastro: " . $e->getMessage();
+                error_log("Erro ao aprovar pré-cadastro: " . $e->getMessage());
+            }
+        } else {
+            $erro = "ID do aluno inválido.";
+        }
+    }
+}
+
 // Buscar pré-cadastros pendentes
 try {
     $stmt = $pdo->prepare("
@@ -19,7 +61,7 @@ try {
         LEFT JOIN turmas t ON a.turma_id = t.id
         LEFT JOIN pre_cadastros_controle pc ON a.id = pc.aluno_id
         LEFT JOIN usuarios u ON pc.criado_por = u.id
-        WHERE a.status_cadastro IN ('pre_cadastro', 'completo')
+        WHERE a.status_cadastro IN ('pre_cadastro', 'completo', 'aprovado')
         ORDER BY pc.criado_em DESC
     ");
     $stmt->execute();
@@ -73,6 +115,20 @@ try {
                             </ul>
                         </nav>
                     </div>
+
+                    <?php if (isset($sucesso)): ?>
+                    <div class="alert alert-success">
+                        <i class="mdi mdi-check-circle"></i>
+                        <?php echo htmlspecialchars($sucesso); ?>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php if (isset($erro)): ?>
+                    <div class="alert alert-danger">
+                        <i class="mdi mdi-alert-circle"></i>
+                        <?php echo htmlspecialchars($erro); ?>
+                    </div>
+                    <?php endif; ?>
 
                     <!-- Botão para criar novo pré-cadastro -->
                     <div class="row mb-3">
@@ -192,9 +248,13 @@ try {
                                                                 <i class="mdi mdi-eye"></i>
                                                             </a>
                                                             <?php if ($pre_cadastro['status_cadastro'] === 'completo'): ?>
-                                                            <a href="aprovar.php?id=<?php echo $pre_cadastro['id']; ?>" class="btn btn-sm btn-outline-success">
-                                                                <i class="mdi mdi-check"></i>
-                                                            </a>
+                                                            <form method="POST" style="display: inline;" onsubmit="return confirm('Tem certeza que deseja aprovar este pré-cadastro?')">
+                                                                <input type="hidden" name="acao" value="aprovar_direto">
+                                                                <input type="hidden" name="aluno_id" value="<?php echo $pre_cadastro['id']; ?>">
+                                                                <button type="submit" class="btn btn-sm btn-outline-success" title="Aprovar">
+                                                                    <i class="mdi mdi-check"></i>
+                                                                </button>
+                                                            </form>
                                                             <?php endif; ?>
                                                             <?php if ($pre_cadastro['codigo_pre_cadastro']): ?>
                                                             <button type="button" class="btn btn-sm btn-outline-primary" onclick="copiarLink('<?php echo $pre_cadastro['codigo_pre_cadastro']; ?>')">

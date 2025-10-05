@@ -104,6 +104,22 @@ try {
 } catch (Throwable $e) {
   // mantém fallback
 }
+
+// Receita esperada do mês (todas as mensalidades do mês atual)
+$receitaEsperada = 0;
+try {
+  $mesAtual = date('Y-m');
+  $stmtEsperada = $pdo->prepare(
+    "SELECT SUM(valor_final) AS total_esperado
+     FROM mensalidades
+     WHERE competencia = :m"
+  );
+  $stmtEsperada->execute([':m' => $mesAtual]);
+  $resultado = $stmtEsperada->fetch(PDO::FETCH_ASSOC);
+  $receitaEsperada = (float)($resultado['total_esperado'] ?? 0);
+} catch (Throwable $e) {
+  $receitaEsperada = 0;
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -155,6 +171,15 @@ try {
                 <div class="card-body">
                   <h4 class="card-title">Pendentes (mês)</h4>
                   <h2 class="text-warning mb-0">R$ <?php echo number_format((float)$resumoMes['pendentes'], 2, ',', '.'); ?></h2>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">Receita Esperada (mês)</h4>
+                  <h2 class="text-info mb-0">R$ <?php echo number_format($receitaEsperada, 2, ',', '.'); ?></h2>
+                  <small class="text-muted">Total das mensalidades</small>
                 </div>
               </div>
             </div>

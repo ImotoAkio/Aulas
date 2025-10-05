@@ -56,6 +56,12 @@ if (!function_exists('getPageUrl')) {
         </ul>
       </div>
     </li>
+    <li class="nav-item">
+      <a class="nav-link" href="<?php echo getPageUrl('financeiro/pre_cadastro/index.php'); ?>">
+        <span class="menu-title">Pré-cadastros</span>
+        <i class="mdi mdi-account-plus menu-icon"></i>
+      </a>
+    </li>
   </ul>
 </nav>
 

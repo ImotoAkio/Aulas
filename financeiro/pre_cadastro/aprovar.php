@@ -24,7 +24,7 @@ try {
         LEFT JOIN turmas t ON a.turma_id = t.id
         LEFT JOIN pre_cadastros_controle pc ON a.id = pc.aluno_id
         LEFT JOIN usuarios u ON pc.criado_por = u.id
-        WHERE a.id = ? AND a.status_cadastro = 'completo'
+        WHERE a.id = ? AND a.status_cadastro IN ('completo', 'aprovado')
     ");
     $stmt->execute([$aluno_id]);
     $aluno = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -153,7 +153,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             Dados do Aluno - <?php echo htmlspecialchars($aluno['nome']); ?>
                                         </h4>
                                         <div>
-                                            <span class="badge badge-warning fs-6">Completo - Pronto para Aprovação</span>
+                                            <?php if ($aluno['status_cadastro'] === 'aprovado'): ?>
+                                                <span class="badge badge-success fs-6">Aprovado - Matriculado</span>
+                                            <?php else: ?>
+                                                <span class="badge badge-warning fs-6">Completo - Pronto para Aprovação</span>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                     
@@ -294,6 +298,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                             </div>
                             
+                            <?php if ($aluno['status_cadastro'] !== 'aprovado'): ?>
                             <div class="card mt-3">
                                 <div class="card-body">
                                     <h4 class="card-title">
@@ -329,6 +334,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </form>
                                 </div>
                             </div>
+                            <?php else: ?>
+                            <div class="card mt-3">
+                                <div class="card-body text-center">
+                                    <h4 class="card-title text-success">
+                                        <i class="mdi mdi-check-circle me-2"></i>
+                                        Cadastro Aprovado
+                                    </h4>
+                                    <p class="text-muted">Este aluno já está oficialmente matriculado.</p>
+                                    <div class="alert alert-success">
+                                        <i class="mdi mdi-check-circle"></i>
+                                        <strong>Status:</strong> Aprovado e Matriculado
+                                    </div>
+                                </div>
+                            </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                     

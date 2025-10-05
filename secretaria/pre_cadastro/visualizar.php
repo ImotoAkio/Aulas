@@ -187,72 +187,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao'])) {
                                     </div>
                                     <?php endif; ?>
                                     
-                                    <?php if ($aluno['telefone_principal'] || $aluno['telefone_secundario']): ?>
+                                    <?php if ($aluno['telefone1'] || $aluno['telefone2']): ?>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <?php if ($aluno['telefone_principal']): ?>
-                                            <p><strong>Telefone Principal:</strong> <?php echo htmlspecialchars($aluno['telefone_principal']); ?></p>
+                                            <?php if ($aluno['telefone1']): ?>
+                                            <p><strong>Telefone Principal:</strong> <?php echo htmlspecialchars($aluno['telefone1']); ?></p>
                                             <?php endif; ?>
                                         </div>
                                         <div class="col-md-6">
-                                            <?php if ($aluno['telefone_secundario']): ?>
-                                            <p><strong>Telefone Secundário:</strong> <?php echo htmlspecialchars($aluno['telefone_secundario']); ?></p>
+                                            <?php if ($aluno['telefone2']): ?>
+                                            <p><strong>Telefone Secundário:</strong> <?php echo htmlspecialchars($aluno['telefone2']); ?></p>
                                             <?php endif; ?>
                                         </div>
                                     </div>
                                     <?php endif; ?>
                                     
-                                    <?php if ($aluno['email']): ?>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <p><strong>Email:</strong> <?php echo htmlspecialchars($aluno['email']); ?></p>
-                                        </div>
-                                    </div>
-                                    <?php endif; ?>
-                                    
-                                    <?php if ($aluno['nome_responsavel']): ?>
+                                    <?php if ($aluno['nome_resp_legal']): ?>
                                     <hr>
                                     <h5 class="mb-3">Dados do Responsável</h5>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <p><strong>Nome:</strong> <?php echo htmlspecialchars($aluno['nome_responsavel']); ?></p>
+                                            <p><strong>Nome:</strong> <?php echo htmlspecialchars($aluno['nome_resp_legal']); ?></p>
                                         </div>
                                         <div class="col-md-6">
-                                            <p><strong>Parentesco:</strong> <?php echo htmlspecialchars($aluno['parentesco'] ?? 'Não informado'); ?></p>
+                                            <p><strong>Parentesco:</strong> <?php echo htmlspecialchars($aluno['grau_parentesco_resp_legal'] ?? 'Não informado'); ?></p>
                                         </div>
                                     </div>
                                     
-                                    <?php if ($aluno['cpf_responsavel']): ?>
+                                    <?php if ($aluno['cpf_resp_legal']): ?>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <p><strong>CPF:</strong> <?php echo htmlspecialchars($aluno['cpf_responsavel']); ?></p>
+                                            <p><strong>CPF:</strong> <?php echo htmlspecialchars($aluno['cpf_resp_legal']); ?></p>
                                         </div>
                                         <div class="col-md-6">
-                                            <p><strong>Telefone:</strong> <?php echo htmlspecialchars($aluno['telefone_responsavel'] ?? 'Não informado'); ?></p>
+                                            <p><strong>Profissão:</strong> <?php echo htmlspecialchars($aluno['profissao_resp_legal'] ?? 'Não informado'); ?></p>
                                         </div>
                                     </div>
                                     <?php endif; ?>
                                     
-                                    <?php if ($aluno['email_responsavel']): ?>
+                                    <?php if ($aluno['local_trabalho_resp_legal']): ?>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <p><strong>Email:</strong> <?php echo htmlspecialchars($aluno['email_responsavel']); ?></p>
+                                            <p><strong>Local de Trabalho:</strong> <?php echo htmlspecialchars($aluno['local_trabalho_resp_legal']); ?></p>
                                         </div>
                                     </div>
                                     <?php endif; ?>
                                     <?php endif; ?>
                                     
-                                    <?php if ($aluno['observacoes_medicas'] || $aluno['alergias'] || $aluno['medicamentos']): ?>
+                                    <?php if ($aluno['alergias']): ?>
                                     <hr>
                                     <h5 class="mb-3">Informações Médicas</h5>
                                     <?php if ($aluno['alergias']): ?>
                                     <p><strong>Alergias:</strong> <?php echo htmlspecialchars($aluno['alergias']); ?></p>
-                                    <?php endif; ?>
-                                    <?php if ($aluno['medicamentos']): ?>
-                                    <p><strong>Medicamentos:</strong> <?php echo htmlspecialchars($aluno['medicamentos']); ?></p>
-                                    <?php endif; ?>
-                                    <?php if ($aluno['observacoes_medicas']): ?>
-                                    <p><strong>Observações Médicas:</strong> <?php echo htmlspecialchars($aluno['observacoes_medicas']); ?></p>
                                     <?php endif; ?>
                                     <?php endif; ?>
                                 </div>

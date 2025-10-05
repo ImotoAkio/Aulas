@@ -43,12 +43,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("
             UPDATE alunos SET 
                 nome = ?, cpf = ?, rg = ?, data_nascimento = ?, sexo = ?,
-                nacionalidade = ?, naturalidade = ?, cep = ?, endereco = ?,
+                nacionalidade = ?, naturalidade_cidade = ?, cep = ?, endereco = ?,
                 numero = ?, complemento = ?, bairro = ?, cidade = ?, estado = ?,
-                telefone_principal = ?, telefone_secundario = ?, email = ?,
-                nome_responsavel = ?, cpf_responsavel = ?, rg_responsavel = ?,
-                telefone_responsavel = ?, email_responsavel = ?, parentesco = ?,
-                alergias = ?, medicamentos = ?, observacoes_medicas = ?,
+                telefone1 = ?, telefone2 = ?,
+                nome_resp_legal = ?, cpf_resp_legal = ?, grau_parentesco_resp_legal = ?,
+                alergias = ?,
                 status_cadastro = 'completo', preenchido_por_responsavel = TRUE,
                 dados_preenchidos_em = NOW()
             WHERE id = ?
@@ -71,16 +70,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST['estado'],
             $_POST['telefone_principal'],
             $_POST['telefone_secundario'],
-            $_POST['email'],
             $_POST['nome_responsavel'],
             $_POST['cpf_responsavel'],
-            $_POST['rg_responsavel'],
-            $_POST['telefone_responsavel'],
-            $_POST['email_responsavel'],
             $_POST['parentesco'],
             $_POST['alergias'],
-            $_POST['medicamentos'],
-            $_POST['observacoes_medicas'],
             $aluno['id']
         ]);
         

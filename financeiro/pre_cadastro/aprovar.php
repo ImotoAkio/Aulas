@@ -153,7 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             Dados do Aluno - <?php echo htmlspecialchars($aluno['nome']); ?>
                                         </h4>
                                         <div>
-                                            <span class="badge badge-info fs-6">Completo - Aguardando Aprovação</span>
+                                            <span class="badge badge-warning fs-6">Completo - Pronto para Aprovação</span>
                                         </div>
                                     </div>
                                     

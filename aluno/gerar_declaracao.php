@@ -53,8 +53,8 @@ $titulo = $titulos[$tipo] ?? 'DECLARAÇÃO';
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title><?= $titulo ?> - <?= htmlspecialchars($aluno['nome_completo'] ?: $aluno['nome']) ?></title>
-  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/mdi/css/materialdesignicons.min.css"); ?>"
-  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/css/style.css"); ?>"
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/mdi/css/materialdesignicons.min.css"); ?>">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/css/style.css"); ?>">
   <style>
     @media print {
       .no-print { display: none !important; }
@@ -66,84 +66,161 @@ $titulo = $titulos[$tipo] ?? 'DECLARAÇÃO';
       max-width: 800px;
       margin: 20px auto;
       background: white;
-      padding: 40px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
-      border-radius: 10px;
+      padding: 50px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.15);
+      border-radius: 15px;
       font-family: 'Times New Roman', serif;
-      line-height: 1.6;
+      line-height: 1.8;
+      border: 2px solid #f0f0f0;
     }
     
     .cabecalho {
       text-align: center;
-      margin-bottom: 40px;
-      border-bottom: 2px solid #333;
-      padding-bottom: 20px;
+      margin-bottom: 50px;
+      border-bottom: 3px solid #2c3e50;
+      padding-bottom: 30px;
+      position: relative;
+    }
+    
+    .cabecalho::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 4px;
+      background: linear-gradient(90deg, #3498db, #2c3e50);
+      border-radius: 2px;
     }
     
     .logo {
-      font-size: 24px;
+      font-size: 28px;
       font-weight: bold;
-      color: #333;
-      margin-bottom: 10px;
+      color: #2c3e50;
+      margin-bottom: 15px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    .logo-subtitle {
+      font-size: 14px;
+      color: #7f8c8d;
+      font-style: italic;
+      margin-bottom: 20px;
     }
     
     .titulo {
-      font-size: 18px;
+      font-size: 22px;
       font-weight: bold;
       text-transform: uppercase;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
+      color: #2c3e50;
+      letter-spacing: 2px;
     }
     
     .subtitulo {
-      font-size: 14px;
-      color: #666;
+      font-size: 16px;
+      color: #7f8c8d;
+      font-weight: 500;
     }
     
     .conteudo {
       text-align: justify;
-      margin-bottom: 40px;
-      font-size: 14px;
+      margin-bottom: 50px;
+      font-size: 16px;
+      color: #34495e;
+    }
+    
+    .conteudo p {
+      margin-bottom: 20px;
+      text-indent: 30px;
+    }
+    
+    .nome-destacado {
+      text-align: center;
+      font-weight: bold;
+      margin: 40px 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      border-left: 5px solid #3498db;
+      border-radius: 8px;
+      font-size: 18px;
+      color: #2c3e50;
     }
     
     .assinatura {
-      margin-top: 60px;
+      margin-top: 80px;
       text-align: center;
     }
     
     .linha-assinatura {
-      border-top: 1px solid #333;
-      width: 200px;
-      margin: 10px auto;
+      border-top: 2px solid #2c3e50;
+      width: 250px;
+      margin: 15px auto;
+    }
+    
+    .assinatura-texto {
+      font-weight: bold;
+      color: #2c3e50;
+      font-size: 16px;
+    }
+    
+    .assinatura-subtexto {
+      font-size: 14px;
+      color: #7f8c8d;
+      margin-top: 5px;
     }
     
     .carimbo {
-      margin-top: 30px;
+      margin-top: 40px;
       text-align: center;
       font-size: 12px;
-      color: #666;
+      color: #95a5a6;
+      border-top: 1px solid #ecf0f1;
+      padding-top: 20px;
     }
     
     .botoes {
       text-align: center;
-      margin: 20px 0;
+      margin: 30px 0;
     }
     
     .btn-print, .btn-back {
-      background: #007bff;
+      background: linear-gradient(135deg, #3498db, #2980b9);
       color: white;
       border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
+      padding: 12px 25px;
+      border-radius: 8px;
       cursor: pointer;
-      margin: 0 10px;
+      margin: 0 15px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
     }
     
     .btn-back {
-      background: #6c757d;
+      background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+      box-shadow: 0 4px 8px rgba(149, 165, 166, 0.3);
     }
     
     .btn-print:hover, .btn-back:hover {
-      opacity: 0.8;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+    }
+    
+    .finalidade-box {
+      background: #f8f9fa;
+      border-left: 4px solid #3498db;
+      padding: 15px 20px;
+      margin: 20px 0;
+      border-radius: 5px;
+    }
+    
+    .data-local {
+      text-align: right;
+      margin-top: 40px;
+      font-weight: 500;
+      color: #2c3e50;
     }
   </style>
 </head>
@@ -162,22 +239,24 @@ $titulo = $titulos[$tipo] ?? 'DECLARAÇÃO';
 
   <div class="declaracao-container">
     <!-- Cabeçalho -->
-         <div class="cabecalho">
-       <div class="logo">
-         <div style="font-size: 24px; font-weight: bold; color: #333; margin-bottom: 10px;">COLÉGIO ROSA DE SHAROM</div>
-         <div style="font-size: 12px; color: #666;">Estabelecimento de Ensino</div>
-       </div>
-       <div class="titulo"><?= $titulo ?></div>
-       <div class="subtitulo">Documento Oficial</div>
-     </div>
+    <div class="cabecalho">
+      <div class="logo">
+        COLÉGIO ROSA DE SHAROM
+      </div>
+      <div class="logo-subtitle">
+        Estabelecimento de Ensino
+      </div>
+      <div class="titulo"><?= $titulo ?></div>
+      <div class="subtitulo">Documento Oficial</div>
+    </div>
 
     <!-- Conteúdo -->
     <div class="conteudo">
-             <p>A <strong>COLÉGIO ROSA DE SHAROM</strong>, estabelecimento de ensino devidamente autorizado, declara que:</p>
+      <p>A <strong>COLÉGIO ROSA DE SHAROM</strong>, estabelecimento de ensino devidamente autorizado, declara que:</p>
       
-      <p style="text-align: center; font-weight: bold; margin: 30px 0;">
-        <strong><?= htmlspecialchars($aluno['nome_completo'] ?: $aluno['nome']) ?></strong>
-      </p>
+      <div class="nome-destacado">
+        <?= htmlspecialchars($aluno['nome_completo'] ?: $aluno['nome']) ?>
+      </div>
       
       <?php if ($tipo === 'vinculo'): ?>
         <p>está <strong>regularmente matriculado</strong> nesta instituição de ensino, cursando a <strong><?= htmlspecialchars($aluno['turma_nome'] ?? 'turma não definida') ?></strong> no ano letivo de <strong><?= htmlspecialchars($aluno['ano_letivo'] ?? 'N/A') ?></strong>.</p>
@@ -192,22 +271,24 @@ $titulo = $titulos[$tipo] ?? 'DECLARAÇÃO';
       <?php endif; ?>
       
       <?php if (!empty($finalidade)): ?>
-        <p><strong>Finalidade:</strong> <?= htmlspecialchars($finalidade) ?></p>
+        <div class="finalidade-box">
+          <p><strong>Finalidade:</strong> <?= htmlspecialchars($finalidade) ?></p>
+        </div>
       <?php endif; ?>
       
       <p>Esta declaração é válida para os fins a que se destina e é emitida em <strong><?= $data_extenso ?></strong>.</p>
       
-      <p style="margin-top: 30px;">
-        <strong>Local e Data:</strong> Recife, <?= $data_formatada ?>
-      </p>
+      <div class="data-local">
+        <p><strong>Local e Data:</strong> Recife, <?= $data_formatada ?></p>
+      </div>
     </div>
 
     <!-- Assinatura -->
-         <div class="assinatura">
-       <div class="linha-assinatura"></div>
-       <strong>COLÉGIO ROSA DE SHAROM</strong><br>
-       <small>Secretaria Escolar</small>
-     </div>
+    <div class="assinatura">
+      <div class="linha-assinatura"></div>
+      <div class="assinatura-texto">COLÉGIO ROSA DE SHAROM</div>
+      <div class="assinatura-subtexto">Secretaria Escolar</div>
+    </div>
 
     <!-- Carimbo -->
     <div class="carimbo">

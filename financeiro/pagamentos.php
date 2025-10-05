@@ -13,6 +13,24 @@ if (!isset($_SESSION['usuario_id']) || ($_SESSION['tipo'] ?? '') !== 'financeiro
 $mes = $_GET['mes'] ?? date('Y-m'); // formato YYYY-MM
 $status = $_GET['status'] ?? '';
 
+$marcarPagoId = isset($_GET['marcar_pago']) ? (int)$_GET['marcar_pago'] : 0;
+if ($marcarPagoId > 0) {
+  try {
+    $stmtP = $pdo->prepare("UPDATE pagamentos SET status='pago', pago_em=NOW() WHERE id=:id");
+    $stmtP->execute([':id' => $marcarPagoId]);
+  } catch (Throwable $e) {
+    // loga e segue
+    error_log('Erro marcar pago: ' . $e->getMessage());
+  }
+  // Redireciona para limpar a query string de ação
+  $qs = [];
+  if ($mes) { $qs['mes'] = $mes; }
+  if ($status !== '') { $qs['status'] = $status; }
+  $redir = 'pagamentos.php' . (count($qs) ? ('?' . http_build_query($qs)) : '');
+  header('Location: ' . $redir);
+  exit;
+}
+
 $pagamentos = [];
 $erro_consulta = null;
 
@@ -93,7 +111,7 @@ try {
             </div>
           </div>
 
-          <div class="card">
+  <div class="card">
             <div class="card-body">
               <div class="table-responsive">
                 <table class="table table-striped">
@@ -107,14 +125,17 @@ try {
                     </tr>
                   </thead>
                   <tbody>
-                    <?php foreach ($pagamentos as $p): ?>
+            <?php foreach ($pagamentos as $p): ?>
                       <tr>
                         <td><?php echo htmlspecialchars($p['aluno_nome']); ?></td>
                         <td><?php echo htmlspecialchars($p['referencia_mes']); ?></td>
                         <td>R$ <?php echo number_format((float)$p['valor'], 2, ',', '.'); ?></td>
-                        <td><span class="badge bg-<?php echo $p['status']==='pago'?'success':($p['status']==='pendente'?'warning':'secondary'); ?>"><?php echo htmlspecialchars($p['status']); ?></span></td>
+                <td><span class="badge bg-<?php echo $p['status']==='pago'?'success':($p['status']==='pendente'?'warning':'secondary'); ?>"><?php echo htmlspecialchars($p['status']); ?></span></td>
                         <td>
-                          <a class="btn btn-sm btn-outline-primary" href="aluno_detalhe.php?id=<?php echo (int)$p['aluno_id']; ?>">Ver aluno</a>
+                  <a class="btn btn-sm btn-outline-primary" href="aluno_detalhe.php?id=<?php echo (int)$p['aluno_id']; ?>">Ver aluno</a>
+                  <?php if ($p['status'] !== 'pago'): ?>
+                    <a class="btn btn-sm btn-outline-success" href="?mes=<?php echo urlencode($mes); ?>&status=<?php echo urlencode($status); ?>&marcar_pago=<?php echo (int)$p['id']; ?>">Marcar pago</a>
+                  <?php endif; ?>
                         </td>
                       </tr>
                     <?php endforeach; ?>

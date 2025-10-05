@@ -12,6 +12,7 @@ if (!isset($_SESSION['usuario_id']) || ($_SESSION['tipo'] ?? '') !== 'financeiro
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $aluno = null;
 $historico = [];
+$mensalidades = [];
 
 try {
   $stmt = $pdo->prepare("SELECT id, nome, turma_id FROM alunos WHERE id = :id");
@@ -21,6 +22,11 @@ try {
   $stmt2 = $pdo->prepare("SELECT referencia_mes, valor, status FROM pagamentos WHERE aluno_id = :id ORDER BY referencia_mes DESC");
   $stmt2->execute([':id' => $id]);
   $historico = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+
+  // Mensalidades do aluno
+  $stmt3 = $pdo->prepare("SELECT competencia, valor_final, vencimento, status FROM mensalidades WHERE aluno_id = :id ORDER BY vencimento DESC");
+  $stmt3->execute([':id' => $id]);
+  $mensalidades = $stmt3->fetchAll(PDO::FETCH_ASSOC);
 } catch (Throwable $e) {
   $aluno = $aluno ?: ['id'=>$id,'nome'=>'Aluno Exemplo','turma_id'=>1];
   $historico = [['referencia_mes'=>date('Y-m'),'valor'=>250.00,'status'=>'pago']];
@@ -85,6 +91,37 @@ try {
                 </div>
               </div>
             </div>
+
+          <div class="card mt-3">
+            <div class="card-body">
+              <h4 class="card-title">Mensalidades</h4>
+              <div class="table-responsive">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>Competência</th>
+                      <th>Vencimento</th>
+                      <th>Status</th>
+                      <th>Valor</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php foreach ($mensalidades as $m): ?>
+                      <tr>
+                        <td><?php echo htmlspecialchars($m['competencia']); ?></td>
+                        <td><?php echo htmlspecialchars($m['vencimento']); ?></td>
+                        <td><?php echo htmlspecialchars($m['status']); ?></td>
+                        <td>R$ <?php echo number_format((float)$m['valor_final'], 2, ',', '.'); ?></td>
+                      </tr>
+                    <?php endforeach; ?>
+                    <?php if (!$mensalidades): ?>
+                      <tr><td colspan="4">Nenhum registro.</td></tr>
+                    <?php endif; ?>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
           <?php endif; ?>
 
         </div>

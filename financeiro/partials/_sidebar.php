@@ -35,7 +35,10 @@ if (!function_exists('getPageUrl')) {
             <a class="nav-link" href="<?php echo getPageUrl('financeiro/pagamentos.php'); ?>">Listar/Filtrar</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="<?php echo getPageUrl('financeiro/mensalidades.php'); ?>">Mensalidades</a>
+            <a class="nav-link" href="<?php echo getPageUrl('financeiro/mensalidades.php'); ?>">Gerar Mensalidades</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="<?php echo getPageUrl('financeiro/listar_mensalidades.php'); ?>">Listar Mensalidades</a>
           </li>
         </ul>
       </div>

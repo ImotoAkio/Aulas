@@ -316,7 +316,7 @@ $titulo = $titulos[$tipo] ?? 'DECLARAÇÃO';
       <p>Esta declaração é válida para os fins a que se destina e é emitida em <strong><?= $data_extenso ?></strong>.</p>
       
       <div class="data-local">
-        <p><strong>Local e Data:</strong> Recife, <?= $data_formatada ?></p>
+        <p><strong>Local e Data:</strong> Petrolina - PE, <?= $data_formatada ?></p>
       </div>
     </div>
 

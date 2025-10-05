@@ -11,8 +11,11 @@ $pdo = getConnection();
 
 // Processar aprovação direta
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao'])) {
+    error_log("DEBUG: POST recebido - acao: " . ($_POST['acao'] ?? 'não definido'));
+    
     if ($_POST['acao'] === 'aprovar_direto') {
         $aluno_id = (int)($_POST['aluno_id'] ?? 0);
+        error_log("DEBUG: Tentando aprovar aluno ID: " . $aluno_id);
         
         if ($aluno_id > 0) {
             try {
@@ -22,6 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao'])) {
                 $stmt = $pdo->prepare("SELECT status_cadastro FROM alunos WHERE id = ?");
                 $stmt->execute([$aluno_id]);
                 $aluno = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                error_log("DEBUG: Status atual do aluno: " . ($aluno['status_cadastro'] ?? 'não encontrado'));
                 
                 if ($aluno && $aluno['status_cadastro'] === 'completo') {
                     // Atualizar status do aluno para aprovado
@@ -34,9 +39,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao'])) {
                     
                     $pdo->commit();
                     
+                    error_log("DEBUG: Aluno aprovado com sucesso!");
                     $sucesso = "Pré-cadastro aprovado com sucesso! O aluno está oficialmente matriculado.";
                 } else {
                     $pdo->rollBack();
+                    error_log("DEBUG: Erro - aluno não encontrado ou status inválido");
                     $erro = "Erro: Aluno não encontrado ou status inválido para aprovação.";
                 }
                 

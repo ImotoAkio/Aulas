@@ -20,7 +20,7 @@ try {
         LEFT JOIN pre_cadastros_controle pc ON a.id = pc.aluno_id
         LEFT JOIN usuarios u ON pc.criado_por = u.id
         WHERE a.status_cadastro IN ('pre_cadastro', 'completo')
-        ORDER BY a.criado_em DESC
+        ORDER BY pc.criado_em DESC
     ");
     $stmt->execute();
     $pre_cadastros = $stmt->fetchAll(PDO::FETCH_ASSOC);

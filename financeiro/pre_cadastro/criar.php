@@ -25,8 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             // Inserir aluno com status de pré-cadastro
             $stmt = $pdo->prepare("
-                INSERT INTO alunos (nome, turma_id, status_cadastro, codigo_pre_cadastro, criado_em) 
-                VALUES (?, ?, 'pre_cadastro', ?, NOW())
+                INSERT INTO alunos (nome, turma_id, status_cadastro, codigo_pre_cadastro) 
+                VALUES (?, ?, 'pre_cadastro', ?)
             ");
             $stmt->execute([$nome, $turma_id, $codigo]);
             $aluno_id = $pdo->lastInsertId();

@@ -194,20 +194,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
           </div>
 
-          <!-- Histórico de Declarações -->
-          <div class="row">
-            <div class="col-12 grid-margin stretch-card">
-              <div class="card">
-                <div class="card-body">
-                  <h4 class="card-title">Minhas Declarações Geradas</h4>
-                  <div class="alert alert-info">
-                    <i class="mdi mdi-information"></i> 
-                    <strong>Funcionalidade em desenvolvimento:</strong> Em breve você poderá visualizar o histórico de declarações geradas.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
         <!-- content-wrapper ends -->
         <!-- partial:../../partials/_footer.html -->

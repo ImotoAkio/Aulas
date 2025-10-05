@@ -38,11 +38,9 @@ try {
 // Buscar notas do aluno
 try {
     $stmt = $pdo->prepare("
-        SELECT n.*, d.nome as disciplina_nome, d.carga_horaria,
-               u.nome as professor_nome
+        SELECT n.*, d.nome as disciplina_nome, d.carga_horaria
         FROM notas n
         LEFT JOIN disciplinas d ON n.disciplina_id = d.id
-        LEFT JOIN usuarios u ON n.professor_id = u.id
         WHERE n.aluno_id = ?
         ORDER BY d.nome, n.unidade
     ");
@@ -51,34 +49,10 @@ try {
     
     // Debug: verificar consulta SQL
     error_log("DEBUG Boletim - Aluno ID: " . $aluno_id);
-    error_log("DEBUG Boletim - Query executada com sucesso");
     error_log("DEBUG Boletim - Total de registros retornados: " . count($notas));
     
-    // Se não há notas, tentar consulta alternativa
-    if (empty($notas)) {
-        error_log("DEBUG Boletim - Nenhuma nota encontrada, tentando consulta alternativa...");
-        
-        // Verificar se existem dados na tabela notas para qualquer aluno
-        $stmt_check = $pdo->prepare("SELECT COUNT(*) as total FROM notas");
-        $stmt_check->execute();
-        $total_notas = $stmt_check->fetch();
-        error_log("DEBUG Boletim - Total de notas na tabela: " . $total_notas['total']);
-        
-        // Verificar se o aluno existe
-        $stmt_aluno = $pdo->prepare("SELECT id, nome FROM alunos WHERE id = ?");
-        $stmt_aluno->execute([$aluno_id]);
-        $aluno_check = $stmt_aluno->fetch();
-        error_log("DEBUG Boletim - Aluno encontrado: " . ($aluno_check ? $aluno_check['nome'] : 'NÃO ENCONTRADO'));
-        
-        // Tentar consulta mais simples
-        $stmt_simple = $pdo->prepare("SELECT * FROM notas WHERE aluno_id = ?");
-        $stmt_simple->execute([$aluno_id]);
-        $notas_simple = $stmt_simple->fetchAll();
-        error_log("DEBUG Boletim - Notas simples encontradas: " . count($notas_simple));
-        
-        if (!empty($notas_simple)) {
-            error_log("DEBUG Boletim - Primeira nota simples: " . json_encode($notas_simple[0]));
-        }
+    if (!empty($notas)) {
+        error_log("DEBUG Boletim - Primeira nota encontrada: " . json_encode($notas[0]));
     }
 } catch (PDOException $e) {
     error_log("Erro ao buscar notas: " . $e->getMessage());
@@ -92,71 +66,34 @@ foreach ($notas as $nota) {
     if (!isset($disciplinas_notas[$disciplina])) {
         $disciplinas_notas[$disciplina] = [
             'carga_horaria' => $nota['carga_horaria'],
-            'professor' => $nota['professor_nome'],
             'notas' => []
         ];
     }
     
-    // Criar estrutura de notas por unidade baseada na estrutura real da tabela
-    // Verificar campos de média individuais primeiro
-    if (isset($nota['media_1']) && $nota['media_1'] !== null && $nota['media_1'] > 0) {
+    // Usar os campos media_1, media_2, media_3, media_4 da estrutura real
+    // Considerar apenas médias > 0 (ignorar 0.00)
+    if ($nota['media_1'] > 0) {
         $disciplinas_notas[$disciplina]['notas'][1] = [
             'nota' => $nota['media_1'],
             'unidade' => 1
         ];
     }
-    if (isset($nota['media_2']) && $nota['media_2'] !== null && $nota['media_2'] > 0) {
+    if ($nota['media_2'] > 0) {
         $disciplinas_notas[$disciplina]['notas'][2] = [
             'nota' => $nota['media_2'],
             'unidade' => 2
         ];
     }
-    if (isset($nota['media_3']) && $nota['media_3'] !== null && $nota['media_3'] > 0) {
+    if ($nota['media_3'] > 0) {
         $disciplinas_notas[$disciplina]['notas'][3] = [
             'nota' => $nota['media_3'],
             'unidade' => 3
         ];
     }
-    if (isset($nota['media_4']) && $nota['media_4'] !== null && $nota['media_4'] > 0) {
+    if ($nota['media_4'] > 0) {
         $disciplinas_notas[$disciplina]['notas'][4] = [
             'nota' => $nota['media_4'],
             'unidade' => 4
-        ];
-    }
-    
-    // Se não há campos de média individuais, usar campos de nota individual
-    if (empty($disciplinas_notas[$disciplina]['notas'])) {
-        if (isset($nota['nota_1']) && $nota['nota_1'] !== null && $nota['nota_1'] > 0) {
-            $disciplinas_notas[$disciplina]['notas'][1] = [
-                'nota' => $nota['nota_1'],
-                'unidade' => 1
-            ];
-        }
-        if (isset($nota['nota_2']) && $nota['nota_2'] !== null && $nota['nota_2'] > 0) {
-            $disciplinas_notas[$disciplina]['notas'][2] = [
-                'nota' => $nota['nota_2'],
-                'unidade' => 2
-            ];
-        }
-        if (isset($nota['nota_3']) && $nota['nota_3'] !== null && $nota['nota_3'] > 0) {
-            $disciplinas_notas[$disciplina]['notas'][3] = [
-                'nota' => $nota['nota_3'],
-                'unidade' => 3
-            ];
-        }
-        if (isset($nota['nota_4']) && $nota['nota_4'] !== null && $nota['nota_4'] > 0) {
-            $disciplinas_notas[$disciplina]['notas'][4] = [
-                'nota' => $nota['nota_4'],
-                'unidade' => 4
-            ];
-        }
-    }
-    
-    // Se ainda não há notas, usar campo 'nota' genérico
-    if (empty($disciplinas_notas[$disciplina]['notas']) && isset($nota['nota']) && $nota['nota'] !== null && $nota['nota'] > 0) {
-        $disciplinas_notas[$disciplina]['notas'][$nota['unidade']] = [
-            'nota' => $nota['nota'],
-            'unidade' => $nota['unidade']
         ];
     }
 }
@@ -193,60 +130,9 @@ error_log("DEBUG Boletim - Total de notas encontradas: " . count($notas));
 error_log("DEBUG Boletim - Disciplinas com notas: " . implode(', ', array_keys($disciplinas_notas)));
 error_log("DEBUG Boletim - Médias calculadas: " . json_encode($medias_gerais));
 
-// Se não há dados reais, criar dados de exemplo para teste
+// Se não há dados reais, manter arrays vazios
 if (empty($medias_gerais)) {
-    error_log("DEBUG Boletim - Criando dados de exemplo para teste...");
-    $medias_gerais = [
-        'Matemática' => 8.5,
-        'Português' => 7.2,
-        'História' => 6.8,
-        'Geografia' => 9.1,
-        'Ciências' => 7.9
-    ];
-    $disciplinas_notas = [
-        'Matemática' => [
-            'carga_horaria' => 80,
-            'professor' => 'Prof. João',
-            'notas' => [
-                1 => ['nota' => 8.0, 'unidade' => 1],
-                2 => ['nota' => 9.0, 'unidade' => 2]
-            ]
-        ],
-        'Português' => [
-            'carga_horaria' => 80,
-            'professor' => 'Prof. Maria',
-            'notas' => [
-                1 => ['nota' => 7.0, 'unidade' => 1],
-                2 => ['nota' => 7.5, 'unidade' => 2]
-            ]
-        ],
-        'História' => [
-            'carga_horaria' => 40,
-            'professor' => 'Prof. Pedro',
-            'notas' => [
-                1 => ['nota' => 6.5, 'unidade' => 1],
-                2 => ['nota' => 7.0, 'unidade' => 2]
-            ]
-        ],
-        'Geografia' => [
-            'carga_horaria' => 40,
-            'professor' => 'Prof. Ana',
-            'notas' => [
-                1 => ['nota' => 9.0, 'unidade' => 1],
-                2 => ['nota' => 9.2, 'unidade' => 2]
-            ]
-        ],
-        'Ciências' => [
-            'carga_horaria' => 60,
-            'professor' => 'Prof. Carlos',
-            'notas' => [
-                1 => ['nota' => 7.5, 'unidade' => 1],
-                2 => ['nota' => 8.3, 'unidade' => 2]
-            ]
-        ]
-    ];
-    $media_geral = round(array_sum($medias_gerais) / count($medias_gerais), 1);
-    error_log("DEBUG Boletim - Dados de exemplo criados. Média geral: " . $media_geral);
+    error_log("DEBUG Boletim - Nenhum dado encontrado no banco de dados");
 }
 
 ?>

@@ -200,6 +200,54 @@ try {
                                     <?php endif; ?>
                                     <?php endif; ?>
                                     
+                                    <?php if ($aluno['nome_mae'] || $aluno['nome_pai']): ?>
+                                    <hr>
+                                    <h5 class="mb-3">Dados dos Pais</h5>
+                                    <?php if ($aluno['nome_mae']): ?>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p><strong>Nome da Mãe:</strong> <?php echo htmlspecialchars($aluno['nome_mae']); ?></p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong>CPF da Mãe:</strong> <?php echo htmlspecialchars($aluno['cpf_mae'] ?? 'Não informado'); ?></p>
+                                        </div>
+                                    </div>
+                                    <?php endif; ?>
+                                    
+                                    <?php if ($aluno['nome_pai']): ?>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p><strong>Nome do Pai:</strong> <?php echo htmlspecialchars($aluno['nome_pai']); ?></p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong>CPF do Pai:</strong> <?php echo htmlspecialchars($aluno['cpf_pai'] ?? 'Não informado'); ?></p>
+                                        </div>
+                                    </div>
+                                    <?php endif; ?>
+                                    <?php endif; ?>
+                                    
+                                    <?php if ($aluno['nis'] || $aluno['tipo_sanguineo'] || $aluno['fator_rh']): ?>
+                                    <hr>
+                                    <h5 class="mb-3">Informações Adicionais</h5>
+                                    <div class="row">
+                                        <?php if ($aluno['nis']): ?>
+                                        <div class="col-md-4">
+                                            <p><strong>NIS:</strong> <?php echo htmlspecialchars($aluno['nis']); ?></p>
+                                        </div>
+                                        <?php endif; ?>
+                                        <?php if ($aluno['tipo_sanguineo']): ?>
+                                        <div class="col-md-4">
+                                            <p><strong>Tipo Sanguíneo:</strong> <?php echo htmlspecialchars($aluno['tipo_sanguineo']); ?></p>
+                                        </div>
+                                        <?php endif; ?>
+                                        <?php if ($aluno['fator_rh']): ?>
+                                        <div class="col-md-4">
+                                            <p><strong>Fator RH:</strong> <?php echo htmlspecialchars($aluno['fator_rh']); ?></p>
+                                        </div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <?php endif; ?>
+                                    
                                     <?php if ($aluno['alergias']): ?>
                                     <hr>
                                     <h5 class="mb-3">Informações Médicas</h5>

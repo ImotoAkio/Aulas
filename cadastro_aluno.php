@@ -47,6 +47,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 numero = ?, complemento = ?, bairro = ?, cidade = ?, estado = ?,
                 telefone1 = ?, telefone2 = ?,
                 nome_resp_legal = ?, cpf_resp_legal = ?, grau_parentesco_resp_legal = ?,
+                profissao_resp_legal = ?, local_trabalho_resp_legal = ?,
+                nis = ?, tipo_sanguineo = ?, fator_rh = ?,
+                nome_mae = ?, cpf_mae = ?, nome_pai = ?, cpf_pai = ?,
                 alergias = ?,
                 status_cadastro = 'completo', preenchido_por_responsavel = TRUE,
                 dados_preenchidos_em = NOW()
@@ -73,7 +76,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST['nome_responsavel'],
             $_POST['cpf_responsavel'],
             $_POST['parentesco'],
-            $_POST['alergias'],
+            $_POST['profissao_responsavel'] ?: null,
+            $_POST['local_trabalho_responsavel'] ?: null,
+            $_POST['nis'] ?: null,
+            $_POST['tipo_sanguineo'] ?: null,
+            $_POST['fator_rh'] ?: null,
+            $_POST['nome_mae'] ?: null,
+            $_POST['cpf_mae'] ?: null,
+            $_POST['nome_pai'] ?: null,
+            $_POST['cpf_pai'] ?: null,
+            $_POST['alergias'] ?: null,
             $aluno['id']
         ]);
         
@@ -220,6 +232,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                        value="<?php echo htmlspecialchars($aluno['naturalidade'] ?? ''); ?>">
                             </div>
                         </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="nis" class="form-label">NIS</label>
+                                <input type="text" class="form-control" id="nis" name="nis" 
+                                       value="<?php echo htmlspecialchars($aluno['nis'] ?? ''); ?>" 
+                                       placeholder="Número de Identificação Social">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="tipo_sanguineo" class="form-label">Tipo Sanguíneo</label>
+                                <select class="form-control" id="tipo_sanguineo" name="tipo_sanguineo">
+                                    <option value="">Selecione</option>
+                                    <option value="A" <?php echo ($aluno['tipo_sanguineo'] ?? '') === 'A' ? 'selected' : ''; ?>>A</option>
+                                    <option value="B" <?php echo ($aluno['tipo_sanguineo'] ?? '') === 'B' ? 'selected' : ''; ?>>B</option>
+                                    <option value="AB" <?php echo ($aluno['tipo_sanguineo'] ?? '') === 'AB' ? 'selected' : ''; ?>>AB</option>
+                                    <option value="O" <?php echo ($aluno['tipo_sanguineo'] ?? '') === 'O' ? 'selected' : ''; ?>>O</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="fator_rh" class="form-label">Fator RH</label>
+                                <select class="form-control" id="fator_rh" name="fator_rh">
+                                    <option value="">Selecione</option>
+                                    <option value="+" <?php echo ($aluno['fator_rh'] ?? '') === '+' ? 'selected' : ''; ?>>Positivo (+)</option>
+                                    <option value="-" <?php echo ($aluno['fator_rh'] ?? '') === '-' ? 'selected' : ''; ?>>Negativo (-)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dados dos Pais -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="mdi mdi-account-group text-info me-2"></i>
+                            Dados dos Pais
+                        </h3>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nome_mae" class="form-label">Nome da Mãe</label>
+                                <input type="text" class="form-control" id="nome_mae" name="nome_mae" 
+                                       value="<?php echo htmlspecialchars($aluno['nome_mae'] ?? ''); ?>" 
+                                       placeholder="Nome completo da mãe">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="cpf_mae" class="form-label">CPF da Mãe</label>
+                                <input type="text" class="form-control" id="cpf_mae" name="cpf_mae" 
+                                       value="<?php echo htmlspecialchars($aluno['cpf_mae'] ?? ''); ?>" 
+                                       placeholder="000.000.000-00">
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nome_pai" class="form-label">Nome do Pai</label>
+                                <input type="text" class="form-control" id="nome_pai" name="nome_pai" 
+                                       value="<?php echo htmlspecialchars($aluno['nome_pai'] ?? ''); ?>" 
+                                       placeholder="Nome completo do pai">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="cpf_pai" class="form-label">CPF do Pai</label>
+                                <input type="text" class="form-control" id="cpf_pai" name="cpf_pai" 
+                                       value="<?php echo htmlspecialchars($aluno['cpf_pai'] ?? ''); ?>" 
+                                       placeholder="000.000.000-00">
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Endereço -->
@@ -362,6 +439,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <label for="email_responsavel" class="form-label">Email do Responsável</label>
                                 <input type="email" class="form-control" id="email_responsavel" name="email_responsavel" 
                                        value="<?php echo htmlspecialchars($aluno['email_responsavel'] ?? ''); ?>">
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="profissao_responsavel" class="form-label">Profissão do Responsável</label>
+                                <input type="text" class="form-control" id="profissao_responsavel" name="profissao_responsavel" 
+                                       value="<?php echo htmlspecialchars($aluno['profissao_resp_legal'] ?? ''); ?>" 
+                                       placeholder="Ex: Professor, Médico, Comerciante...">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="local_trabalho_responsavel" class="form-label">Local de Trabalho</label>
+                                <input type="text" class="form-control" id="local_trabalho_responsavel" name="local_trabalho_responsavel" 
+                                       value="<?php echo htmlspecialchars($aluno['local_trabalho_resp_legal'] ?? ''); ?>" 
+                                       placeholder="Nome da empresa ou local de trabalho">
                             </div>
                         </div>
                     </div>

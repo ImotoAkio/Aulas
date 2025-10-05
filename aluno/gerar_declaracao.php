@@ -103,10 +103,31 @@ $titulo = $titulos[$tipo] ?? 'DECLARAÇÃO';
     }
     
     .logo-subtitle {
-      font-size: 14px;
+      font-size: 16px;
       color: #7f8c8d;
       font-style: italic;
+      margin-bottom: 25px;
+    }
+    
+    .endereco {
+      font-size: 13px;
+      color: #34495e;
       margin-bottom: 20px;
+      line-height: 1.4;
+    }
+    
+    .autorizacao {
+      font-size: 12px;
+      color: #7f8c8d;
+      margin-bottom: 15px;
+      line-height: 1.3;
+    }
+    
+    .cnpj {
+      font-size: 12px;
+      color: #7f8c8d;
+      margin-bottom: 25px;
+      font-weight: 500;
     }
     
     .titulo {
@@ -241,18 +262,34 @@ $titulo = $titulos[$tipo] ?? 'DECLARAÇÃO';
     <!-- Cabeçalho -->
     <div class="cabecalho">
       <div class="logo">
-        COLÉGIO ROSA DE SHAROM
+        Educandário Rosa de Sharom
       </div>
       <div class="logo-subtitle">
-        Estabelecimento de Ensino
+        Ensino Infantil, Fundamental e Médio
       </div>
+      
+      <div class="endereco">
+        Avenida. 01, nº 86 Quati II, Petrolina – PE / CEP: 56314-510<br>
+        Contato/Whatsapp: (87) 98837-5103 E-mail: rosasharom@gmail.com
+      </div>
+      
+      <div class="autorizacao">
+        Portaria de Autorização de Funcionamento nº 3.281 de 11/06/2004<br>
+        Publicado no D.O nº 110 de 12/06/04<br>
+        Cadastro escolar nº P- 653.118
+      </div>
+      
+      <div class="cnpj">
+        CNPJ: 49.000.772/0001-12 – Código do MEC/INEP Nº 26.168-294
+      </div>
+      
       <div class="titulo"><?= $titulo ?></div>
       <div class="subtitulo">Documento Oficial</div>
     </div>
 
     <!-- Conteúdo -->
     <div class="conteudo">
-      <p>A <strong>COLÉGIO ROSA DE SHAROM</strong>, estabelecimento de ensino devidamente autorizado, declara que:</p>
+      <p>O <strong>EDUCANDÁRIO ROSA DE SHAROM</strong>, estabelecimento de ensino devidamente autorizado, declara que:</p>
       
       <div class="nome-destacado">
         <?= htmlspecialchars($aluno['nome_completo'] ?: $aluno['nome']) ?>
@@ -286,7 +323,7 @@ $titulo = $titulos[$tipo] ?? 'DECLARAÇÃO';
     <!-- Assinatura -->
     <div class="assinatura">
       <div class="linha-assinatura"></div>
-      <div class="assinatura-texto">COLÉGIO ROSA DE SHAROM</div>
+      <div class="assinatura-texto">EDUCANDÁRIO ROSA DE SHAROM</div>
       <div class="assinatura-subtexto">Secretaria Escolar</div>
     </div>
 

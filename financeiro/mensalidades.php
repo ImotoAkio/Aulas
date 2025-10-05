@@ -246,39 +246,52 @@ try {
           <?php if ($erro): ?><div class="alert alert-danger"><?php echo htmlspecialchars($erro); ?></div><?php endif; ?>
           <?php if ($sucesso): ?><div class="alert alert-success"><?php echo htmlspecialchars($sucesso); ?></div><?php endif; ?>
 
-          <div class="row mb-4">
-            <div class="col-md-4">
-              <div class="card text-center">
-                <div class="card-body">
-                  <i class="mdi mdi-account-multiple text-primary" style="font-size: 2rem;"></i>
-                  <h5 class="card-title mt-2">Geração em Massa</h5>
-                  <p class="card-text">Gera mensalidades com valor padrão para uma turma específica em um mês.</p>
+          <!-- 1. GERAÇÃO EM MASSA -->
+          <div class="card mb-3">
+            <div class="card-body">
+              <h4 class="card-title">
+                <i class="mdi mdi-account-multiple text-primary me-2"></i>
+                Geração em Massa
+              </h4>
+              <p class="text-muted">Gera mensalidades com valor padrão para uma turma específica em um mês.</p>
+              <form class="row g-3" method="post" action="mensalidades.php">
+                <input type="hidden" name="acao" value="gerar">
+                <div class="col-md-3">
+                  <label class="form-label">Competência</label>
+                  <input type="month" name="competencia" class="form-control" required>
                 </div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="card text-center">
-                <div class="card-body">
-                  <i class="mdi mdi-calendar-range text-warning" style="font-size: 2rem;"></i>
-                  <h5 class="card-title mt-2">Geração Anual</h5>
-                  <p class="card-text">Gera mensalidades para todos os 12 meses do ano para um aluno ou turma.</p>
+                <div class="col-md-3">
+                  <label class="form-label">Vencimento</label>
+                  <input type="date" name="vencimento" class="form-control" required>
                 </div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="card text-center">
-                <div class="card-body">
-                  <i class="mdi mdi-account text-success" style="font-size: 2rem;"></i>
-                  <h5 class="card-title mt-2">Geração Individual</h5>
-                  <p class="card-text">Gera mensalidade específica com valor personalizado para um aluno.</p>
+                <div class="col-md-3">
+                  <label class="form-label">Valor Padrão (R$)</label>
+                  <input type="number" name="valor_padrao" step="0.01" min="0" class="form-control" required>
                 </div>
-              </div>
+                <div class="col-md-3">
+                  <label class="form-label">Turma (opcional)</label>
+                  <select name="turma_id" class="form-control">
+                    <option value="">Todas</option>
+                    <?php foreach ($turmas as $t): ?>
+                      <option value="<?php echo (int)$t['id']; ?>"><?php echo htmlspecialchars($t['nome']); ?></option>
+                    <?php endforeach; ?>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <button class="btn btn-gradient-primary" type="submit">Gerar em Massa</button>
+                </div>
+              </form>
             </div>
           </div>
 
+          <!-- 2. GERAÇÃO ANUAL -->
           <div class="card mb-3">
             <div class="card-body">
-              <h4 class="card-title">Gerar Mensalidades para o Ano Todo</h4>
+              <h4 class="card-title">
+                <i class="mdi mdi-calendar-range text-warning me-2"></i>
+                Geração Anual
+              </h4>
+              <p class="text-muted">Gera mensalidades para todos os 12 meses do ano para um aluno ou turma.</p>
               <form class="row g-3" method="post" action="mensalidades.php">
                 <input type="hidden" name="acao" value="gerar_ano">
                 <div class="col-md-3">
@@ -358,7 +371,14 @@ try {
             </div>
           </div>
 
+          <!-- 3. GERAÇÃO INDIVIDUAL -->
           <div class="card mb-3">
+            <div class="card-body">
+              <h4 class="card-title">
+                <i class="mdi mdi-account text-success me-2"></i>
+                Geração Individual
+              </h4>
+              <p class="text-muted">Gera mensalidade específica com valor personalizado para um aluno.</p>
               <form class="row g-3" method="post" action="mensalidades.php">
                 <input type="hidden" name="acao" value="gerar_individual">
                 <div class="col-md-4">
@@ -450,9 +470,15 @@ try {
             </div>
           </div>
 
+          <!-- LISTAGEM DE MENSALIDADES -->
           <div class="card">
             <div class="card-body">
-              <h4 class="card-title">Listagem</h4>
+              <h4 class="card-title">
+                <i class="mdi mdi-format-list-bulleted text-info me-2"></i>
+                Listagem de Mensalidades
+              </h4>
+              <p class="text-muted">Visualize e filtre as mensalidades geradas.</p>
+              
               <form class="row g-3 mb-3" method="get" action="mensalidades.php">
                 <div class="col-md-3">
                   <label class="form-label">Competência</label>

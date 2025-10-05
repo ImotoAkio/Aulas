@@ -251,20 +251,6 @@ if (empty($medias_gerais)) {
             </div>
           </div>
           
-          <!-- Gráfico de Desempenho -->
-          <div class="row">
-            <div class="col-12">
-              <div class="card">
-                <div class="card-body">
-                  <h5 class="card-title">Desempenho por Disciplina</h5>
-                  <div style="position: relative; height: 400px;">
-                    <canvas id="graficoDesempenho"></canvas>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
           <!-- Tabela de Notas -->
           <div class="row">
             <div class="col-12">
@@ -384,126 +370,12 @@ if (empty($medias_gerais)) {
   <!-- plugins:js -->
   <script src="<?php echo getAssetUrl("assets/vendors/js/vendor.bundle.base.js"); ?>"></script>
   <!-- endinject -->
-  <!-- Plugin js for this page -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- End plugin js for this page -->
   <!-- inject:js -->
   <script src="<?php echo getAssetUrl("assets/js/off-canvas.js"); ?>"></script>
   <script src="<?php echo getAssetUrl("assets/js/misc.js"); ?>"></script>
   <!-- endinject -->
   
   <script>
-    // Dados para o gráfico
-    var disciplinas = <?= json_encode(array_keys($medias_gerais)) ?>;
-    var medias = <?= json_encode(array_values($medias_gerais)) ?>;
-    
-    // Debug: verificar dados
-    console.log('Disciplinas:', disciplinas);
-    console.log('Médias:', medias);
-    console.log('Total de disciplinas:', disciplinas.length);
-    
-    // Função para criar o gráfico
-    function criarGrafico() {
-      // Verificar se Chart está disponível
-      if (typeof Chart === 'undefined') {
-        console.error('Chart.js não foi carregado corretamente');
-        // Tentar novamente após 1 segundo
-        setTimeout(criarGrafico, 1000);
-        return;
-      }
-      
-      // Verificar se o canvas existe
-      var canvas = document.getElementById('graficoDesempenho');
-      if (!canvas) {
-        console.error('Canvas do gráfico não encontrado');
-        return;
-      }
-      
-      // Verificar se há dados para exibir
-      if (!disciplinas || disciplinas.length === 0) {
-        console.log('Nenhuma disciplina encontrada para o gráfico');
-        canvas.parentElement.innerHTML = '<div class="text-center py-4"><i class="mdi mdi-chart-line" style="font-size: 48px; color: #ccc;"></i><p class="text-muted mt-2">Nenhuma nota disponível para exibir no gráfico</p></div>';
-        return;
-      }
-      
-      try {
-        // Criar gráfico
-        var ctx = canvas.getContext('2d');
-        var grafico = new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: disciplinas,
-            datasets: [{
-              label: 'Média por Disciplina',
-              data: medias,
-              backgroundColor: medias.map(function(media) {
-                return media >= 6 ? 'rgba(40, 167, 69, 0.8)' : 'rgba(220, 53, 69, 0.8)';
-              }),
-              borderColor: medias.map(function(media) {
-                return media >= 6 ? 'rgba(40, 167, 69, 1)' : 'rgba(220, 53, 69, 1)';
-              }),
-              borderWidth: 2,
-              borderRadius: 4
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              y: {
-                beginAtZero: true,
-                max: 10,
-                ticks: {
-                  stepSize: 1,
-                  color: '#666'
-                },
-                grid: {
-                  color: 'rgba(0,0,0,0.1)'
-                }
-              },
-              x: {
-                ticks: {
-                  color: '#666',
-                  maxRotation: 45,
-                  minRotation: 0
-                },
-                grid: {
-                  display: false
-                }
-              }
-            },
-            plugins: {
-              legend: {
-                display: false
-              },
-              tooltip: {
-                backgroundColor: 'rgba(0,0,0,0.8)',
-                titleColor: '#fff',
-                bodyColor: '#fff',
-                borderColor: '#ddd',
-                borderWidth: 1
-              }
-            },
-            animation: {
-              duration: 1000,
-              easing: 'easeInOutQuart'
-            }
-          }
-        });
-        
-        console.log('Gráfico criado com sucesso!');
-      } catch (error) {
-        console.error('Erro ao criar gráfico:', error);
-        canvas.parentElement.innerHTML = '<div class="text-center py-4"><i class="mdi mdi-alert-circle" style="font-size: 48px; color: #dc3545;"></i><p class="text-danger mt-2">Erro ao carregar o gráfico</p></div>';
-      }
-    }
-    
-    // Aguardar o DOM carregar
-    document.addEventListener('DOMContentLoaded', function() {
-      // Aguardar um pouco mais para garantir que todos os scripts carregaram
-      setTimeout(criarGrafico, 500);
-    });
-    
     function gerarPDF() {
       window.open('gerar_pdf_boletim.php', '_blank');
     }

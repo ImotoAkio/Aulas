@@ -130,10 +130,10 @@ if (!empty($medias_gerais)) {
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Boletim Escolar - Rosa de Sharom</title>
   <!-- plugins:css -->
-  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/css/vendor.bundle.base.css"); ?>"
-  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/mdi/css/materialdesignicons.min.css"); ?>"
-  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/ti-icons/css/themify-icons.css"); ?>"
-  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/font-awesome/css/font-awesome.min.css"); ?>"
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/css/vendor.bundle.base.css"); ?>">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/mdi/css/materialdesignicons.min.css"); ?>">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/ti-icons/css/themify-icons.css"); ?>">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/font-awesome/css/font-awesome.min.css"); ?>">
   <!-- endinject -->
   <!-- Plugin css for this page -->
   <!-- Chart.js não requer CSS separado -->
@@ -364,14 +364,14 @@ if (!empty($medias_gerais)) {
   <!-- container-scroller -->
 
   <!-- plugins:js -->
-  <script src="<?php echo getAssetUrl("assets/vendors/js/vendor.bundle.base.js"); ?>"</script>
+  <script src="<?php echo getAssetUrl("assets/vendors/js/vendor.bundle.base.js"); ?>"></script>
   <!-- endinject -->
   <!-- Plugin js for this page -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- End plugin js for this page -->
   <!-- inject:js -->
-  <script src="<?php echo getAssetUrl("assets/js/off-canvas.js"); ?>"</script>
-  <script src="<?php echo getAssetUrl("assets/js/misc.js"); ?>"</script>
+  <script src="<?php echo getAssetUrl("assets/js/off-canvas.js"); ?>"></script>
+  <script src="<?php echo getAssetUrl("assets/js/misc.js"); ?>"></script>
   <!-- endinject -->
   
   <script>

@@ -1,8 +1,9 @@
 <?php
+session_start();
 require_once '../../config/database.php';
 
 // Verificar se o usuário está logado e é secretaria ou coordenador
-if (!isset($_SESSION['id']) || !in_array($_SESSION['tipo'], ['coordenador', 'secretaria'])) {
+if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['tipo'], ['coordenador', 'secretaria'])) {
     redirectTo('login.php');
 }
 

@@ -1,8 +1,9 @@
 <?php
+session_start();
 require_once '../../config/database.php';
 
 // Verificar se o usuário está logado e é financeiro
-if (!isset($_SESSION['id']) || $_SESSION['tipo'] !== 'financeiro') {
+if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo'] !== 'financeiro') {
     redirectTo('login.php');
 }
 
@@ -35,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 INSERT INTO pre_cadastros_controle (aluno_id, codigo_link, criado_por, link_expiracao, observacoes) 
                 VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL 30 DAY), ?)
             ");
-            $stmt->execute([$aluno_id, $codigo, $_SESSION['id'], $observacoes]);
+            $stmt->execute([$aluno_id, $codigo, $_SESSION['usuario_id'], $observacoes]);
             
             $pdo->commit();
             

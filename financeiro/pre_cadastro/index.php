@@ -1,8 +1,9 @@
 <?php
+session_start();
 require_once '../../config/database.php';
 
 // Verificar se o usuário está logado e é financeiro
-if (!isset($_SESSION['id']) || $_SESSION['tipo'] !== 'financeiro') {
+if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo'] !== 'financeiro') {
     redirectTo('login.php');
 }
 

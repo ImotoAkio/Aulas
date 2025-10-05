@@ -120,13 +120,13 @@ foreach ($notas_por_disciplina as $disciplina => $notas_disciplina) {
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Minhas Notas - <?= htmlspecialchars($aluno['nome_completo'] ?: $aluno['nome']) ?></title>
   <!-- plugins:css -->
-  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/css/vendor.bundle.base.css"); ?>"
-  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/mdi/css/materialdesignicons.min.css"); ?>"
-  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/ti-icons/css/themify-icons.css"); ?>"
-  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/font-awesome/css/font-awesome.min.css"); ?>"
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/css/vendor.bundle.base.css"); ?>">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/mdi/css/materialdesignicons.min.css"); ?>">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/ti-icons/css/themify-icons.css"); ?>">
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/font-awesome/css/font-awesome.min.css"); ?>">
   <!-- endinject -->
   <!-- Plugin css for this page -->
-  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/datatables/dataTables.bootstrap4.css"); ?>"
+  <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/datatables/dataTables.bootstrap4.css"); ?>">
   <!-- End plugin css for this page -->
   <!-- inject:css -->
   <!-- endinject -->
@@ -312,7 +312,9 @@ foreach ($notas_por_disciplina as $disciplina => $notas_disciplina) {
               <div class="card">
                 <div class="card-body">
                   <h4 class="card-title">Gráfico de Desempenho</h4>
-                  <canvas id="desempenhoChart" width="400" height="200"></canvas>
+                  <div style="position: relative; height: 400px;">
+                    <canvas id="desempenhoChart"></canvas>
+                  </div>
                 </div>
               </div>
             </div>
@@ -336,62 +338,133 @@ foreach ($notas_por_disciplina as $disciplina => $notas_disciplina) {
   </div>
   <!-- container-scroller -->
   <!-- plugins:js -->
-  <script src="<?php echo getAssetUrl("assets/vendors/js/vendor.bundle.base.js"); ?>"</script>
+  <script src="<?php echo getAssetUrl("assets/vendors/js/vendor.bundle.base.js"); ?>"></script>
   <!-- endinject -->
   <!-- Plugin js for this page -->
-  <script src="<?php echo getAssetUrl("assets/vendors/chart.js/Chart.min.js"); ?>"</script>
-  <script src="<?php echo getAssetUrl("assets/vendors/datatables/jquery.dataTables.js"); ?>"</script>
-  <script src="<?php echo getAssetUrl("assets/vendors/datatables/dataTables.bootstrap4.js"); ?>"</script>
+  <script src="<?php echo getAssetUrl("assets/vendors/chart.js/Chart.min.js"); ?>"></script>
+  <script src="<?php echo getAssetUrl("assets/vendors/datatables/jquery.dataTables.js"); ?>"></script>
+  <script src="<?php echo getAssetUrl("assets/vendors/datatables/dataTables.bootstrap4.js"); ?>"></script>
   <!-- End plugin js for this page -->
   <!-- inject:js -->
-  <script src="<?php echo getAssetUrl("assets/js/off-canvas.js"); ?>"</script>
-  <script src="<?php echo getAssetUrl("assets/js/misc.js"); ?>"</script>
-  <script src="<?php echo getAssetUrl("assets/js/settings.js"); ?>"</script>
-  <script src="<?php echo getAssetUrl("assets/js/todolist.js"); ?>"</script>
-  <script src="<?php echo getAssetUrl("assets/js/jquery.cookie.js"); ?>"</script>
+  <script src="<?php echo getAssetUrl("assets/js/off-canvas.js"); ?>"></script>
+  <script src="<?php echo getAssetUrl("assets/js/misc.js"); ?>"></script>
+  <script src="<?php echo getAssetUrl("assets/js/settings.js"); ?>"></script>
+  <script src="<?php echo getAssetUrl("assets/js/todolist.js"); ?>"></script>
+  <script src="<?php echo getAssetUrl("assets/js/jquery.cookie.js"); ?>"></script>
   <!-- endinject -->
   <!-- Custom js for this page -->
-  <script src="<?php echo getAssetUrl("assets/js/data-table.js"); ?>"</script>
+  <script src="<?php echo getAssetUrl("assets/js/data-table.js"); ?>"></script>
   <!-- End custom js for this page -->
 
   <script>
-    // Gráfico de desempenho
-    var ctx = document.getElementById('desempenhoChart').getContext('2d');
-    var desempenhoChart = new Chart(ctx, {
-      type: 'radar',
-      data: {
-        labels: [<?= implode(',', array_map(function($d) { return '"' . addslashes($d) . '"'; }, array_keys($medias_finais))) ?>],
-        datasets: [{
-          label: 'Médias por Disciplina',
-          data: [<?= implode(',', array_values($medias_finais)) ?>],
-          backgroundColor: 'rgba(102, 126, 234, 0.2)',
-          borderColor: 'rgba(102, 126, 234, 1)',
-          borderWidth: 2,
-          pointBackgroundColor: 'rgba(102, 126, 234, 1)',
-          pointBorderColor: '#fff',
-          pointHoverBackgroundColor: '#fff',
-          pointHoverBorderColor: 'rgba(102, 126, 234, 1)'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          r: {
-            beginAtZero: true,
-            max: 10,
-            ticks: {
-              stepSize: 2
+    // Dados para o gráfico
+    var disciplinas = <?= json_encode(array_keys($medias_finais)) ?>;
+    var medias = <?= json_encode(array_values($medias_finais)) ?>;
+    
+    // Função para criar o gráfico
+    function criarGraficoDesempenho() {
+      // Verificar se Chart está disponível
+      if (typeof Chart === 'undefined') {
+        console.error('Chart.js não foi carregado corretamente');
+        // Tentar novamente após 1 segundo
+        setTimeout(criarGraficoDesempenho, 1000);
+        return;
+      }
+      
+      // Verificar se o canvas existe
+      var canvas = document.getElementById('desempenhoChart');
+      if (!canvas) {
+        console.error('Canvas do gráfico não encontrado');
+        return;
+      }
+      
+      // Verificar se há dados para exibir
+      if (!disciplinas || disciplinas.length === 0) {
+        console.log('Nenhuma disciplina encontrada para o gráfico');
+        canvas.parentElement.innerHTML = '<div class="text-center py-4"><i class="mdi mdi-chart-line" style="font-size: 48px; color: #ccc;"></i><p class="text-muted mt-2">Nenhuma nota disponível para exibir no gráfico</p></div>';
+        return;
+      }
+      
+      try {
+        // Criar gráfico
+        var ctx = canvas.getContext('2d');
+        var desempenhoChart = new Chart(ctx, {
+          type: 'radar',
+          data: {
+            labels: disciplinas,
+            datasets: [{
+              label: 'Médias por Disciplina',
+              data: medias,
+              backgroundColor: 'rgba(102, 126, 234, 0.2)',
+              borderColor: 'rgba(102, 126, 234, 1)',
+              borderWidth: 2,
+              pointBackgroundColor: 'rgba(102, 126, 234, 1)',
+              pointBorderColor: '#fff',
+              pointHoverBackgroundColor: '#fff',
+              pointHoverBorderColor: 'rgba(102, 126, 234, 1)',
+              pointRadius: 5,
+              pointHoverRadius: 7
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              r: {
+                beginAtZero: true,
+                max: 10,
+                ticks: {
+                  stepSize: 2,
+                  color: '#666'
+                },
+                grid: {
+                  color: 'rgba(0,0,0,0.1)'
+                },
+                pointLabels: {
+                  color: '#666',
+                  font: {
+                    size: 12
+                  }
+                }
+              }
+            },
+            plugins: {
+              legend: {
+                display: true,
+                position: 'top',
+                labels: {
+                  color: '#666',
+                  font: {
+                    size: 12
+                  }
+                }
+              },
+              tooltip: {
+                backgroundColor: 'rgba(0,0,0,0.8)',
+                titleColor: '#fff',
+                bodyColor: '#fff',
+                borderColor: '#ddd',
+                borderWidth: 1
+              }
+            },
+            animation: {
+              duration: 1000,
+              easing: 'easeInOutQuart'
             }
           }
-        },
-        plugins: {
-          legend: {
-            display: true,
-            position: 'top'
-          }
-        }
+        });
+        
+        console.log('Gráfico de desempenho criado com sucesso!');
+      } catch (error) {
+        console.error('Erro ao criar gráfico:', error);
+        canvas.parentElement.innerHTML = '<div class="text-center py-4"><i class="mdi mdi-alert-circle" style="font-size: 48px; color: #dc3545;"></i><p class="text-danger mt-2">Erro ao carregar o gráfico</p></div>';
       }
+    }
+    
+    // Aguardar o DOM carregar
+    document.addEventListener('DOMContentLoaded', function() {
+      // Aguardar um pouco mais para garantir que todos os scripts carregaram
+      setTimeout(criarGraficoDesempenho, 500);
     });
   </script>
 </body>

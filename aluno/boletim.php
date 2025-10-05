@@ -66,28 +66,65 @@ foreach ($notas as $nota) {
     }
     
     // Criar estrutura de notas por unidade baseada na estrutura real da tabela
-    if (!isset($disciplinas_notas[$disciplina]['notas'][1]) && $nota['media_1'] !== null) {
+    // Verificar campos de média individuais primeiro
+    if (isset($nota['media_1']) && $nota['media_1'] !== null && $nota['media_1'] > 0) {
         $disciplinas_notas[$disciplina]['notas'][1] = [
             'nota' => $nota['media_1'],
             'unidade' => 1
         ];
     }
-    if (!isset($disciplinas_notas[$disciplina]['notas'][2]) && $nota['media_2'] !== null) {
+    if (isset($nota['media_2']) && $nota['media_2'] !== null && $nota['media_2'] > 0) {
         $disciplinas_notas[$disciplina]['notas'][2] = [
             'nota' => $nota['media_2'],
             'unidade' => 2
         ];
     }
-    if (!isset($disciplinas_notas[$disciplina]['notas'][3]) && $nota['media_3'] !== null) {
+    if (isset($nota['media_3']) && $nota['media_3'] !== null && $nota['media_3'] > 0) {
         $disciplinas_notas[$disciplina]['notas'][3] = [
             'nota' => $nota['media_3'],
             'unidade' => 3
         ];
     }
-    if (!isset($disciplinas_notas[$disciplina]['notas'][4]) && $nota['media_4'] !== null) {
+    if (isset($nota['media_4']) && $nota['media_4'] !== null && $nota['media_4'] > 0) {
         $disciplinas_notas[$disciplina]['notas'][4] = [
             'nota' => $nota['media_4'],
             'unidade' => 4
+        ];
+    }
+    
+    // Se não há campos de média individuais, usar campos de nota individual
+    if (empty($disciplinas_notas[$disciplina]['notas'])) {
+        if (isset($nota['nota_1']) && $nota['nota_1'] !== null && $nota['nota_1'] > 0) {
+            $disciplinas_notas[$disciplina]['notas'][1] = [
+                'nota' => $nota['nota_1'],
+                'unidade' => 1
+            ];
+        }
+        if (isset($nota['nota_2']) && $nota['nota_2'] !== null && $nota['nota_2'] > 0) {
+            $disciplinas_notas[$disciplina]['notas'][2] = [
+                'nota' => $nota['nota_2'],
+                'unidade' => 2
+            ];
+        }
+        if (isset($nota['nota_3']) && $nota['nota_3'] !== null && $nota['nota_3'] > 0) {
+            $disciplinas_notas[$disciplina]['notas'][3] = [
+                'nota' => $nota['nota_3'],
+                'unidade' => 3
+            ];
+        }
+        if (isset($nota['nota_4']) && $nota['nota_4'] !== null && $nota['nota_4'] > 0) {
+            $disciplinas_notas[$disciplina]['notas'][4] = [
+                'nota' => $nota['nota_4'],
+                'unidade' => 4
+            ];
+        }
+    }
+    
+    // Se ainda não há notas, usar campo 'nota' genérico
+    if (empty($disciplinas_notas[$disciplina]['notas']) && isset($nota['nota']) && $nota['nota'] !== null && $nota['nota'] > 0) {
+        $disciplinas_notas[$disciplina]['notas'][$nota['unidade']] = [
+            'nota' => $nota['nota'],
+            'unidade' => $nota['unidade']
         ];
     }
 }
@@ -118,6 +155,11 @@ $media_geral = 0;
 if (!empty($medias_gerais)) {
     $media_geral = round(array_sum($medias_gerais) / count($medias_gerais), 1);
 }
+
+// Debug: verificar dados
+error_log("DEBUG Boletim - Total de notas encontradas: " . count($notas));
+error_log("DEBUG Boletim - Disciplinas com notas: " . implode(', ', array_keys($disciplinas_notas)));
+error_log("DEBUG Boletim - Médias calculadas: " . json_encode($medias_gerais));
 
 ?>
 
@@ -378,8 +420,13 @@ if (!empty($medias_gerais)) {
   
   <script>
     // Dados para o gráfico
-    var disciplinas = <?= json_encode(array_keys($disciplinas_notas)) ?>;
+    var disciplinas = <?= json_encode(array_keys($medias_gerais)) ?>;
     var medias = <?= json_encode(array_values($medias_gerais)) ?>;
+    
+    // Debug: verificar dados
+    console.log('Disciplinas:', disciplinas);
+    console.log('Médias:', medias);
+    console.log('Total de disciplinas:', disciplinas.length);
     
     // Função para criar o gráfico
     function criarGrafico() {

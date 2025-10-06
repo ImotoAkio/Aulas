@@ -322,6 +322,8 @@ try {
     </div>
 
     <script src="<?php echo getAssetUrl('assets/vendors/js/vendor.bundle.base.js'); ?>"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?php echo getAssetUrl('assets/js/off-canvas.js'); ?>"></script>
     <script src="<?php echo getAssetUrl('assets/js/hoverable-collapse.js'); ?>"></script>
     <script src="<?php echo getAssetUrl('assets/js/misc.js'); ?>"></script>

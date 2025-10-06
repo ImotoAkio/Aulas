@@ -316,7 +316,7 @@ try {
                     
                     <div class="row mt-3">
                         <div class="col-12">
-                            <a href="index.php" class="btn btn-light">
+                            <a href="<?php echo getPageUrl('financeiro/pre_cadastro/index.php'); ?>" class="btn btn-light">
                                 <i class="mdi mdi-arrow-left"></i> Voltar para Lista
                             </a>
                         </div>

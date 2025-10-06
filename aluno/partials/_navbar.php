@@ -72,7 +72,7 @@ if (!function_exists('getBaseUrl')) {
           </a>
         </div>
       </li>
-      <li class="nav-item dropdown">
+      <li class="nav-item dropdown d-none d-lg-block">
         <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-bs-toggle="dropdown">
           <i class="mdi mdi-bell-outline"></i>
           <span class="count-symbol bg-danger"></span>

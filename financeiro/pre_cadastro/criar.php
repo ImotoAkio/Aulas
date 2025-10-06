@@ -158,7 +158,7 @@ try {
                                                 <button type="submit" class="btn btn-gradient-primary me-2">
                                                     <i class="mdi mdi-content-save"></i> Criar Pré-cadastro
                                                 </button>
-                                                <a href="index.php" class="btn btn-light">
+                                                <a href="<?php echo getPageUrl('financeiro/pre_cadastro/index.php'); ?>" class="btn btn-light">
                                                     <i class="mdi mdi-arrow-left"></i> Voltar
                                                 </a>
                                             </div>

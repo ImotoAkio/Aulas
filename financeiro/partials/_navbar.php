@@ -33,7 +33,7 @@ if (!function_exists('getAssetUrl')) {
           <i class="mdi mdi-fullscreen" id="fullscreen-button"></i>
         </a>
       </li>
-      <li class="nav-item dropdown">
+      <li class="nav-item dropdown d-none d-lg-block">
         <a class="nav-link count-indicator dropdown-toggle" id="messageDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
           <i class="mdi mdi-email-outline"></i>
           <span class="count-symbol bg-warning"></span>
@@ -55,7 +55,7 @@ if (!function_exists('getAssetUrl')) {
           <h6 class="p-3 mb-0 text-center">Aguarde!</h6>
         </div>
       </li>
-      <li class="nav-item dropdown">
+      <li class="nav-item dropdown d-none d-lg-block">
         <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-bs-toggle="dropdown">
           <i class="mdi mdi-bell-outline"></i>
           <span class="count-symbol bg-danger"></span>

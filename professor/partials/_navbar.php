@@ -35,7 +35,7 @@ if (!function_exists('getBaseUrl')) {
               <i class="mdi mdi-fullscreen" id="fullscreen-button"></i>
             </a>
           </li>
-          <li class="nav-item dropdown">
+          <li class="nav-item dropdown d-none d-lg-block">
             <a class="nav-link count-indicator dropdown-toggle" id="messageDropdown" href="#" data-bs-toggle="dropdown"
               aria-expanded="false">
               <i class="mdi mdi-email-outline"></i>
@@ -60,7 +60,7 @@ if (!function_exists('getBaseUrl')) {
               <h6 class="p-3 mb-0 text-center">Aguarde!</h6>
             </div>
           </li>
-          <li class="nav-item dropdown">
+          <li class="nav-item dropdown d-none d-lg-block">
             <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#"
               data-bs-toggle="dropdown">
               <i class="mdi mdi-bell-outline"></i>

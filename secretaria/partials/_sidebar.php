@@ -17,7 +17,7 @@
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="../secretaria/index.php">
+        <a class="nav-link" href="../index.php">
           <span class="menu-title">Página Inicial</span>
           <i class="mdi mdi-home menu-icon"></i>
         </a>
@@ -31,13 +31,13 @@
         <div class="collapse" id="ui-basic">
           <ul class="nav flex-column sub-menu">
             <li class="nav-item">
-              <a class="nav-link" href="../secretaria/planos.php">Planos de Aula</a>
+              <a class="nav-link" href="../planos.php">Planos de Aula</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="../secretaria/notas.php">Notas</a>
+              <a class="nav-link" href="../notas.php">Notas</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="../secretaria/parecer.php">Parecer Pedagógico</a>
+              <a class="nav-link" href="../parecer.php">Parecer Pedagógico</a>
             </li>
           </ul>
         </div>
@@ -50,34 +50,34 @@
         <div class="collapse" id="cadastros">
           <ul class="nav flex-column sub-menu">
             <li class="nav-item">
-              <a class="nav-link" href="../secretaria/cad/professor.php">Professor</a>
+              <a class="nav-link" href="cad/professor.php">Professor</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="../secretaria/cad/aluno.php">Aluno</a>
+              <a class="nav-link" href="cad/aluno.php">Aluno</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="../secretaria/cad/listar_alunos.php">Listar Alunos</a>
+              <a class="nav-link" href="cad/listar_alunos.php">Listar Alunos</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="../secretaria/cad/secretario.php">Secretário</a>
+              <a class="nav-link" href="cad/secretario.php">Secretário</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="../secretaria/cad/disciplinas.php">Disciplinas</a>
+              <a class="nav-link" href="cad/disciplinas.php">Disciplinas</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="../secretaria/cad/turmas.php">Turmas</a>
+              <a class="nav-link" href="cad/turmas.php">Turmas</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="../secretaria/cad/financeiro.php">Usuário Financeiro</a>
+              <a class="nav-link" href="cad/financeiro.php">Usuário Financeiro</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="../secretaria/cad/sincronizar_nomes.php">Sincronizar Nomes</a>
+              <a class="nav-link" href="cad/sincronizar_nomes.php">Sincronizar Nomes</a>
             </li>
           </ul>
         </div>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="../secretaria/pre_cadastro/index.php">
+        <a class="nav-link" href="pre_cadastro/index.php">
           <span class="menu-title">Pré-cadastros</span>
           <i class="mdi mdi-account-plus menu-icon"></i>
         </a>
@@ -90,10 +90,10 @@
         <div class="collapse" id="declaracoes">
           <ul class="nav flex-column sub-menu">
             <li class="nav-item">
-              <a class="nav-link" href="../secretaria/declaracoes/professor.php">Professor</a>
+              <a class="nav-link" href="declaracoes/professor.php">Professor</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="../secretaria/declaracoes/aluno.php">Vínculo - Aluno</a>
+              <a class="nav-link" href="declaracoes/aluno.php">Vínculo - Aluno</a>
             </li>
           </ul>
         </div>

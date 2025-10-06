@@ -10,9 +10,11 @@ if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['tipo'], ['coordenado
 $pdo = getConnection();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $tipo_cadastro = $_POST['tipo_cadastro'] ?? 'novo';
     $nome = trim($_POST['nome'] ?? '');
     $turma_id = !empty($_POST['turma_id']) ? (int)$_POST['turma_id'] : null;
     $observacoes = trim($_POST['observacoes'] ?? '');
+    $aluno_existente_id = !empty($_POST['aluno_existente_id']) ? (int)$_POST['aluno_existente_id'] : null;
     
     if (empty($nome)) {
         $erro = "Nome do aluno é obrigatório.";
@@ -23,20 +25,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Gerar código único para o link
             $codigo = substr(md5(uniqid() . time()), 0, 20);
             
-            // Inserir aluno com status de pré-cadastro
-            $stmt = $pdo->prepare("
-                INSERT INTO alunos (nome, turma_id, status_cadastro, codigo_pre_cadastro) 
-                VALUES (?, ?, 'pre_cadastro', ?)
-            ");
-            $stmt->execute([$nome, $turma_id, $codigo]);
-            $aluno_id = $pdo->lastInsertId();
+            if ($tipo_cadastro === 'existente' && $aluno_existente_id) {
+                // Re-matrícula: atualizar aluno existente
+                $stmt = $pdo->prepare("
+                    UPDATE alunos 
+                    SET status_cadastro = 'pre_cadastro', codigo_pre_cadastro = ?, turma_id = ?
+                    WHERE id = ?
+                ");
+                $stmt->execute([$codigo, $turma_id, $aluno_existente_id]);
+                $aluno_id = $aluno_existente_id;
+            } else {
+                // Novo aluno: inserir novo registro
+                $stmt = $pdo->prepare("
+                    INSERT INTO alunos (nome, turma_id, status_cadastro, codigo_pre_cadastro) 
+                    VALUES (?, ?, 'pre_cadastro', ?)
+                ");
+                $stmt->execute([$nome, $turma_id, $codigo]);
+                $aluno_id = $pdo->lastInsertId();
+            }
             
-            // Inserir registro de controle
+            // Inserir/atualizar registro de controle
             $stmt = $pdo->prepare("
-                INSERT INTO pre_cadastros_controle (aluno_id, codigo_link, criado_por, link_expiracao, observacoes) 
-                VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL 30 DAY), ?)
+                INSERT INTO pre_cadastros_controle (aluno_id, codigo_link, criado_por, link_expiracao, observacoes, tipo_cadastro) 
+                VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL 30 DAY), ?, ?)
+                ON DUPLICATE KEY UPDATE 
+                codigo_link = VALUES(codigo_link),
+                criado_por = VALUES(criado_por),
+                link_expiracao = VALUES(link_expiracao),
+                observacoes = VALUES(observacoes),
+                tipo_cadastro = VALUES(tipo_cadastro)
             ");
-            $stmt->execute([$aluno_id, $codigo, $_SESSION['usuario_id'], $observacoes]);
+            $stmt->execute([$aluno_id, $codigo, $_SESSION['usuario_id'], $observacoes, $tipo_cadastro]);
             
             $pdo->commit();
             
@@ -115,6 +134,72 @@ try {
                                     <?php endif; ?>
                                     
                                     <form method="POST" action="criar.php">
+                                        <div class="row">
+                                            <div class="col-md-12 mb-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Tipo de Cadastro *</label>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio" name="tipo_cadastro" id="tipo_novo" value="novo" 
+                                                                       <?php echo ($_POST['tipo_cadastro'] ?? 'novo') === 'novo' ? 'checked' : ''; ?>>
+                                                                <label class="form-check-label" for="tipo_novo">
+                                                                    <i class="mdi mdi-account-plus text-success me-2"></i>
+                                                                    <strong>Novo Aluno</strong>
+                                                                    <small class="d-block text-muted">Primeira matrícula no colégio</small>
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio" name="tipo_cadastro" id="tipo_existente" value="existente" 
+                                                                       <?php echo ($_POST['tipo_cadastro'] ?? '') === 'existente' ? 'checked' : ''; ?>>
+                                                                <label class="form-check-label" for="tipo_existente">
+                                                                    <i class="mdi mdi-account-sync text-warning me-2"></i>
+                                                                    <strong>Re-matrícula</strong>
+                                                                    <small class="d-block text-muted">Aluno já matriculado anteriormente</small>
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row" id="campo-aluno-existente" style="display: none;">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label for="aluno_existente_id" class="form-label">Selecionar Aluno Existente</label>
+                                                    <select class="form-control" id="aluno_existente_id" name="aluno_existente_id">
+                                                        <option value="">Selecione o aluno...</option>
+                                                        <?php
+                                                        // Buscar alunos já matriculados
+                                                        try {
+                                                            $stmt = $pdo->query("
+                                                                SELECT id, nome, turma_id, t.nome as turma_nome 
+                                                                FROM alunos a 
+                                                                LEFT JOIN turmas t ON a.turma_id = t.id 
+                                                                WHERE status_cadastro = 'aprovado' 
+                                                                ORDER BY nome
+                                                            ");
+                                                            while ($aluno = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                                                $selected = ($_POST['aluno_existente_id'] ?? '') == $aluno['id'] ? 'selected' : '';
+                                                                echo "<option value=\"{$aluno['id']}\" {$selected}>";
+                                                                echo htmlspecialchars($aluno['nome']);
+                                                                if ($aluno['turma_nome']) {
+                                                                    echo " - Turma: " . htmlspecialchars($aluno['turma_nome']);
+                                                                }
+                                                                echo "</option>";
+                                                            }
+                                                        } catch (PDOException $e) {
+                                                            error_log("Erro ao buscar alunos: " . $e->getMessage());
+                                                        }
+                                                        ?>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="form-group">
@@ -220,5 +305,43 @@ try {
     <script src="<?php echo getAssetUrl('assets/js/misc.js'); ?>"></script>
     <script src="<?php echo getAssetUrl('assets/js/settings.js'); ?>"></script>
     <script src="<?php echo getAssetUrl('assets/js/todolist.js'); ?>"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tipoNovo = document.getElementById('tipo_novo');
+            const tipoExistente = document.getElementById('tipo_existente');
+            const campoAlunoExistente = document.getElementById('campo-aluno-existente');
+            const nomeField = document.getElementById('nome');
+            const alunoSelect = document.getElementById('aluno_existente_id');
+            
+            function toggleCampoAlunoExistente() {
+                if (tipoExistente.checked) {
+                    campoAlunoExistente.style.display = 'block';
+                    nomeField.required = false;
+                    alunoSelect.required = true;
+                } else {
+                    campoAlunoExistente.style.display = 'none';
+                    nomeField.required = true;
+                    alunoSelect.required = false;
+                }
+            }
+            
+            // Event listeners
+            tipoNovo.addEventListener('change', toggleCampoAlunoExistente);
+            tipoExistente.addEventListener('change', toggleCampoAlunoExistente);
+            
+            // Preencher nome automaticamente quando selecionar aluno existente
+            alunoSelect.addEventListener('change', function() {
+                if (this.value) {
+                    const selectedOption = this.options[this.selectedIndex];
+                    const nomeAluno = selectedOption.text.split(' - Turma:')[0];
+                    nomeField.value = nomeAluno;
+                }
+            });
+            
+            // Inicializar estado
+            toggleCampoAlunoExistente();
+        });
+    </script>
 </body>
 </html>

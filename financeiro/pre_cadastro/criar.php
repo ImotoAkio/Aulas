@@ -10,9 +10,11 @@ if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo'] !== 'financeiro') {
 $pdo = getConnection();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $tipo_cadastro = $_POST['tipo_cadastro'] ?? 'novo';
     $nome = trim($_POST['nome'] ?? '');
     $turma_id = !empty($_POST['turma_id']) ? (int)$_POST['turma_id'] : null;
     $observacoes = trim($_POST['observacoes'] ?? '');
+    $aluno_existente_id = !empty($_POST['aluno_existente_id']) ? (int)$_POST['aluno_existente_id'] : null;
     
     if (empty($nome)) {
         $erro = "Nome do aluno é obrigatório.";
@@ -23,20 +25,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Gerar código único para o link
             $codigo = substr(md5(uniqid() . time()), 0, 20);
             
-            // Inserir aluno com status de pré-cadastro
-            $stmt = $pdo->prepare("
-                INSERT INTO alunos (nome, turma_id, status_cadastro, codigo_pre_cadastro) 
-                VALUES (?, ?, 'pre_cadastro', ?)
-            ");
-            $stmt->execute([$nome, $turma_id, $codigo]);
-            $aluno_id = $pdo->lastInsertId();
+            if ($tipo_cadastro === 'existente' && $aluno_existente_id) {
+                // Re-matrícula: atualizar aluno existente
+                $stmt = $pdo->prepare("
+                    UPDATE alunos 
+                    SET status_cadastro = 'pre_cadastro', codigo_pre_cadastro = ?, turma_id = ?
+                    WHERE id = ?
+                ");
+                $stmt->execute([$codigo, $turma_id, $aluno_existente_id]);
+                $aluno_id = $aluno_existente_id;
+            } else {
+                // Novo aluno: inserir novo registro
+                $stmt = $pdo->prepare("
+                    INSERT INTO alunos (nome, turma_id, status_cadastro, codigo_pre_cadastro) 
+                    VALUES (?, ?, 'pre_cadastro', ?)
+                ");
+                $stmt->execute([$nome, $turma_id, $codigo]);
+                $aluno_id = $pdo->lastInsertId();
+            }
             
-            // Inserir registro de controle
+            // Inserir/atualizar registro de controle
             $stmt = $pdo->prepare("
-                INSERT INTO pre_cadastros_controle (aluno_id, codigo_link, criado_por, link_expiracao, observacoes) 
-                VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL 30 DAY), ?)
+                INSERT INTO pre_cadastros_controle (aluno_id, codigo_link, criado_por, link_expiracao, observacoes, tipo_cadastro) 
+                VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL 30 DAY), ?, ?)
+                ON DUPLICATE KEY UPDATE 
+                codigo_link = VALUES(codigo_link),
+                criado_por = VALUES(criado_por),
+                link_expiracao = VALUES(link_expiracao),
+                observacoes = VALUES(observacoes),
+                tipo_cadastro = VALUES(tipo_cadastro)
             ");
-            $stmt->execute([$aluno_id, $codigo, $_SESSION['usuario_id'], $observacoes]);
+            $stmt->execute([$aluno_id, $codigo, $_SESSION['usuario_id'], $observacoes, $tipo_cadastro]);
             
             $pdo->commit();
             

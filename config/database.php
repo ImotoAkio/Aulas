@@ -64,6 +64,7 @@ function getPageUrl($path) {
         return $path;
     }
     
+    // Garantir que sempre seja uma URL absoluta
     return $baseUrl . $path;
 }
 

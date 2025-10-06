@@ -29,7 +29,7 @@ if (!function_exists('getPageUrl')) {
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
+        <a class="nav-link" data-toggle="collapse" href="javascript:void(0)" data-target="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
           <span class="menu-title">Pedagógico</span>
           <i class="menu-arrow"></i>
           <i class="mdi mdi-crosshairs-gps menu-icon"></i>
@@ -49,7 +49,7 @@ if (!function_exists('getPageUrl')) {
         </div>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-toggle="collapse" href="#cadastros" aria-expanded="false" aria-controls="cadastros">
+        <a class="nav-link" data-toggle="collapse" href="javascript:void(0)" data-target="#cadastros" aria-expanded="false" aria-controls="cadastros">
           <span class="menu-title">Cadastros</span>
           <i class="mdi mdi-contacts menu-icon"></i>
         </a>
@@ -89,7 +89,7 @@ if (!function_exists('getPageUrl')) {
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-toggle="collapse" href="#declaracoes" aria-expanded="false" aria-controls="declaracoes">
+        <a class="nav-link" data-toggle="collapse" href="javascript:void(0)" data-target="#declaracoes" aria-expanded="false" aria-controls="declaracoes">
           <span class="menu-title">Declarações</span>
           <i class="mdi mdi-file-document menu-icon"></i>
         </a>

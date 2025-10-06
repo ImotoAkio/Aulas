@@ -25,7 +25,7 @@ if (!function_exists('getPageUrl')) {
       </a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" data-bs-toggle="collapse" href="#pagamentos" aria-expanded="false" aria-controls="pagamentos">
+      <a class="nav-link" data-bs-toggle="collapse" href="javascript:void(0)" data-bs-target="#pagamentos" aria-expanded="false" aria-controls="pagamentos">
         <span class="menu-title">Pagamentos</span>
         <i class="mdi mdi-cash-multiple menu-icon"></i>
       </a>
@@ -44,7 +44,7 @@ if (!function_exists('getPageUrl')) {
       </div>
     </li>
     <li class="nav-item">
-      <a class="nav-link" data-bs-toggle="collapse" href="#alunos" aria-expanded="false" aria-controls="alunos">
+      <a class="nav-link" data-bs-toggle="collapse" href="javascript:void(0)" data-bs-target="#alunos" aria-expanded="false" aria-controls="alunos">
         <span class="menu-title">Alunos</span>
         <i class="mdi mdi-account-multiple menu-icon"></i>
       </a>

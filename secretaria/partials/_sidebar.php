@@ -50,34 +50,34 @@
         <div class="collapse" id="cadastros">
           <ul class="nav flex-column sub-menu">
             <li class="nav-item">
-              <a class="nav-link" href="cad/professor.php">Professor</a>
+              <a class="nav-link" href="../cad/professor.php">Professor</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="cad/aluno.php">Aluno</a>
+              <a class="nav-link" href="../cad/aluno.php">Aluno</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="cad/listar_alunos.php">Listar Alunos</a>
+              <a class="nav-link" href="../cad/listar_alunos.php">Listar Alunos</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="cad/secretario.php">Secretário</a>
+              <a class="nav-link" href="../cad/secretario.php">Secretário</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="cad/disciplinas.php">Disciplinas</a>
+              <a class="nav-link" href="../cad/disciplinas.php">Disciplinas</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="cad/turmas.php">Turmas</a>
+              <a class="nav-link" href="../cad/turmas.php">Turmas</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="cad/financeiro.php">Usuário Financeiro</a>
+              <a class="nav-link" href="../cad/financeiro.php">Usuário Financeiro</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="cad/sincronizar_nomes.php">Sincronizar Nomes</a>
+              <a class="nav-link" href="../cad/sincronizar_nomes.php">Sincronizar Nomes</a>
             </li>
           </ul>
         </div>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="pre_cadastro/index.php">
+        <a class="nav-link" href="index.php">
           <span class="menu-title">Pré-cadastros</span>
           <i class="mdi mdi-account-plus menu-icon"></i>
         </a>
@@ -90,10 +90,10 @@
         <div class="collapse" id="declaracoes">
           <ul class="nav flex-column sub-menu">
             <li class="nav-item">
-              <a class="nav-link" href="declaracoes/professor.php">Professor</a>
+              <a class="nav-link" href="../declaracoes/professor.php">Professor</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="declaracoes/aluno.php">Vínculo - Aluno</a>
+              <a class="nav-link" href="../declaracoes/aluno.php">Vínculo - Aluno</a>
             </li>
           </ul>
         </div>

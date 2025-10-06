@@ -54,7 +54,7 @@
         </div>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="pre_cadastro/index.php">
+        <a class="nav-link" href="index.php">
           <span class="menu-title">Pré-cadastros</span>
           <i class="mdi mdi-account-plus menu-icon"></i>
         </a>

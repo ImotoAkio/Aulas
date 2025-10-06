@@ -42,14 +42,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Atualizar dados do aluno
         $stmt = $pdo->prepare("
             UPDATE alunos SET 
-                nome = ?, cpf = ?, rg = ?, data_nascimento = ?, sexo = ?,
-                nacionalidade = ?, naturalidade_cidade = ?, cep = ?, endereco = ?,
-                numero = ?, complemento = ?, bairro = ?, cidade = ?, estado = ?,
+                nome = ?, nome_completo = ?, cpf = ?, rg = ?, data_nascimento = ?, sexo = ?,
+                nacionalidade = ?, naturalidade_cidade = ?, naturalidade_estado = ?,
+                nis = ?, tipo_sanguineo = ?, fator_rh = ?,
+                nome_mae = ?, cpf_mae = ?, nome_pai = ?, cpf_pai = ?,
+                cep = ?, endereco = ?, numero = ?, complemento = ?, bairro = ?, cidade = ?, estado = ?,
                 telefone1 = ?, telefone2 = ?,
                 nome_resp_legal = ?, cpf_resp_legal = ?, grau_parentesco_resp_legal = ?,
                 profissao_resp_legal = ?, local_trabalho_resp_legal = ?,
-                nis = ?, tipo_sanguineo = ?, fator_rh = ?,
-                nome_mae = ?, cpf_mae = ?, nome_pai = ?, cpf_pai = ?,
                 alergias = ?,
                 status_cadastro = 'completo', preenchido_por_responsavel = TRUE,
                 dados_preenchidos_em = NOW()
@@ -58,26 +58,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $stmt->execute([
             $_POST['nome_completo'],
+            $_POST['nome_completo'],
             $_POST['cpf'],
             $_POST['rg'],
             $_POST['data_nascimento'] ?: null,
             $_POST['sexo'] ?: null,
             $_POST['nacionalidade'] ?: 'Brasileira',
-            $_POST['naturalidade'],
-            $_POST['cep'],
-            $_POST['endereco'],
-            $_POST['numero'],
-            $_POST['complemento'],
-            $_POST['bairro'],
-            $_POST['cidade'],
-            $_POST['estado'],
-            $_POST['telefone_principal'],
-            $_POST['telefone_secundario'],
-            $_POST['nome_responsavel'],
-            $_POST['cpf_responsavel'],
-            $_POST['parentesco'],
-            $_POST['profissao_responsavel'] ?: null,
-            $_POST['local_trabalho_responsavel'] ?: null,
+            $_POST['naturalidade_cidade'],
+            $_POST['naturalidade_estado'],
             $_POST['nis'] ?: null,
             $_POST['tipo_sanguineo'] ?: null,
             $_POST['fator_rh'] ?: null,
@@ -85,6 +73,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST['cpf_mae'] ?: null,
             $_POST['nome_pai'] ?: null,
             $_POST['cpf_pai'] ?: null,
+            $_POST['cep'],
+            $_POST['endereco'],
+            $_POST['numero'],
+            $_POST['complemento'],
+            $_POST['bairro'],
+            $_POST['cidade'],
+            $_POST['estado'],
+            $_POST['telefone1'],
+            $_POST['telefone2'],
+            $_POST['nome_resp_legal'],
+            $_POST['cpf_resp_legal'],
+            $_POST['grau_parentesco_resp_legal'],
+            $_POST['profissao_resp_legal'] ?: null,
+            $_POST['local_trabalho_resp_legal'] ?: null,
             $_POST['alergias'] ?: null,
             $aluno['id']
         ]);
@@ -227,9 +229,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                        value="<?php echo htmlspecialchars($aluno['nacionalidade'] ?? 'Brasileira'); ?>">
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label for="naturalidade" class="form-label">Naturalidade</label>
-                                <input type="text" class="form-control" id="naturalidade" name="naturalidade" 
-                                       value="<?php echo htmlspecialchars($aluno['naturalidade'] ?? ''); ?>">
+                                <label for="naturalidade_cidade" class="form-label">Cidade de Nascimento</label>
+                                <input type="text" class="form-control" id="naturalidade_cidade" name="naturalidade_cidade" 
+                                       value="<?php echo htmlspecialchars($aluno['naturalidade_cidade'] ?? ''); ?>">
+                            </div>
+                            <div class="col-md-2 mb-3">
+                                <label for="naturalidade_estado" class="form-label">UF Nascimento</label>
+                                <input type="text" class="form-control" id="naturalidade_estado" name="naturalidade_estado" 
+                                       value="<?php echo htmlspecialchars($aluno['naturalidade_estado'] ?? ''); ?>" 
+                                       maxlength="2" placeholder="Ex: PE">
                             </div>
                         </div>
                         
@@ -365,24 +373,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="telefone_principal" class="form-label">Telefone Principal</label>
-                                <input type="text" class="form-control" id="telefone_principal" name="telefone_principal" 
-                                       value="<?php echo htmlspecialchars($aluno['telefone_principal'] ?? ''); ?>" 
+                                <label for="telefone1" class="form-label">Telefone Principal</label>
+                                <input type="text" class="form-control" id="telefone1" name="telefone1" 
+                                       value="<?php echo htmlspecialchars($aluno['telefone1'] ?? ''); ?>" 
                                        placeholder="(87) 99999-9999">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="telefone_secundario" class="form-label">Telefone Secundário</label>
-                                <input type="text" class="form-control" id="telefone_secundario" name="telefone_secundario" 
-                                       value="<?php echo htmlspecialchars($aluno['telefone_secundario'] ?? ''); ?>" 
+                                <label for="telefone2" class="form-label">Telefone Secundário</label>
+                                <input type="text" class="form-control" id="telefone2" name="telefone2" 
+                                       value="<?php echo htmlspecialchars($aluno['telefone2'] ?? ''); ?>" 
                                        placeholder="(87) 99999-9999">
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" 
-                                       value="<?php echo htmlspecialchars($aluno['email'] ?? ''); ?>">
                             </div>
                         </div>
                     </div>
@@ -396,62 +396,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="nome_responsavel" class="form-label">Nome do Responsável</label>
-                                <input type="text" class="form-control" id="nome_responsavel" name="nome_responsavel" 
-                                       value="<?php echo htmlspecialchars($aluno['nome_responsavel'] ?? ''); ?>">
+                                <label for="nome_resp_legal" class="form-label">Nome do Responsável Legal</label>
+                                <input type="text" class="form-control" id="nome_resp_legal" name="nome_resp_legal" 
+                                       value="<?php echo htmlspecialchars($aluno['nome_resp_legal'] ?? ''); ?>">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="parentesco" class="form-label">Parentesco</label>
-                                <select class="form-control" id="parentesco" name="parentesco">
+                                <label for="grau_parentesco_resp_legal" class="form-label">Parentesco</label>
+                                <select class="form-control" id="grau_parentesco_resp_legal" name="grau_parentesco_resp_legal">
                                     <option value="">Selecione</option>
-                                    <option value="Pai" <?php echo ($aluno['parentesco'] ?? '') === 'Pai' ? 'selected' : ''; ?>>Pai</option>
-                                    <option value="Mãe" <?php echo ($aluno['parentesco'] ?? '') === 'Mãe' ? 'selected' : ''; ?>>Mãe</option>
-                                    <option value="Avô" <?php echo ($aluno['parentesco'] ?? '') === 'Avô' ? 'selected' : ''; ?>>Avô</option>
-                                    <option value="Avó" <?php echo ($aluno['parentesco'] ?? '') === 'Avó' ? 'selected' : ''; ?>>Avó</option>
-                                    <option value="Tio(a)" <?php echo ($aluno['parentesco'] ?? '') === 'Tio(a)' ? 'selected' : ''; ?>>Tio(a)</option>
-                                    <option value="Outro" <?php echo ($aluno['parentesco'] ?? '') === 'Outro' ? 'selected' : ''; ?>>Outro</option>
+                                    <option value="Pai" <?php echo ($aluno['grau_parentesco_resp_legal'] ?? '') === 'Pai' ? 'selected' : ''; ?>>Pai</option>
+                                    <option value="Mãe" <?php echo ($aluno['grau_parentesco_resp_legal'] ?? '') === 'Mãe' ? 'selected' : ''; ?>>Mãe</option>
+                                    <option value="Avô" <?php echo ($aluno['grau_parentesco_resp_legal'] ?? '') === 'Avô' ? 'selected' : ''; ?>>Avô</option>
+                                    <option value="Avó" <?php echo ($aluno['grau_parentesco_resp_legal'] ?? '') === 'Avó' ? 'selected' : ''; ?>>Avó</option>
+                                    <option value="Tio(a)" <?php echo ($aluno['grau_parentesco_resp_legal'] ?? '') === 'Tio(a)' ? 'selected' : ''; ?>>Tio(a)</option>
+                                    <option value="Outro" <?php echo ($aluno['grau_parentesco_resp_legal'] ?? '') === 'Outro' ? 'selected' : ''; ?>>Outro</option>
                                 </select>
                             </div>
                         </div>
                         
                         <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label for="cpf_responsavel" class="form-label">CPF do Responsável</label>
-                                <input type="text" class="form-control" id="cpf_responsavel" name="cpf_responsavel" 
-                                       value="<?php echo htmlspecialchars($aluno['cpf_responsavel'] ?? ''); ?>" 
+                            <div class="col-md-6 mb-3">
+                                <label for="cpf_resp_legal" class="form-label">CPF do Responsável</label>
+                                <input type="text" class="form-control" id="cpf_resp_legal" name="cpf_resp_legal" 
+                                       value="<?php echo htmlspecialchars($aluno['cpf_resp_legal'] ?? ''); ?>" 
                                        placeholder="000.000.000-00">
                             </div>
-                            <div class="col-md-4 mb-3">
-                                <label for="rg_responsavel" class="form-label">RG do Responsável</label>
-                                <input type="text" class="form-control" id="rg_responsavel" name="rg_responsavel" 
-                                       value="<?php echo htmlspecialchars($aluno['rg_responsavel'] ?? ''); ?>">
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label for="telefone_responsavel" class="form-label">Telefone do Responsável</label>
-                                <input type="text" class="form-control" id="telefone_responsavel" name="telefone_responsavel" 
-                                       value="<?php echo htmlspecialchars($aluno['telefone_responsavel'] ?? ''); ?>" 
-                                       placeholder="(87) 99999-9999">
-                            </div>
-                        </div>
-                        
-                        <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="email_responsavel" class="form-label">Email do Responsável</label>
-                                <input type="email" class="form-control" id="email_responsavel" name="email_responsavel" 
-                                       value="<?php echo htmlspecialchars($aluno['email_responsavel'] ?? ''); ?>">
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="profissao_responsavel" class="form-label">Profissão do Responsável</label>
-                                <input type="text" class="form-control" id="profissao_responsavel" name="profissao_responsavel" 
+                                <label for="profissao_resp_legal" class="form-label">Profissão do Responsável</label>
+                                <input type="text" class="form-control" id="profissao_resp_legal" name="profissao_resp_legal" 
                                        value="<?php echo htmlspecialchars($aluno['profissao_resp_legal'] ?? ''); ?>" 
                                        placeholder="Ex: Professor, Médico, Comerciante...">
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="local_trabalho_responsavel" class="form-label">Local de Trabalho</label>
-                                <input type="text" class="form-control" id="local_trabalho_responsavel" name="local_trabalho_responsavel" 
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="local_trabalho_resp_legal" class="form-label">Local de Trabalho</label>
+                                <input type="text" class="form-control" id="local_trabalho_resp_legal" name="local_trabalho_resp_legal" 
                                        value="<?php echo htmlspecialchars($aluno['local_trabalho_resp_legal'] ?? ''); ?>" 
                                        placeholder="Nome da empresa ou local de trabalho">
                             </div>
@@ -470,22 +451,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <label for="alergias" class="form-label">Alergias</label>
                                 <textarea class="form-control" id="alergias" name="alergias" rows="3" 
                                           placeholder="Descreva qualquer alergia conhecida..."><?php echo htmlspecialchars($aluno['alergias'] ?? ''); ?></textarea>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
-                                <label for="medicamentos" class="form-label">Medicamentos em Uso</label>
-                                <textarea class="form-control" id="medicamentos" name="medicamentos" rows="3" 
-                                          placeholder="Liste medicamentos que o aluno utiliza regularmente..."><?php echo htmlspecialchars($aluno['medicamentos'] ?? ''); ?></textarea>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
-                                <label for="observacoes_medicas" class="form-label">Observações Médicas</label>
-                                <textarea class="form-control" id="observacoes_medicas" name="observacoes_medicas" rows="3" 
-                                          placeholder="Outras informações médicas importantes..."><?php echo htmlspecialchars($aluno['observacoes_medicas'] ?? ''); ?></textarea>
                             </div>
                         </div>
                     </div>

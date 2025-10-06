@@ -79,15 +79,13 @@ if (!function_exists('getPageUrl')) {
             <li class="nav-item">
               <a class="nav-link" href="<?php echo getPageUrl('secretaria/cad/sincronizar_nomes.php'); ?>">Sincronizar Nomes</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="<?php echo getPageUrl('secretaria/pre_cadastro/index.php'); ?>">Pré-cadastros</a>
+            </li>
           </ul>
         </div>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="<?php echo getPageUrl('secretaria/pre_cadastro/index.php'); ?>">
-          <span class="menu-title">Pré-cadastros</span>
-          <i class="mdi mdi-account-plus menu-icon"></i>
-        </a>
-      </li>
+
       <li class="nav-item">
         <a class="nav-link" data-toggle="collapse" href="#declaracoes" aria-expanded="false" aria-controls="declaracoes">
           <span class="menu-title">Declarações</span>

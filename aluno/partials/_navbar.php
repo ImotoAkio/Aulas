@@ -133,5 +133,12 @@ if (!function_exists('getBaseUrl')) {
     <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
       <span class="mdi mdi-menu"></span>
     </button>
+    
+    <!-- Botão de logout para dispositivos móveis -->
+    <div class="d-lg-none">
+      <a class="nav-link" href="<?php echo getBaseUrl(); ?>logout.php" style="color: #6c757d;">
+        <i class="mdi mdi-power" style="font-size: 20px;"></i>
+      </a>
+    </div>
   </div>
 </nav>

@@ -103,10 +103,9 @@ try {
     <div class="container-scroller">
         <?php include '../partials/_navbar.php'; ?>
         
-        <div class="container-fluid page-body-wrapper">
-            <?php include '../partials/_sidebar.php'; ?>
-            
-            <div class="main-panel">
+        <?php include '../partials/_sidebar.php'; ?>
+        
+        <div class="main-panel">
                 <div class="content-wrapper">
                     <div class="page-header">
                         <h3 class="page-title">

@@ -327,7 +327,6 @@ try {
     <script src="<?php echo getAssetUrl('assets/js/misc.js'); ?>"></script>
     <script src="<?php echo getAssetUrl('assets/js/settings.js'); ?>"></script>
     <script src="<?php echo getAssetUrl('assets/js/todolist.js'); ?>"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
         function copiarLink(codigo) {

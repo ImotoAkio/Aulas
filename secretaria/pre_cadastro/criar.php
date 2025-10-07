@@ -173,13 +173,13 @@ try {
                                                     <select class="form-control" id="aluno_existente_id" name="aluno_existente_id">
                                                         <option value="">Selecione o aluno...</option>
                                                         <?php
-                                                        // Buscar alunos já matriculados
+                                                        // Buscar alunos já matriculados (que já passaram pelo processo de aprovação)
                                                         try {
                                                             $stmt = $pdo->query("
                                                                 SELECT id, nome, turma_id, t.nome as turma_nome 
                                                                 FROM alunos a 
                                                                 LEFT JOIN turmas t ON a.turma_id = t.id 
-                                                                WHERE status_cadastro = 'aprovado' 
+                                                                WHERE status_cadastro = 'completo' 
                                                                 ORDER BY nome
                                                             ");
                                                             while ($aluno = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -200,7 +200,7 @@ try {
                                             </div>
                                         </div>
                                         
-                                        <div class="row">
+                                        <div class="row" id="campo-nome-novo" style="display: block;">
                                             <div class="col-md-12">
                                                 <div class="form-group">
                                                     <label for="nome" class="form-label">Nome do Aluno *</label>
@@ -311,24 +311,29 @@ try {
             const tipoNovo = document.getElementById('tipo_novo');
             const tipoExistente = document.getElementById('tipo_existente');
             const campoAlunoExistente = document.getElementById('campo-aluno-existente');
+            const campoNomeNovo = document.getElementById('campo-nome-novo');
             const nomeField = document.getElementById('nome');
             const alunoSelect = document.getElementById('aluno_existente_id');
             
-            function toggleCampoAlunoExistente() {
+            function toggleCampos() {
                 if (tipoExistente.checked) {
+                    // Re-matrícula: mostrar seleção de aluno, ocultar campo nome
                     campoAlunoExistente.style.display = 'block';
+                    campoNomeNovo.style.display = 'none';
                     nomeField.required = false;
                     alunoSelect.required = true;
                 } else {
+                    // Novo aluno: ocultar seleção de aluno, mostrar campo nome
                     campoAlunoExistente.style.display = 'none';
+                    campoNomeNovo.style.display = 'block';
                     nomeField.required = true;
                     alunoSelect.required = false;
                 }
             }
             
             // Event listeners
-            tipoNovo.addEventListener('change', toggleCampoAlunoExistente);
-            tipoExistente.addEventListener('change', toggleCampoAlunoExistente);
+            tipoNovo.addEventListener('change', toggleCampos);
+            tipoExistente.addEventListener('change', toggleCampos);
             
             // Preencher nome automaticamente quando selecionar aluno existente
             alunoSelect.addEventListener('change', function() {
@@ -340,7 +345,7 @@ try {
             });
             
             // Inicializar estado
-            toggleCampoAlunoExistente();
+            toggleCampos();
         });
     </script>
 </body>

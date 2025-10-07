@@ -102,6 +102,23 @@ if (!function_exists('getPageUrl')) {
           </ul>
         </div>
       </li>
+
+      <li class="nav-item">
+        <a class="nav-link" data-toggle="collapse" href="#declaracoes" aria-expanded="false" aria-controls="declaracoes">
+          <span class="menu-title">Pré cadastros</span>
+          <i class="mdi mdi-file-document menu-icon"></i>
+        </a>
+        <div class="collapse" id="declaracoes">
+          <ul class="nav flex-column sub-menu">
+            <li class="nav-item">
+              <a class="nav-link" href="<?php echo getPageUrl('secretaria/pre_cadastro/criar.php'); ?>">Criar</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="<?php echo getPageUrl('secretaria/pre_cadastro/index.php'); ?>">Listar - Aluno</a>
+            </li>
+          </ul>
+        </div>
+      </li>
     </ul>
   </nav>
   <!-- partial -->

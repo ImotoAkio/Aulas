@@ -135,6 +135,72 @@ try {
                                     
                                     <form method="POST" action="criar.php">
                                         <div class="row">
+                                            <div class="col-md-12 mb-4">
+                                                <div class="form-group">
+                                                    <label class="form-label">Tipo de Cadastro *</label>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio" name="tipo_cadastro" id="tipo_novo" value="novo" 
+                                                                       <?php echo ($_POST['tipo_cadastro'] ?? 'novo') === 'novo' ? 'checked' : ''; ?>>
+                                                                <label class="form-check-label" for="tipo_novo">
+                                                                    <i class="mdi mdi-account-plus text-success me-2"></i>
+                                                                    <strong>Novo Aluno</strong>
+                                                                    <small class="d-block text-muted">Primeira matrícula no colégio</small>
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio" name="tipo_cadastro" id="tipo_existente" value="existente" 
+                                                                       <?php echo ($_POST['tipo_cadastro'] ?? '') === 'existente' ? 'checked' : ''; ?>>
+                                                                <label class="form-check-label" for="tipo_existente">
+                                                                    <i class="mdi mdi-account-sync text-warning me-2"></i>
+                                                                    <strong>Re-matrícula</strong>
+                                                                    <small class="d-block text-muted">Aluno já matriculado anteriormente</small>
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row" id="campo-aluno-existente" style="display: none;">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label for="aluno_existente_id" class="form-label">Selecionar Aluno Existente</label>
+                                                    <select class="form-control" id="aluno_existente_id" name="aluno_existente_id">
+                                                        <option value="">Selecione o aluno...</option>
+                                                        <?php
+                                                        // Buscar alunos já matriculados (que já passaram pelo processo de aprovação)
+                                                        try {
+                                                            $stmt = $pdo->query("
+                                                                SELECT id, nome, turma_id, t.nome as turma_nome 
+                                                                FROM alunos a 
+                                                                LEFT JOIN turmas t ON a.turma_id = t.id 
+                                                                WHERE status_cadastro = 'completo' 
+                                                                ORDER BY nome
+                                                            ");
+                                                            while ($aluno = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                                                $selected = ($_POST['aluno_existente_id'] ?? '') == $aluno['id'] ? 'selected' : '';
+                                                                echo "<option value=\"{$aluno['id']}\" {$selected}>";
+                                                                echo htmlspecialchars($aluno['nome']);
+                                                                if ($aluno['turma_nome']) {
+                                                                    echo " - Turma: " . htmlspecialchars($aluno['turma_nome']);
+                                                                }
+                                                                echo "</option>";
+                                                            }
+                                                        } catch (PDOException $e) {
+                                                            error_log("Erro ao buscar alunos: " . $e->getMessage());
+                                                        }
+                                                        ?>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row" id="campo-nome-novo" style="display: block;">
                                             <div class="col-md-12">
                                                 <div class="form-group">
                                                     <label for="nome" class="form-label">Nome do Aluno *</label>
@@ -239,5 +305,48 @@ try {
     <script src="<?php echo getAssetUrl('assets/js/misc.js'); ?>"></script>
     <script src="<?php echo getAssetUrl('assets/js/settings.js'); ?>"></script>
     <script src="<?php echo getAssetUrl('assets/js/todolist.js'); ?>"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tipoNovo = document.getElementById('tipo_novo');
+            const tipoExistente = document.getElementById('tipo_existente');
+            const campoAlunoExistente = document.getElementById('campo-aluno-existente');
+            const campoNomeNovo = document.getElementById('campo-nome-novo');
+            const nomeField = document.getElementById('nome');
+            const alunoSelect = document.getElementById('aluno_existente_id');
+            
+            function toggleCampos() {
+                if (tipoExistente.checked) {
+                    // Re-matrícula: mostrar seleção de aluno, ocultar campo nome
+                    campoAlunoExistente.style.display = 'block';
+                    campoNomeNovo.style.display = 'none';
+                    nomeField.required = false;
+                    alunoSelect.required = true;
+                } else {
+                    // Novo aluno: ocultar seleção de aluno, mostrar campo nome
+                    campoAlunoExistente.style.display = 'none';
+                    campoNomeNovo.style.display = 'block';
+                    nomeField.required = true;
+                    alunoSelect.required = false;
+                }
+            }
+            
+            // Event listeners
+            tipoNovo.addEventListener('change', toggleCampos);
+            tipoExistente.addEventListener('change', toggleCampos);
+            
+            // Preencher nome automaticamente quando selecionar aluno existente
+            alunoSelect.addEventListener('change', function() {
+                if (this.value) {
+                    const selectedOption = this.options[this.selectedIndex];
+                    const nomeAluno = selectedOption.text.split(' - Turma:')[0];
+                    nomeField.value = nomeAluno;
+                }
+            });
+            
+            // Inicializar estado
+            toggleCampos();
+        });
+    </script>
 </body>
 </html>

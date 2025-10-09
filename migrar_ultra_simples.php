@@ -1,4 +1,18 @@
 
+<?php
+/**
+ * MIGRAÇÃO ULTRA-SIMPLES - ZERO DEPENDÊNCIAS
+ * Funciona sem nenhum arquivo externo
+ */
+
+// Configurações básicas
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+echo "<!DOCTYPE html>";
+echo "<html><head><meta charset='UTF-8'><title>Migração Ultra-Simples</title></head><body>";
+echo "<h2>🔄 MIGRAÇÃO ULTRA-SIMPLES DO BANCO</h2>";
+
 // ========================================
 // CONFIGURAÇÕES DO BANCO - AJUSTE AQUI
 // ========================================

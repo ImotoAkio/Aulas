@@ -7,9 +7,9 @@
 
 // Configurações do banco de dados
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'u894209272_planos_aula');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_NAME', 'u894209272_app');
+define('DB_USER', 'u894209272_app');
+define('DB_PASS', 'Akio2604*');
 define('DB_CHARSET', 'utf8');
 
 // Configurações PDO

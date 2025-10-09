@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Validações obrigatórias
     if (empty($nome_completo) || empty($data_nascimento) || empty($sexo) || empty($cpf) || empty($turma_id)) {
         $_SESSION['erro_cadastro'] = 'Campos obrigatórios não preenchidos.';
-        header('Location: aluno.php');
+        header('Location: listar_alunos.php');
         exit();
     }
     
@@ -60,14 +60,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $cpf_limpo = preg_replace('/[^0-9]/', '', $cpf);
     if (strlen($cpf_limpo) != 11) {
         $_SESSION['erro_cadastro'] = 'CPF inválido.';
-        header('Location: aluno.php');
+        header('Location: listar_alunos.php');
         exit();
     }
     
     // Validar turma
     if (!is_numeric($turma_id)) {
         $_SESSION['erro_cadastro'] = 'Turma inválida.';
-        header('Location: aluno.php');
+        header('Location: listar_alunos.php');
         exit();
     }
     
@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->execute([$cpf_limpo]);
         if ($stmt->fetch()) {
             $_SESSION['erro_cadastro'] = 'Já existe um aluno cadastrado com este CPF.';
-            header('Location: aluno.php');
+            header('Location: listar_alunos.php');
             exit();
         }
         
@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->execute([$turma_id]);
         if (!$stmt->fetch()) {
             $_SESSION['erro_cadastro'] = 'Turma não encontrada.';
-            header('Location: aluno.php');
+            header('Location: listar_alunos.php');
             exit();
         }
         
@@ -143,11 +143,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } catch (PDOException $e) {
         error_log("Erro ao cadastrar aluno: " . $e->getMessage());
         $_SESSION['erro_cadastro'] = 'Erro ao cadastrar aluno. Tente novamente.';
-        header('Location: aluno.php');
+        header('Location: listar_alunos.php');
         exit();
     }
 } else {
-    header('Location: aluno.php');
+    header('Location: listar_alunos.php');
     exit();
 }
 ?>

@@ -72,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Buscar turmas para o formulário
 try {
-    $stmt = $pdo->prepare("SELECT id, nome FROM turmas ORDER BY nome");
+    $stmt = $pdo->prepare("SELECT id, nome, ano_letivo FROM turmas ORDER BY nome");
     $stmt->execute();
     $turmas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
@@ -170,32 +170,51 @@ try {
                                             <div class="col-md-12">
                                                 <div class="form-group">
                                                     <label for="aluno_existente_id" class="form-label">Selecionar Aluno Existente</label>
-                                                    <select class="form-control" id="aluno_existente_id" name="aluno_existente_id">
-                                                        <option value="">Selecione o aluno...</option>
-                                                        <?php
-                                                        // Buscar alunos já matriculados (que já passaram pelo processo de aprovação)
-                                                        try {
-                                                            $stmt = $pdo->query("
-                                                                SELECT id, nome, turma_id, t.nome as turma_nome 
-                                                                FROM alunos a 
-                                                                LEFT JOIN turmas t ON a.turma_id = t.id 
-                                                                WHERE status_cadastro = 'completo' 
-                                                                ORDER BY nome
-                                                            ");
-                                                            while ($aluno = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                                                $selected = ($_POST['aluno_existente_id'] ?? '') == $aluno['id'] ? 'selected' : '';
-                                                                echo "<option value=\"{$aluno['id']}\" {$selected}>";
-                                                                echo htmlspecialchars($aluno['nome']);
-                                                                if ($aluno['turma_nome']) {
-                                                                    echo " - Turma: " . htmlspecialchars($aluno['turma_nome']);
-                                                                }
-                                                                echo "</option>";
-                                                            }
-                                                        } catch (PDOException $e) {
-                                                            error_log("Erro ao buscar alunos: " . $e->getMessage());
-                                                        }
-                                                        ?>
-                                                    </select>
+                                                    
+                                                    <!-- Campo de busca melhorado -->
+                                                    <div class="search-container mb-3">
+                                                        <div class="input-group">
+                                                            <div class="input-group-prepend">
+                                                                <span class="input-group-text bg-primary text-white">
+                                                                    <i class="mdi mdi-magnify"></i>
+                                                                </span>
+                                                            </div>
+                                                            <input type="text" class="form-control" id="buscar-aluno" 
+                                                                   placeholder="Digite o nome do aluno para pesquisar..." 
+                                                                   autocomplete="off">
+                                                            <div class="input-group-append">
+                                                                <button class="btn btn-outline-secondary" type="button" id="limpar-busca">
+                                                                    <i class="mdi mdi-close"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <small class="text-muted mt-1 d-block">
+                                                            <i class="mdi mdi-information"></i> Digite para filtrar a lista de alunos em tempo real
+                                                        </small>
+                                                    </div>
+                                                    
+                                                    <!-- Lista de resultados melhorada -->
+                                                    <div class="alunos-container">
+                                                        <div class="card">
+                                                            <div class="card-header bg-light">
+                                                                <div class="d-flex justify-content-between align-items-center">
+                                                                    <h6 class="mb-0">
+                                                                        <i class="mdi mdi-account-multiple text-primary"></i>
+                                                                        Lista de Alunos
+                                                                    </h6>
+                                                                    <span class="badge badge-primary" id="contador-alunos">67 alunos</span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="card-body p-0">
+                                                                <div class="alunos-list" id="alunos-list" style="max-height: 300px; overflow-y: auto;">
+                                                                    <!-- Alunos serão carregados aqui via JavaScript -->
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <!-- Campo hidden para o valor selecionado -->
+                                                    <input type="hidden" id="aluno_existente_id" name="aluno_existente_id" value="">
                                                 </div>
                                             </div>
                                         </div>
@@ -221,6 +240,9 @@ try {
                                                         <option value="<?php echo $turma['id']; ?>" 
                                                                 <?php echo (isset($_POST['turma_id']) && $_POST['turma_id'] == $turma['id']) ? 'selected' : ''; ?>>
                                                             <?php echo htmlspecialchars($turma['nome']); ?>
+                                                            <?php if ($turma['ano_letivo']): ?>
+                                                                (<?php echo htmlspecialchars($turma['ano_letivo']); ?>)
+                                                            <?php endif; ?>
                                                         </option>
                                                         <?php endforeach; ?>
                                                     </select>
@@ -306,6 +328,72 @@ try {
     <script src="<?php echo getAssetUrl('assets/js/settings.js'); ?>"></script>
     <script src="<?php echo getAssetUrl('assets/js/todolist.js'); ?>"></script>
     
+    <style>
+        .aluno-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .aluno-item:hover {
+            background-color: #f8f9fa;
+            border-left: 4px solid #007bff;
+        }
+        
+        .aluno-item.selected {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .aluno-info {
+            flex: 1;
+        }
+        
+        .aluno-nome {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 2px;
+        }
+        
+        .aluno-turma {
+            font-size: 0.85em;
+            color: #666;
+        }
+        
+        .aluno-badge {
+            background-color: #007bff;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75em;
+        }
+        
+        .no-results {
+            padding: 40px 20px;
+            text-align: center;
+            color: #666;
+        }
+        
+        .no-results i {
+            font-size: 3em;
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+        
+        .search-container .input-group-text {
+            border-color: #007bff;
+        }
+        
+        .search-container .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+    </style>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const tipoNovo = document.getElementById('tipo_novo');
@@ -313,38 +401,162 @@ try {
             const campoAlunoExistente = document.getElementById('campo-aluno-existente');
             const campoNomeNovo = document.getElementById('campo-nome-novo');
             const nomeField = document.getElementById('nome');
-            const alunoSelect = document.getElementById('aluno_existente_id');
+            const alunoHidden = document.getElementById('aluno_existente_id');
+            const buscarAluno = document.getElementById('buscar-aluno');
+            const limparBusca = document.getElementById('limpar-busca');
+            const contadorAlunos = document.getElementById('contador-alunos');
+            const alunosList = document.getElementById('alunos-list');
+            
+            // Dados dos alunos (carregados do PHP)
+            const alunos = <?php
+                try {
+                    $stmt = $pdo->query("
+                        SELECT a.id, a.nome, a.turma_id, t.nome as turma_nome, t.ano_letivo
+                        FROM alunos a 
+                        LEFT JOIN turmas t ON a.turma_id = t.id 
+                        ORDER BY a.nome
+                    ");
+                    $alunos = [];
+                    while ($aluno = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                        $alunos[] = [
+                            'id' => (int)$aluno['id'],
+                            'nome' => $aluno['nome'],
+                            'turma_nome' => $aluno['turma_nome'],
+                            'ano_letivo' => $aluno['ano_letivo']
+                        ];
+                    }
+                    echo json_encode($alunos, JSON_UNESCAPED_UNICODE);
+                } catch (PDOException $e) {
+                    echo '[]';
+                }
+            ?>;
+            
+            console.log('Alunos carregados:', alunos);
+            
+            let alunosFiltrados = [...alunos];
+            let alunoSelecionado = null;
             
             function toggleCampos() {
                 if (tipoExistente.checked) {
-                    // Re-matrícula: mostrar seleção de aluno, ocultar campo nome
                     campoAlunoExistente.style.display = 'block';
                     campoNomeNovo.style.display = 'none';
                     nomeField.required = false;
-                    alunoSelect.required = true;
+                    alunoHidden.required = true;
+                    carregarListaAlunos();
                 } else {
-                    // Novo aluno: ocultar seleção de aluno, mostrar campo nome
                     campoAlunoExistente.style.display = 'none';
                     campoNomeNovo.style.display = 'block';
                     nomeField.required = true;
-                    alunoSelect.required = false;
+                    alunoHidden.required = false;
                 }
             }
             
-            // Event listeners
-            tipoNovo.addEventListener('change', toggleCampos);
-            tipoExistente.addEventListener('change', toggleCampos);
-            
-            // Preencher nome automaticamente quando selecionar aluno existente
-            alunoSelect.addEventListener('change', function() {
-                if (this.value) {
-                    const selectedOption = this.options[this.selectedIndex];
-                    const nomeAluno = selectedOption.text.split(' - Turma:')[0];
-                    nomeField.value = nomeAluno;
+            function carregarListaAlunos() {
+                if (!alunosList) {
+                    console.error('Elemento alunos-list não encontrado');
+                    return;
                 }
-            });
+                
+                alunosList.innerHTML = '';
+                
+                if (alunosFiltrados.length === 0) {
+                    alunosList.innerHTML = `
+                        <div class="no-results">
+                            <i class="mdi mdi-account-search"></i>
+                            <p>Nenhum aluno encontrado</p>
+                            <small>Tente ajustar os termos de busca</small>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                alunosFiltrados.forEach(aluno => {
+                    const alunoItem = document.createElement('div');
+                    alunoItem.className = 'aluno-item';
+                    alunoItem.dataset.alunoId = aluno.id;
+                    
+                    const turmaInfo = aluno.turma_nome ? 
+                        `${aluno.turma_nome}${aluno.ano_letivo ? ` (${aluno.ano_letivo})` : ''}` : 
+                        'Sem turma';
+                    
+                    alunoItem.innerHTML = `
+                        <div class="aluno-info">
+                            <div class="aluno-nome">${aluno.nome}</div>
+                            <div class="aluno-turma">
+                                <i class="mdi mdi-school"></i> ${turmaInfo}
+                            </div>
+                        </div>
+                        <div class="aluno-badge">ID: ${aluno.id}</div>
+                    `;
+                    
+                    alunoItem.addEventListener('click', () => selecionarAluno(aluno));
+                    alunosList.appendChild(alunoItem);
+                });
+                
+                if (contadorAlunos) {
+                    contadorAlunos.textContent = `${alunosFiltrados.length} de ${alunos.length} alunos`;
+                }
+            }
             
-            // Inicializar estado
+            function selecionarAluno(aluno) {
+                // Remover seleção anterior
+                document.querySelectorAll('.aluno-item').forEach(item => {
+                    item.classList.remove('selected');
+                });
+                
+                // Selecionar novo aluno
+                const alunoItem = document.querySelector(`[data-aluno-id="${aluno.id}"]`);
+                if (alunoItem) {
+                    alunoItem.classList.add('selected');
+                }
+                
+                alunoSelecionado = aluno;
+                alunoHidden.value = aluno.id;
+                nomeField.value = aluno.nome;
+                
+                // Destacar o campo de busca
+                buscarAluno.value = aluno.nome;
+                buscarAluno.style.backgroundColor = '#e8f5e8';
+                setTimeout(() => {
+                    buscarAluno.style.backgroundColor = '';
+                }, 1000);
+            }
+            
+            function filtrarAlunos(termo) {
+                const termoLower = termo.toLowerCase();
+                
+                alunosFiltrados = alunos.filter(aluno => {
+                    const nomeMatch = aluno.nome.toLowerCase().includes(termoLower);
+                    const turmaMatch = aluno.turma_nome && aluno.turma_nome.toLowerCase().includes(termoLower);
+                    const anoMatch = aluno.ano_letivo && aluno.ano_letivo.toString().includes(termoLower);
+                    
+                    return nomeMatch || turmaMatch || anoMatch;
+                });
+                
+                carregarListaAlunos();
+            }
+            
+            // Event listeners
+            if (tipoNovo) tipoNovo.addEventListener('change', toggleCampos);
+            if (tipoExistente) tipoExistente.addEventListener('change', toggleCampos);
+            
+            if (buscarAluno) {
+                buscarAluno.addEventListener('input', function() {
+                    filtrarAlunos(this.value);
+                });
+            }
+            
+            if (limparBusca) {
+                limparBusca.addEventListener('click', function() {
+                    buscarAluno.value = '';
+                    filtrarAlunos('');
+                    alunoSelecionado = null;
+                    alunoHidden.value = '';
+                    nomeField.value = '';
+                });
+            }
+            
+            // Inicializar
             toggleCampos();
         });
     </script>

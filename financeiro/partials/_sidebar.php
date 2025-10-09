@@ -27,7 +27,7 @@ if (!function_exists('getPageUrl')) {
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-toggle="collapse" href="#pagamentos" aria-expanded="false" aria-controls="pagamentos">
+        <a class="nav-link" data-bs-toggle="collapse" href="#pagamentos" aria-expanded="false" aria-controls="pagamentos">
           <span class="menu-title">Pagamentos</span>
           <i class="mdi mdi-cash-multiple menu-icon"></i>
         </a>
@@ -46,7 +46,7 @@ if (!function_exists('getPageUrl')) {
         </div>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-toggle="collapse" href="#alunos" aria-expanded="false" aria-controls="alunos">
+        <a class="nav-link" data-bs-toggle="collapse" href="#alunos" aria-expanded="false" aria-controls="alunos">
           <span class="menu-title">Alunos</span>
           <i class="mdi mdi-account-multiple menu-icon"></i>
         </a>
@@ -59,9 +59,27 @@ if (!function_exists('getPageUrl')) {
         </div>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="<?php echo getPageUrl('financeiro/pre_cadastro/index.php'); ?>">
+        <a class="nav-link" data-bs-toggle="collapse" href="#pre-cadastros" aria-expanded="false" aria-controls="pre-cadastros">
           <span class="menu-title">Pré-cadastros</span>
+          <i class="menu-arrow"></i>
           <i class="mdi mdi-account-plus menu-icon"></i>
+        </a>
+        <div class="collapse" id="pre-cadastros">
+          <ul class="nav flex-column sub-menu">
+            <li class="nav-item">
+              <a class="nav-link" href="<?php echo getPageUrl('financeiro/pre_cadastro/criar.php'); ?>">Criar</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="<?php echo getPageUrl('financeiro/pre_cadastro/index.php'); ?>">Listar - Aluno</a>
+            </li>
+          </ul>
+        </div>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" href="<?php echo getPageUrl('financeiro/configuracoes.php'); ?>">
+          <span class="menu-title">Configurações Avançadas</span>
+          <i class="mdi mdi-cog menu-icon"></i>
         </a>
       </li>
     </ul>

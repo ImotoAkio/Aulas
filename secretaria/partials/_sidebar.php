@@ -29,7 +29,7 @@ if (!function_exists('getPageUrl')) {
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
+        <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
           <span class="menu-title">Pedagógico</span>
           <i class="menu-arrow"></i>
           <i class="mdi mdi-crosshairs-gps menu-icon"></i>
@@ -49,7 +49,7 @@ if (!function_exists('getPageUrl')) {
         </div>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-toggle="collapse" href="#cadastros" aria-expanded="false" aria-controls="cadastros">
+        <a class="nav-link" data-bs-toggle="collapse" href="#cadastros" aria-expanded="false" aria-controls="cadastros">
           <span class="menu-title">Cadastros</span>
           <i class="mdi mdi-contacts menu-icon"></i>
         </a>
@@ -59,7 +59,7 @@ if (!function_exists('getPageUrl')) {
               <a class="nav-link" href="<?php echo getPageUrl('secretaria/cad/professor.php'); ?>">Professor</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="<?php echo getPageUrl('secretaria/cad/aluno.php'); ?>">Aluno</a>
+              <a class="nav-link" href="<?php echo getPageUrl('secretaria/cad/listar_alunos.php'); ?>">Aluno</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="<?php echo getPageUrl('secretaria/cad/listar_alunos.php'); ?>">Listar Alunos</a>
@@ -79,15 +79,13 @@ if (!function_exists('getPageUrl')) {
             <li class="nav-item">
               <a class="nav-link" href="<?php echo getPageUrl('secretaria/cad/sincronizar_nomes.php'); ?>">Sincronizar Nomes</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="<?php echo getPageUrl('secretaria/pre_cadastro/index.php'); ?>">Pré-cadastros</a>
-            </li>
+
           </ul>
         </div>
       </li>
 
       <li class="nav-item">
-        <a class="nav-link" data-toggle="collapse" href="#declaracoes" aria-expanded="false" aria-controls="declaracoes">
+        <a class="nav-link" data-bs-toggle="collapse" href="#declaracoes" aria-expanded="false" aria-controls="declaracoes">
           <span class="menu-title">Declarações</span>
           <i class="mdi mdi-file-document menu-icon"></i>
         </a>
@@ -104,11 +102,11 @@ if (!function_exists('getPageUrl')) {
       </li>
 
       <li class="nav-item">
-        <a class="nav-link" data-toggle="collapse" href="#declaracoes" aria-expanded="false" aria-controls="declaracoes">
+        <a class="nav-link" data-bs-toggle="collapse" href="#pre-cadastros" aria-expanded="false" aria-controls="pre-cadastros">
           <span class="menu-title">Pré cadastros</span>
           <i class="mdi mdi-file-document menu-icon"></i>
         </a>
-        <div class="collapse" id="declaracoes">
+        <div class="collapse" id="pre-cadastros">
           <ul class="nav flex-column sub-menu">
             <li class="nav-item">
               <a class="nav-link" href="<?php echo getPageUrl('secretaria/pre_cadastro/criar.php'); ?>">Criar</a>
@@ -118,6 +116,14 @@ if (!function_exists('getPageUrl')) {
             </li>
           </ul>
         </div>
+      </li>
+
+
+      <li class="nav-item">
+        <a class="nav-link" href="<?php echo getPageUrl('secretaria/configuracoes.php'); ?>">
+          <span class="menu-title">Configurações Avançadas</span>
+          <i class="mdi mdi-cog menu-icon"></i>
+        </a>
       </li>
     </ul>
   </nav>

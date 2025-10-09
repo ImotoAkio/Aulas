@@ -11,7 +11,7 @@ if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo'] != 'coordenador') {
 
 // Verificar se há dados da declaração
 if (!isset($_SESSION['declaracao_vinculo'])) {
-    header('Location: aluno.php');
+    header('Location: ../declaracoes/aluno.php');
     exit();
 }
 

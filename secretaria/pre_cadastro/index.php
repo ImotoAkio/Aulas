@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once '../../config/database.php';
+require_once '../../config/webhook_functions.php';
 
 // Verificar se o usuário está logado e é secretaria ou coordenador
 if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['tipo'], ['coordenador', 'secretaria'])) {
@@ -39,8 +40,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao'])) {
                     
                     $pdo->commit();
                     
+                    // Enviar webhook de aprovação
+                    $webhook_enviado = enviarWebhookAprovacao($aluno_id, $pdo);
+                    
                     error_log("DEBUG: Aluno aprovado com sucesso!");
                     $sucesso = "Pré-cadastro aprovado com sucesso! O aluno está oficialmente matriculado.";
+                    if ($webhook_enviado) {
+                        $sucesso .= " Notificação enviada via webhook.";
+                    } else {
+                        $sucesso .= " <small class='text-warning'>(Webhook não configurado ou falhou)</small>";
+                    }
                 } else {
                     $pdo->rollBack();
                     error_log("DEBUG: Erro - aluno não encontrado ou status inválido");
@@ -62,12 +71,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao'])) {
 try {
     $stmt = $pdo->prepare("
         SELECT a.id, a.nome, a.codigo_pre_cadastro, a.status_cadastro, a.preenchido_por_responsavel, 
-               a.dados_preenchidos_em, t.nome as turma_nome, u.nome as criado_por_nome,
-               pc.criado_em, pc.link_expiracao, pc.observacoes
+               a.dados_preenchidos_em, t.nome as turma_nome, pc.link_expiracao, pc.observacoes, pc.criado_em
         FROM alunos a
+        INNER JOIN pre_cadastros_controle pc ON a.id = pc.aluno_id
         LEFT JOIN turmas t ON a.turma_id = t.id
-        LEFT JOIN pre_cadastros_controle pc ON a.id = pc.aluno_id
-        LEFT JOIN usuarios u ON pc.criado_por = u.id
         WHERE a.status_cadastro IN ('pre_cadastro', 'completo', 'aprovado')
         ORDER BY pc.criado_em DESC
     ");
@@ -202,8 +209,6 @@ try {
                                                     <th>Aluno</th>
                                                     <th>Turma</th>
                                                     <th>Status</th>
-                                                    <th>Criado por</th>
-                                                    <th>Data Criação</th>
                                                     <th>Preenchido</th>
                                                     <th>Ações</th>
                                                 </tr>
@@ -239,8 +244,6 @@ try {
                                                         ?>
                                                         <span class="badge <?php echo $status_class; ?>"><?php echo $status_text; ?></span>
                                                     </td>
-                                                    <td><?php echo htmlspecialchars($pre_cadastro['criado_por_nome'] ?? 'N/A'); ?></td>
-                                                    <td><?php echo date('d/m/Y H:i', strtotime($pre_cadastro['criado_em'])); ?></td>
                                                     <td>
                                                         <?php if ($pre_cadastro['preenchido_por_responsavel']): ?>
                                                             <span class="badge badge-success">Sim</span>
@@ -251,7 +254,7 @@ try {
                                                     </td>
                                                     <td>
                                                         <div class="btn-group" role="group">
-                                                            <a href="visualizar.php?id=<?php echo $pre_cadastro['id']; ?>" class="btn btn-sm btn-outline-info">
+                                                            <a href="visualizar.php?id=<?php echo $pre_cadastro['id']; ?>" class="btn btn-sm btn-outline-info" title="Visualizar">
                                                                 <i class="mdi mdi-eye"></i>
                                                             </a>
                                                             <?php if ($pre_cadastro['status_cadastro'] === 'completo'): ?>
@@ -264,8 +267,11 @@ try {
                                                             </form>
                                                             <?php endif; ?>
                                                             <?php if ($pre_cadastro['codigo_pre_cadastro']): ?>
-                                                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="copiarLink('<?php echo $pre_cadastro['codigo_pre_cadastro']; ?>')">
-                                                                <i class="mdi mdi-link"></i>
+                                                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="copiarLink('<?php echo $pre_cadastro['codigo_pre_cadastro']; ?>')" title="Copiar Link">
+                                                                <i class="mdi mdi-content-copy"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-sm btn-outline-success" onclick="abrirModalWhatsApp('<?php echo $pre_cadastro['id']; ?>', '<?php echo htmlspecialchars($pre_cadastro['nome']); ?>', '<?php echo $pre_cadastro['codigo_pre_cadastro']; ?>')" title="Enviar para WhatsApp">
+                                                                <i class="mdi mdi-whatsapp"></i>
                                                             </button>
                                                             <?php endif; ?>
                                                         </div>
@@ -321,6 +327,61 @@ try {
         </div>
     </div>
 
+    <!-- Modal para Envio via WhatsApp -->
+    <div class="modal fade" id="modalWhatsApp" tabindex="-1" role="dialog" aria-labelledby="modalWhatsAppLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalWhatsAppLabel">
+                        <i class="mdi mdi-whatsapp text-success me-2"></i>
+                        Enviar para WhatsApp
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formWhatsApp">
+                        <div class="form-group">
+                            <label for="telefoneWhatsApp">Número do WhatsApp</label>
+                            <input type="tel"
+                                   class="form-control"
+                                   id="telefoneWhatsApp"
+                                   placeholder="(87) 99999-9999"
+                                   required>
+                            <small class="form-text text-muted">
+                                <i class="mdi mdi-information"></i>
+                                Digite o número que receberá os dados via WhatsApp.
+                            </small>
+                        </div>
+                        <div class="alert alert-info">
+                            <h6><i class="mdi mdi-information"></i> Dados que serão enviados:</h6>
+                            <ul class="mb-0">
+                                <li><strong>Link do Cadastro:</strong> <span id="linkCadastroPreview"></span></li>
+                                <li><strong>Nome do Aluno:</strong> <span id="nomeAlunoPreview"></span></li>
+                                <li><strong>Telefone:</strong> Será formatado automaticamente</li>
+                                <li><strong>Timestamp:</strong> Data/hora atual</li>
+                            </ul>
+                        </div>
+                        <div id="whatsapp-status" style="display: none;">
+                            <div class="alert" id="whatsapp-alert">
+                                <div id="whatsapp-mensagem"></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="mdi mdi-close"></i> Cancelar
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="enviarParaWhatsApp()">
+                        <i class="mdi mdi-whatsapp"></i> Enviar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="<?php echo getAssetUrl('assets/vendors/js/vendor.bundle.base.js'); ?>"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -331,10 +392,93 @@ try {
     <script src="<?php echo getAssetUrl('assets/js/todolist.js'); ?>"></script>
     
     <script>
+        // Variáveis globais para o modal
+        let alunoIdAtual = null;
+        let codigoAtual = null;
+        
         function copiarLink(codigo) {
             const link = '<?php echo getBaseUrl(); ?>cadastro_aluno.php?codigo=' + codigo;
             navigator.clipboard.writeText(link).then(function() {
                 alert('Link copiado para a área de transferência!');
+            });
+        }
+        
+        function abrirModalWhatsApp(alunoId, nomeAluno, codigo) {
+            alunoIdAtual = alunoId;
+            codigoAtual = codigo;
+            
+            // Atualizar preview no modal
+            document.getElementById('nomeAlunoPreview').textContent = nomeAluno;
+            document.getElementById('linkCadastroPreview').textContent = '<?php echo getBaseUrl(); ?>cadastro_aluno.php?codigo=' + codigo;
+            
+            // Limpar campo de telefone
+            document.getElementById('telefoneWhatsApp').value = '';
+            
+            // Esconder status
+            document.getElementById('whatsapp-status').style.display = 'none';
+            
+            // Abrir modal
+            $('#modalWhatsApp').modal('show');
+        }
+        
+        function enviarParaWhatsApp() {
+            const telefone = document.getElementById('telefoneWhatsApp').value;
+            const statusDiv = document.getElementById('whatsapp-status');
+            const alertDiv = document.getElementById('whatsapp-alert');
+            const mensagemDiv = document.getElementById('whatsapp-mensagem');
+            
+            if (!telefone) {
+                alert('❌ Por favor, digite o número do WhatsApp!');
+                return;
+            }
+            
+            // Limpar e formatar telefone
+            const telefoneLimpo = telefone.replace(/[^0-9]/g, '');
+            let telefoneFormatado = '';
+            
+            if (!telefoneLimpo.startsWith('55')) {
+                telefoneFormatado = '55' + telefoneLimpo;
+            } else {
+                telefoneFormatado = telefoneLimpo;
+            }
+            
+            // Mostrar status
+            statusDiv.style.display = 'block';
+            alertDiv.className = 'alert alert-info';
+            mensagemDiv.innerHTML = '<i class="mdi mdi-loading mdi-spin"></i> Enviando dados para WhatsApp...';
+            
+            // Enviar via AJAX
+            fetch('visualizar.php?id=' + alunoIdAtual, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'acao=enviar_json&telefone_custom=' + encodeURIComponent(telefoneFormatado)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.webhook_status === 'sucesso') {
+                    alertDiv.className = 'alert alert-success';
+                    mensagemDiv.innerHTML = '<i class="mdi mdi-check-circle"></i> <strong>Sucesso!</strong><br>Dados enviados para WhatsApp: ' + telefoneFormatado;
+                    
+                    // Fechar modal após 2 segundos
+                    setTimeout(() => {
+                        $('#modalWhatsApp').modal('hide');
+                        // Limpar campo
+                        document.getElementById('telefoneWhatsApp').value = '';
+                        statusDiv.style.display = 'none';
+                    }, 2000);
+                } else if (data.webhook_status === 'nao_configurado') {
+                    alertDiv.className = 'alert alert-warning';
+                    mensagemDiv.innerHTML = '<i class="mdi mdi-alert"></i> Webhook não configurado. Configure em Configurações Avançadas.';
+                } else {
+                    alertDiv.className = 'alert alert-danger';
+                    mensagemDiv.innerHTML = '<i class="mdi mdi-close-circle"></i> <strong>Erro!</strong><br>' + (data.webhook_erro || 'Erro desconhecido');
+                }
+            })
+            .catch(error => {
+                alertDiv.className = 'alert alert-danger';
+                mensagemDiv.innerHTML = '<i class="mdi mdi-close-circle"></i> <strong>Erro de conexão!</strong><br>' + error.message;
             });
         }
     </script>

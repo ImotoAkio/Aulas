@@ -7,8 +7,8 @@ if (!function_exists('getPageUrl')) {
 session_start();
 require_once __DIR__ . '/../../config/database.php';
 
-// Verificar se o usuário está logado e é coordenador
-if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo'] != 'coordenador') {
+// Verificar se o usuário está logado e é financeiro ou coordenador
+if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['tipo'], ['coordenador', 'financeiro'])) {
     require_once __DIR__ . '/../../config/database.php';
     redirectTo('login.php');
     exit();
@@ -16,7 +16,7 @@ if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo'] != 'coordenador') {
 
 $aluno_id = $_GET['id'] ?? null;
 if (!$aluno_id) {
-    header('Location: ' . getPageUrl('secretaria/cad/listar_alunos.php'));
+    header('Location: ' . getPageUrl('financeiro/alunos.php'));
     exit();
 }
 
@@ -34,13 +34,13 @@ try {
     
     if (!$aluno) {
         $_SESSION['erro'] = "Aluno não encontrado.";
-        header('Location: ' . getPageUrl('secretaria/cad/listar_alunos.php'));
+        header('Location: ' . getPageUrl('financeiro/alunos.php'));
         exit();
     }
 } catch (PDOException $e) {
     error_log("Erro ao buscar aluno: " . $e->getMessage());
     $_SESSION['erro'] = "Erro ao buscar dados do aluno.";
-    header('Location: ' . getPageUrl('secretaria/cad/listar_alunos.php'));
+    header('Location: ' . getPageUrl('financeiro/alunos.php'));
     exit();
 }
 
@@ -130,7 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->commit();
         
         $_SESSION['sucesso'] = "Aluno atualizado com sucesso!";
-        header('Location: ' . getPageUrl('secretaria/cad/listar_alunos.php'));
+        header('Location: ' . getPageUrl('financeiro/alunos.php'));
         exit();
         
     } catch (Exception $e) {
@@ -232,8 +232,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <h3 class="page-title"> Editar Aluno </h3>
             <nav aria-label="breadcrumb">
               <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href='<?php echo getPageUrl("secretaria/index.php"); ?>'>Dashboard</a></li>
-                <li class="breadcrumb-item"><a href="<?php echo getPageUrl('secretaria/cad/listar_alunos.php'); ?>">Listar Alunos</a></li>
+                <li class="breadcrumb-item"><a href='<?php echo getPageUrl("financeiro/index.php"); ?>'>Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="<?php echo getPageUrl('financeiro/alunos.php'); ?>">Listar Alunos</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Editar Aluno</li>
               </ol>
             </nav>

@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once '../../config/database.php';
+require_once '../../config/webhook_functions.php';
 
 // Verificar se o usuário está logado e é secretaria, coordenador ou financeiro
 if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['tipo'], ['coordenador', 'secretaria', 'financeiro'])) {
@@ -54,7 +55,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 $pdo->commit();
                 
+                // Enviar webhook de aprovação
+                $webhook_enviado = enviarWebhookAprovacao($aluno_id, $pdo);
+                
                 $sucesso = "Pré-cadastro aprovado com sucesso! O aluno está oficialmente matriculado.";
+                if ($webhook_enviado) {
+                    $sucesso .= " Notificação enviada via webhook.";
+                } else {
+                    $sucesso .= " <small class='text-warning'>(Webhook não configurado ou falhou)</small>";
+                }
                 
             } catch (PDOException $e) {
                 $pdo->rollBack();

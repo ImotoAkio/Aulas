@@ -301,17 +301,17 @@ foreach ($alunos as $aluno) {
                             </td>
                             <td>
                               <div class="btn-group" role="group">
-                                <a href="editar_aluno.php?id=<?= $aluno['id'] ?>" 
+                                <a href="<?php echo getPageUrl('secretaria/cad/editar_aluno.php?id=' . $aluno['id']); ?>" 
                                    class="btn btn-outline-primary btn-sm" 
                                    title="Editar">
                                   <i class="mdi mdi-pencil"></i>
                                 </a>
-                                <a href="visualizar_aluno.php?id=<?= $aluno['id'] ?>" 
+                                <a href="<?php echo getPageUrl('secretaria/cad/visualizar_aluno.php?id=' . $aluno['id']); ?>" 
                                    class="btn btn-outline-info btn-sm" 
                                    title="Visualizar">
                                   <i class="mdi mdi-eye"></i>
                                 </a>
-                                <a href="excluir_aluno.php?id=<?= $aluno['id'] ?>" 
+                                <a href="<?php echo getPageUrl('secretaria/cad/excluir_aluno.php?id=' . $aluno['id']); ?>" 
                                    class="btn btn-outline-danger btn-sm" 
                                    title="Excluir"
                                    onclick="return confirm('Tem certeza que deseja excluir este aluno?')">

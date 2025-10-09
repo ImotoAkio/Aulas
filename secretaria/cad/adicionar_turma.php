@@ -14,13 +14,15 @@ if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo'] != 'coordenador') {
     exit();
 }
 
+// Obter conexão com o banco de dados
+$pdo = getConnection();
+
 $erro = '';
 $sucesso = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nome = trim($_POST['nome'] ?? '');
     $ano_letivo = trim($_POST['ano_letivo'] ?? '');
-    $descricao = trim($_POST['descricao'] ?? '');
     
     // Validações
     if (empty($nome)) {
@@ -39,8 +41,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $erro = 'Já existe uma turma com este nome no ano letivo ' . $ano_letivo . '.';
             } else {
                 // Inserir nova turma
-                $stmt = $pdo->prepare("INSERT INTO turmas (nome, ano_letivo, descricao) VALUES (?, ?, ?)");
-                $stmt->execute([$nome, $ano_letivo, $descricao]);
+                $stmt = $pdo->prepare("INSERT INTO turmas (nome, ano_letivo) VALUES (?, ?)");
+                $stmt->execute([$nome, $ano_letivo]);
                 
                 $_SESSION['sucesso'] = 'Turma "' . $nome . '" cadastrada com sucesso!';
                 header('Location: turmas.php');
@@ -141,16 +143,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                              value="<?= htmlspecialchars($_POST['ano_letivo'] ?? date('Y')) ?>"
                              required>
                       <small class="form-text text-muted">Ano letivo da turma</small>
-                    </div>
-
-                    <div class="form-group">
-                      <label for="descricao">Descrição</label>
-                      <textarea class="form-control" 
-                                id="descricao" 
-                                name="descricao" 
-                                rows="3" 
-                                placeholder="Descrição opcional da turma"><?= htmlspecialchars($_POST['descricao'] ?? '') ?></textarea>
-                      <small class="form-text text-muted">Informações adicionais sobre a turma</small>
                     </div>
 
                     <div class="form-group">

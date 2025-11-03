@@ -59,7 +59,7 @@ if (!function_exists('getPageUrl')) {
               <a class="nav-link" href="<?php echo getPageUrl('secretaria/cad/professor.php'); ?>">Professor</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="<?php echo getPageUrl('secretaria/cad/listar_alunos.php'); ?>">Aluno</a>
+              <a class="nav-link" href="<?php echo getPageUrl('secretaria/cad/aluno.php'); ?>">Aluno</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="<?php echo getPageUrl('secretaria/cad/listar_alunos.php'); ?>">Listar Alunos</a>

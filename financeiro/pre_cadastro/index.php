@@ -30,9 +30,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao'])) {
                 error_log("DEBUG: Status atual do aluno: " . ($aluno['status_cadastro'] ?? 'não encontrado'));
                 
                 if ($aluno && $aluno['status_cadastro'] === 'completo') {
-                    // Atualizar status do aluno para aprovado
-                    $stmt = $pdo->prepare("UPDATE alunos SET status_cadastro = 'aprovado' WHERE id = ?");
+                    // Buscar turma_futura_id do pré-cadastro
+                    $stmt = $pdo->prepare("SELECT turma_futura_id FROM pre_cadastros_controle WHERE aluno_id = ?");
                     $stmt->execute([$aluno_id]);
+                    $pre_cadastro = $stmt->fetch(PDO::FETCH_ASSOC);
+                    
+                    // Se tem turma futura, aplicar ela no aluno
+                    if ($pre_cadastro && $pre_cadastro['turma_futura_id']) {
+                        $stmt = $pdo->prepare("UPDATE alunos SET status_cadastro = 'aprovado', turma_id = ? WHERE id = ?");
+                        $stmt->execute([$pre_cadastro['turma_futura_id'], $aluno_id]);
+                    } else {
+                        // Se não tem turma futura, apenas atualiza status
+                        $stmt = $pdo->prepare("UPDATE alunos SET status_cadastro = 'aprovado' WHERE id = ?");
+                        $stmt->execute([$aluno_id]);
+                    }
                     
                     // Atualizar status no controle
                     $stmt = $pdo->prepare("UPDATE pre_cadastros_controle SET status = 'aprovado' WHERE aluno_id = ?");

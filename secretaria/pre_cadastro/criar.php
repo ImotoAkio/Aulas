@@ -35,12 +35,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute([$codigo, $aluno_existente_id]);
                 $aluno_id = $aluno_existente_id;
             } else {
-                // Novo aluno: inserir novo registro
+                // Novo aluno: inserir novo registro (turma_id NULL pois é pré-cadastro)
                 $stmt = $pdo->prepare("
                     INSERT INTO alunos (nome, turma_id, status_cadastro, codigo_pre_cadastro) 
-                    VALUES (?, ?, 'pre_cadastro', ?)
+                    VALUES (?, NULL, 'pre_cadastro', ?)
                 ");
-                $stmt->execute([$nome, $turma_id, $codigo]);
+                $stmt->execute([$nome, $codigo]);
                 $aluno_id = $pdo->lastInsertId();
             }
             

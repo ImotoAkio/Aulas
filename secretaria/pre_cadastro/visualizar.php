@@ -275,6 +275,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['ac
                     </div>
                     <?php endif; ?>
 
+                    <div class="row mb-3">
+                        <div class="col-12 text-right">
+                            <a href="gerar_ficha_cadastral.php?id=<?php echo $aluno_id; ?>" target="_blank" class="btn btn-gradient-info">
+                                <i class="mdi mdi-file-pdf"></i> Ficha Cadastral
+                            </a>
+                        </div>
+                    </div>
+
                     <div class="row">
                         <div class="col-md-8 grid-margin stretch-card">
                             <div class="card">

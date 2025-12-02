@@ -10,7 +10,7 @@ if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['tipo'], ['coordenado
 $pdo = getConnection();
 
 // Verificar se o ID foi fornecido
-$aluno_id = (int)($_GET['id'] ?? 0);
+$aluno_id = (int) ($_GET['id'] ?? 0);
 if ($aluno_id <= 0) {
     redirectTo('secretaria/cad/listar_alunos.php');
 }
@@ -18,7 +18,7 @@ if ($aluno_id <= 0) {
 // Buscar dados do aluno
 try {
     error_log("DEBUG: Buscando aluno ID: " . $aluno_id);
-    
+
     $stmt = $pdo->prepare("
         SELECT a.*, t.nome as turma_nome, t.ano_letivo
         FROM alunos a
@@ -27,12 +27,12 @@ try {
     ");
     $stmt->execute([$aluno_id]);
     $aluno = $stmt->fetch(PDO::FETCH_ASSOC);
-    
+
     error_log("DEBUG: Aluno encontrado: " . ($aluno ? 'SIM' : 'NÃO'));
     if ($aluno) {
         error_log("DEBUG: Nome do aluno: " . $aluno['nome']);
     }
-    
+
     if (!$aluno) {
         error_log("DEBUG: Redirecionando - aluno não encontrado");
         redirectTo('secretaria/cad/listar_alunos.php');
@@ -43,20 +43,26 @@ try {
 }
 
 // Função para formatar data
-function formatarData($data) {
-    if (!$data || $data === '0000-00-00') return 'Não informado';
+function formatarData($data)
+{
+    if (!$data || $data === '0000-00-00')
+        return 'Não informado';
     return date('d/m/Y', strtotime($data));
 }
 
 // Função para formatar CPF
-function formatarCPF($cpf) {
-    if (!$cpf) return 'Não informado';
+function formatarCPF($cpf)
+{
+    if (!$cpf)
+        return 'Não informado';
     return preg_replace('/(\d{3})(\d{3})(\d{3})(\d{2})/', '$1.$2.$3-$4', $cpf);
 }
 
 // Função para formatar telefone
-function formatarTelefone($telefone) {
-    if (!$telefone) return 'Não informado';
+function formatarTelefone($telefone)
+{
+    if (!$telefone)
+        return 'Não informado';
     $telefone = preg_replace('/[^0-9]/', '', $telefone);
     if (strlen($telefone) === 11) {
         return preg_replace('/(\d{2})(\d{5})(\d{4})/', '($1) $2-$3', $telefone);
@@ -69,6 +75,7 @@ function formatarTelefone($telefone) {
 
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -78,13 +85,14 @@ function formatarTelefone($telefone) {
     <link rel="stylesheet" href="<?php echo getAssetUrl('assets/css/style.css'); ?>">
     <link rel="shortcut icon" href="<?php echo getAssetUrl('assets/images/favicon.png'); ?>" />
 </head>
+
 <body>
     <div class="container-scroller">
         <?php include '../partials/_navbar.php'; ?>
-        
+
         <div class="container-fluid page-body-wrapper">
             <?php include '../partials/_sidebar.php'; ?>
-            
+
             <div class="main-panel">
                 <div class="content-wrapper">
                     <div class="page-header">
@@ -96,9 +104,13 @@ function formatarTelefone($telefone) {
                         </h3>
                         <nav aria-label="breadcrumb">
                             <ul class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="<?php echo getPageUrl('secretaria/index.php'); ?>">Secretaria</a></li>
-                                <li class="breadcrumb-item"><a href="<?php echo getPageUrl('secretaria/cad/listar_alunos.php'); ?>">Cadastros</a></li>
-                                <li class="breadcrumb-item active" aria-current="page"><?php echo htmlspecialchars($aluno['nome']); ?></li>
+                                <li class="breadcrumb-item"><a
+                                        href="<?php echo getPageUrl('secretaria/index.php'); ?>">Secretaria</a></li>
+                                <li class="breadcrumb-item"><a
+                                        href="<?php echo getPageUrl('secretaria/cad/listar_alunos.php'); ?>">Cadastros</a>
+                                </li>
+                                <li class="breadcrumb-item active" aria-current="page">
+                                    <?php echo htmlspecialchars($aluno['nome']); ?></li>
                             </ul>
                         </nav>
                     </div>
@@ -106,11 +118,17 @@ function formatarTelefone($telefone) {
                     <!-- Botões de ação -->
                     <div class="row mb-3">
                         <div class="col-12">
-                            <a href="<?php echo getPageUrl('secretaria/cad/listar_alunos.php'); ?>" class="btn btn-gradient-secondary">
+                            <a href="<?php echo getPageUrl('secretaria/cad/listar_alunos.php'); ?>"
+                                class="btn btn-gradient-secondary">
                                 <i class="mdi mdi-arrow-left"></i> Voltar
                             </a>
-                            <a href="<?php echo getPageUrl('secretaria/cad/editar_aluno.php?id=' . $aluno_id); ?>" class="btn btn-gradient-primary">
+                            <a href="<?php echo getPageUrl('secretaria/cad/editar_aluno.php?id=' . $aluno_id); ?>"
+                                class="btn btn-gradient-primary">
                                 <i class="mdi mdi-pencil"></i> Editar
+                            </a>
+                            <a href="<?php echo getPageUrl('secretaria/cad/gerar_ficha_cadastral.php?id=' . $aluno_id); ?>"
+                                target="_blank" class="btn btn-gradient-info">
+                                <i class="mdi mdi-file-pdf"></i> Ficha Cadastral
                             </a>
                         </div>
                     </div>
@@ -127,34 +145,46 @@ function formatarTelefone($telefone) {
                                     </h4>
                                     <div class="row">
                                         <div class="col-sm-6">
-                                            <p><strong>Nome:</strong><br><?php echo htmlspecialchars($aluno['nome']); ?></p>
+                                            <p><strong>Nome:</strong><br><?php echo htmlspecialchars($aluno['nome']); ?>
+                                            </p>
                                         </div>
                                         <div class="col-sm-6">
-                                            <p><strong>Data de Nascimento:</strong><br><?php echo formatarData($aluno['data_nascimento']); ?></p>
+                                            <p><strong>Data de
+                                                    Nascimento:</strong><br><?php echo formatarData($aluno['data_nascimento']); ?>
+                                            </p>
                                         </div>
                                         <div class="col-sm-6">
                                             <p><strong>CPF:</strong><br><?php echo formatarCPF($aluno['cpf']); ?></p>
                                         </div>
                                         <div class="col-sm-6">
-                                            <p><strong>RG:</strong><br><?php echo htmlspecialchars($aluno['rg'] ?? 'Não informado'); ?></p>
+                                            <p><strong>RG:</strong><br><?php echo htmlspecialchars($aluno['rg'] ?? 'Não informado'); ?>
+                                            </p>
                                         </div>
                                         <div class="col-sm-6">
-                                            <p><strong>Naturalidade:</strong><br><?php echo htmlspecialchars($aluno['naturalidade'] ?? 'Não informado'); ?></p>
+                                            <p><strong>Naturalidade:</strong><br><?php echo htmlspecialchars($aluno['naturalidade'] ?? 'Não informado'); ?>
+                                            </p>
                                         </div>
                                         <div class="col-sm-6">
-                                            <p><strong>Estado:</strong><br><?php echo htmlspecialchars($aluno['naturalidade_estado'] ?? 'Não informado'); ?></p>
+                                            <p><strong>Estado:</strong><br><?php echo htmlspecialchars($aluno['naturalidade_estado'] ?? 'Não informado'); ?>
+                                            </p>
                                         </div>
                                         <div class="col-sm-6">
-                                            <p><strong>NIS:</strong><br><?php echo htmlspecialchars($aluno['nis'] ?? 'Não informado'); ?></p>
+                                            <p><strong>NIS:</strong><br><?php echo htmlspecialchars($aluno['nis'] ?? 'Não informado'); ?>
+                                            </p>
                                         </div>
                                         <div class="col-sm-6">
-                                            <p><strong>Tipo Sanguíneo:</strong><br><?php echo htmlspecialchars($aluno['tipo_sanguineo'] ?? 'Não informado'); ?></p>
+                                            <p><strong>Tipo
+                                                    Sanguíneo:</strong><br><?php echo htmlspecialchars($aluno['tipo_sanguineo'] ?? 'Não informado'); ?>
+                                            </p>
                                         </div>
                                         <div class="col-sm-6">
-                                            <p><strong>Fator RH:</strong><br><?php echo htmlspecialchars($aluno['fator_rh'] ?? 'Não informado'); ?></p>
+                                            <p><strong>Fator
+                                                    RH:</strong><br><?php echo htmlspecialchars($aluno['fator_rh'] ?? 'Não informado'); ?>
+                                            </p>
                                         </div>
                                         <div class="col-sm-6">
-                                            <p><strong>Sexo:</strong><br><?php echo htmlspecialchars($aluno['sexo'] ?? 'Não informado'); ?></p>
+                                            <p><strong>Sexo:</strong><br><?php echo htmlspecialchars($aluno['sexo'] ?? 'Não informado'); ?>
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -171,10 +201,13 @@ function formatarTelefone($telefone) {
                                     </h4>
                                     <div class="row">
                                         <div class="col-sm-6">
-                                            <p><strong>Turma:</strong><br><?php echo htmlspecialchars($aluno['turma_nome'] ?? 'Não definida'); ?></p>
+                                            <p><strong>Turma:</strong><br><?php echo htmlspecialchars($aluno['turma_nome'] ?? 'Não definida'); ?>
+                                            </p>
                                         </div>
                                         <div class="col-sm-6">
-                                            <p><strong>Ano Letivo:</strong><br><?php echo htmlspecialchars($aluno['ano_letivo'] ?? 'Não informado'); ?></p>
+                                            <p><strong>Ano
+                                                    Letivo:</strong><br><?php echo htmlspecialchars($aluno['ano_letivo'] ?? 'Não informado'); ?>
+                                            </p>
                                         </div>
                                         <div class="col-sm-6">
                                             <p><strong>Status:</strong><br>
@@ -199,11 +232,14 @@ function formatarTelefone($telefone) {
                                                         $status_text = ucfirst($aluno['status_cadastro']);
                                                 }
                                                 ?>
-                                                <span class="badge <?php echo $status_class; ?>"><?php echo $status_text; ?></span>
+                                                <span
+                                                    class="badge <?php echo $status_class; ?>"><?php echo $status_text; ?></span>
                                             </p>
                                         </div>
                                         <div class="col-sm-6">
-                                            <p><strong>Código Pré-cadastro:</strong><br><?php echo htmlspecialchars($aluno['codigo_pre_cadastro'] ?? 'Não gerado'); ?></p>
+                                            <p><strong>Código
+                                                    Pré-cadastro:</strong><br><?php echo htmlspecialchars($aluno['codigo_pre_cadastro'] ?? 'Não gerado'); ?>
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -222,16 +258,22 @@ function formatarTelefone($telefone) {
                                     </h4>
                                     <div class="row">
                                         <div class="col-sm-6">
-                                            <p><strong>Nome da Mãe:</strong><br><?php echo htmlspecialchars($aluno['nome_mae'] ?? 'Não informado'); ?></p>
+                                            <p><strong>Nome da
+                                                    Mãe:</strong><br><?php echo htmlspecialchars($aluno['nome_mae'] ?? 'Não informado'); ?>
+                                            </p>
                                         </div>
                                         <div class="col-sm-6">
-                                            <p><strong>CPF da Mãe:</strong><br><?php echo formatarCPF($aluno['cpf_mae']); ?></p>
+                                            <p><strong>CPF da
+                                                    Mãe:</strong><br><?php echo formatarCPF($aluno['cpf_mae']); ?></p>
                                         </div>
                                         <div class="col-sm-6">
-                                            <p><strong>Nome do Pai:</strong><br><?php echo htmlspecialchars($aluno['nome_pai'] ?? 'Não informado'); ?></p>
+                                            <p><strong>Nome do
+                                                    Pai:</strong><br><?php echo htmlspecialchars($aluno['nome_pai'] ?? 'Não informado'); ?>
+                                            </p>
                                         </div>
                                         <div class="col-sm-6">
-                                            <p><strong>CPF do Pai:</strong><br><?php echo formatarCPF($aluno['cpf_pai']); ?></p>
+                                            <p><strong>CPF do
+                                                    Pai:</strong><br><?php echo formatarCPF($aluno['cpf_pai']); ?></p>
                                         </div>
                                     </div>
                                 </div>
@@ -248,22 +290,29 @@ function formatarTelefone($telefone) {
                                     </h4>
                                     <div class="row">
                                         <div class="col-sm-6">
-                                            <p><strong>Nome:</strong><br><?php echo htmlspecialchars($aluno['nome_responsavel'] ?? 'Não informado'); ?></p>
+                                            <p><strong>Nome:</strong><br><?php echo htmlspecialchars($aluno['nome_responsavel'] ?? 'Não informado'); ?>
+                                            </p>
                                         </div>
                                         <div class="col-sm-6">
-                                            <p><strong>CPF:</strong><br><?php echo formatarCPF($aluno['cpf_responsavel'] ?? ''); ?></p>
+                                            <p><strong>CPF:</strong><br><?php echo formatarCPF($aluno['cpf_responsavel'] ?? ''); ?>
+                                            </p>
                                         </div>
                                         <div class="col-sm-6">
-                                            <p><strong>Telefone:</strong><br><?php echo formatarTelefone($aluno['telefone_responsavel'] ?? ''); ?></p>
+                                            <p><strong>Telefone:</strong><br><?php echo formatarTelefone($aluno['telefone_responsavel'] ?? ''); ?>
+                                            </p>
                                         </div>
                                         <div class="col-sm-6">
-                                            <p><strong>Email:</strong><br><?php echo htmlspecialchars($aluno['email_responsavel'] ?? 'Não informado'); ?></p>
+                                            <p><strong>Email:</strong><br><?php echo htmlspecialchars($aluno['email_responsavel'] ?? 'Não informado'); ?>
+                                            </p>
                                         </div>
                                         <div class="col-sm-6">
-                                            <p><strong>Profissão:</strong><br><?php echo htmlspecialchars($aluno['profissao_responsavel'] ?? 'Não informado'); ?></p>
+                                            <p><strong>Profissão:</strong><br><?php echo htmlspecialchars($aluno['profissao_responsavel'] ?? 'Não informado'); ?>
+                                            </p>
                                         </div>
                                         <div class="col-sm-6">
-                                            <p><strong>Local de Trabalho:</strong><br><?php echo htmlspecialchars($aluno['local_trabalho_responsavel'] ?? 'Não informado'); ?></p>
+                                            <p><strong>Local de
+                                                    Trabalho:</strong><br><?php echo htmlspecialchars($aluno['local_trabalho_responsavel'] ?? 'Não informado'); ?>
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -282,10 +331,13 @@ function formatarTelefone($telefone) {
                                     </h4>
                                     <div class="row">
                                         <div class="col-sm-12">
-                                            <p><strong>Observações Médicas:</strong><br><?php echo htmlspecialchars($aluno['observacoes_medicas'] ?? 'Nenhuma observação médica registrada'); ?></p>
+                                            <p><strong>Observações
+                                                    Médicas:</strong><br><?php echo htmlspecialchars($aluno['observacoes_medicas'] ?? 'Nenhuma observação médica registrada'); ?>
+                                            </p>
                                         </div>
                                         <div class="col-sm-12">
-                                            <p><strong>Medicamentos:</strong><br><?php echo htmlspecialchars($aluno['medicamentos'] ?? 'Nenhum medicamento registrado'); ?></p>
+                                            <p><strong>Medicamentos:</strong><br><?php echo htmlspecialchars($aluno['medicamentos'] ?? 'Nenhum medicamento registrado'); ?>
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -306,7 +358,8 @@ function formatarTelefone($telefone) {
                                                 <?php if ($aluno['preenchido_por_responsavel']): ?>
                                                     <span class="badge badge-success">Sim</span>
                                                     <?php if ($aluno['dados_preenchidos_em']): ?>
-                                                        <br><small class="text-muted"><?php echo date('d/m/Y H:i', strtotime($aluno['dados_preenchidos_em'])); ?></small>
+                                                        <br><small
+                                                            class="text-muted"><?php echo date('d/m/Y H:i', strtotime($aluno['dados_preenchidos_em'])); ?></small>
                                                     <?php endif; ?>
                                                 <?php else: ?>
                                                     <span class="badge badge-secondary">Não</span>
@@ -314,7 +367,8 @@ function formatarTelefone($telefone) {
                                             </p>
                                         </div>
                                         <div class="col-sm-6">
-                                            <p><strong>Observações:</strong><br><?php echo htmlspecialchars($aluno['observacoes'] ?? 'Nenhuma observação registrada'); ?></p>
+                                            <p><strong>Observações:</strong><br><?php echo htmlspecialchars($aluno['observacoes'] ?? 'Nenhuma observação registrada'); ?>
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -335,4 +389,5 @@ function formatarTelefone($telefone) {
     <script src="<?php echo getAssetUrl('assets/js/settings.js'); ?>"></script>
     <script src="<?php echo getAssetUrl('assets/js/todolist.js'); ?>"></script>
 </body>
+
 </html>

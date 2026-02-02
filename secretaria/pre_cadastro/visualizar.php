@@ -66,6 +66,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao'])) {
     }
 }
 
+// Processar exclusão
+if ($_POST['acao'] === 'excluir') {
+    try {
+        $pdo->beginTransaction();
+        
+        // Excluir do controle
+        $stmt = $pdo->prepare("DELETE FROM pre_cadastros_controle WHERE aluno_id = ?");
+        $stmt->execute([$aluno_id]);
+        
+        // Excluir aluno
+        $stmt = $pdo->prepare("DELETE FROM alunos WHERE id = ?");
+        $stmt->execute([$aluno_id]);
+        
+        $pdo->commit();
+        
+        redirectTo('secretaria/pre_cadastro/index.php');
+        
+    } catch (PDOException $e) {
+        $pdo->rollBack();
+        $erro = "Erro ao excluir pré-cadastro: " . $e->getMessage();
+        error_log("Erro ao excluir pré-cadastro: " . $e->getMessage());
+    }
+}
+
 // Processar envio de JSON
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['acao'] === 'enviar_json') {
     try {
@@ -543,6 +567,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['ac
                                 </div>
                             </div>
                             <?php endif; ?>
+                            
+                            <!-- Card de Exclusão (Zona de Perigo) -->
+                            <div class="card mt-3 border-danger">
+                                <div class="card-body">
+                                    <h4 class="card-title text-danger">
+                                        <i class="mdi mdi-alert-circle me-2"></i>
+                                        Zona de Perigo
+                                    </h4>
+                                    <p class="text-muted">A exclusão é irreversível. Todos os dados do pré-cadastro serão apagados.</p>
+                                    
+                                    <form method="POST" action="visualizar.php?id=<?php echo $aluno_id; ?>" onsubmit="return confirm('Tem certeza que deseja EXCLUIR este pré-cadastro permanentemente? Esta ação não pode ser desfeita.')">
+                                        <input type="hidden" name="acao" value="excluir">
+                                        <button type="submit" class="btn btn-outline-danger w-100">
+                                            <i class="mdi mdi-delete"></i> Excluir Pré-cadastro
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     

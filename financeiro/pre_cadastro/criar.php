@@ -11,7 +11,7 @@ $pdo = getConnection();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tipo_cadastro = $_POST['tipo_cadastro'] ?? 'novo';
-    $nome = trim($_POST['nome'] ?? '');
+    $nome = trim($_POST['nome'] ?? ''); 
     $turma_id = !empty($_POST['turma_id']) ? (int)$_POST['turma_id'] : null;
     $observacoes = trim($_POST['observacoes'] ?? '');
     $aluno_existente_id = !empty($_POST['aluno_existente_id']) ? (int)$_POST['aluno_existente_id'] : null;

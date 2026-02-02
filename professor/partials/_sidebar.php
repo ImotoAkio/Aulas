@@ -4,6 +4,7 @@
     <ul class="nav">
       <li class="nav-item nav-profile">
         <a href="#" class="nav-link">
+          
           <div class="nav-profile-image">
             <i class="mdi mdi-account-circle" style="font-size: 40px; color: #667eea;"></i>
             <span class="login-status online"></span>

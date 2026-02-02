@@ -1,41 +1,60 @@
 <?php
 /**
  * Arquivo de configuração centralizada para conexão com banco de dados
- * 
- * Para facilitar o deploy, altere apenas as configurações abaixo:
+ * Ajustado para Ambiente Docker VPS
  */
 
-// Configurações do banco de dados
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'u894209272_planos_aula');
+// --- CONFIGURAÇÕES DO BANCO (DOCKER) ---
+// O Host deve ser o nome do serviço do banco na Stack (não é localhost)
+define('DB_HOST', 'database_mariadb');
+
+// Nome do banco que você criou no phpMyAdmin para este sistema (ex: sistema_rosa)
+// ATENÇÃO: Não use o nome antigo da Hostinger (u894209...) a menos que tenha criado igual.
+define('DB_NAME', 'sistema_rosa');
+
+// Usuário do banco (No Docker geralmente usamos root ou um user específico criado)
 define('DB_USER', 'root');
-define('DB_PASS', '');
+
+// A senha que você definiu na Stack do banco de dados (A mesma usada no Educx)
+define('DB_PASS', 'Akio2604*');
+
 define('DB_CHARSET', 'utf8');
 
 // Configurações PDO
 define('PDO_ERRMODE', PDO::ERRMODE_EXCEPTION);
 define('PDO_FETCH_MODE', PDO::FETCH_ASSOC);
 
+// --- FUNÇÕES DE URL ---
+
 // Função para detectar ambiente e corrigir caminhos
+// Função para detectar ambiente e corrigir caminhos (VERSÃO CORRIGIDA PARA DOCKER/TRAEFIK)
 function getBaseUrl()
 {
     if (!isset($_SERVER['HTTP_HOST'])) {
         return '/';
     }
 
-    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'];
 
-    // Detecta se está em produção
+    // Detecta se está em produção (Seu domínio oficial)
     $isProduction = strpos($host, 'colegiorosadesharom.com.br') !== false;
+
+    // --- A CORREÇÃO ESTÁ AQUI ---
+    // 1. Se o Traefik avisar que é HTTPS (HTTP_X_FORWARDED_PROTO)
+    // 2. OU se sabemos que é o domínio de produção (que sempre tem SSL)
+    // Então forçamos 'https'
+    if (
+        (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') ||
+        $isProduction
+    ) {
+        $protocol = 'https';
+    } else {
+        $protocol = 'http';
+    }
 
     if ($isProduction) {
         return $protocol . '://' . $host . '/';
     } else {
-        // Se estiver rodando na porta 8081 (nosso servidor de teste) ou 8000, remove o /aulas/
-        if (strpos($host, '8081') !== false || strpos($host, '8000') !== false) {
-            return $protocol . '://' . $host . '/';
-        }
         return $protocol . '://' . $host . '/aulas/';
     }
 }
@@ -71,11 +90,10 @@ function getPageUrl($path)
         return $path;
     }
 
-    // Garantir que sempre seja uma URL absoluta
     return $baseUrl . $path;
 }
 
-// Função para redirecionamento com caminho correto
+// Função para redirecionamento
 function redirectTo($path)
 {
     $baseUrl = getBaseUrl();
@@ -89,6 +107,7 @@ function redirectTo($path)
     exit();
 }
 
+// --- CONEXÃO PDO ---
 try {
     $pdo = new PDO(
         "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET,
@@ -100,11 +119,13 @@ try {
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO_FETCH_MODE);
 
 } catch (PDOException $e) {
-    error_log("Erro na conexão com o banco de dados: " . $e->getMessage());
-    die("Erro na conexão com o banco de dados. Verifique as configurações.");
+    // Log do erro para debug (pode ver nos logs do container)
+    error_log("Erro SQL: " . $e->getMessage());
+
+    // Mensagem amigável para o usuário
+    die("Erro na conexão com o banco de dados. Verifique: 1. Se o banco '" . DB_NAME . "' existe. 2. Se a senha está correta.");
 }
 
-// Função para obter conexão PDO
 function getConnection()
 {
     global $pdo;

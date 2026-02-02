@@ -20,10 +20,12 @@ if (!$aluno_id) {
 try {
     $stmt = $pdo->prepare("
         SELECT a.*, t.nome as turma_nome, pc.criado_em, pc.link_expiracao, pc.observacoes,
+               pc.turma_futura_id, tf.nome as turma_futura_nome,
                u.nome as criado_por_nome
         FROM alunos a
         LEFT JOIN turmas t ON a.turma_id = t.id
         LEFT JOIN pre_cadastros_controle pc ON a.id = pc.aluno_id
+        LEFT JOIN turmas tf ON pc.turma_futura_id = tf.id
         LEFT JOIN usuarios u ON pc.criado_por = u.id
         WHERE a.id = ? AND a.status_cadastro IN ('completo', 'aprovado')
     ");
@@ -45,9 +47,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 $pdo->beginTransaction();
                 
-                // Atualizar status do aluno para aprovado
-                $stmt = $pdo->prepare("UPDATE alunos SET status_cadastro = 'aprovado' WHERE id = ?");
+                // Buscar turma_futura_id do pré-cadastro
+                $stmt = $pdo->prepare("SELECT turma_futura_id FROM pre_cadastros_controle WHERE aluno_id = ?");
                 $stmt->execute([$aluno_id]);
+                $pre_cadastro = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                // Se tem turma futura, aplicar ela no aluno
+                if ($pre_cadastro && $pre_cadastro['turma_futura_id']) {
+                    $stmt = $pdo->prepare("UPDATE alunos SET status_cadastro = 'aprovado', turma_id = ? WHERE id = ?");
+                    $stmt->execute([$pre_cadastro['turma_futura_id'], $aluno_id]);
+                } else {
+                    // Se não tem turma futura, apenas atualiza status
+                    $stmt = $pdo->prepare("UPDATE alunos SET status_cadastro = 'aprovado' WHERE id = ?");
+                    $stmt->execute([$aluno_id]);
+                }
                 
                 // Atualizar status no controle
                 $stmt = $pdo->prepare("UPDATE pre_cadastros_controle SET status = 'aprovado' WHERE aluno_id = ?");
@@ -175,9 +188,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <p><strong>Nome:</strong> <?php echo htmlspecialchars($aluno['nome']); ?></p>
                                         </div>
                                         <div class="col-md-6">
-                                            <p><strong>Turma:</strong> <?php echo htmlspecialchars($aluno['turma_nome'] ?? 'Não definida'); ?></p>
+                                            <p><strong>Turma Atual:</strong> <?php echo htmlspecialchars($aluno['turma_nome'] ?? 'Não definida'); ?></p>
                                         </div>
                                     </div>
+                                    
+                                    <?php if ($aluno['turma_futura_nome']): ?>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <p><strong>Turma Futura (após aprovação):</strong> 
+                                                <span class="badge badge-info"><?php echo htmlspecialchars($aluno['turma_futura_nome']); ?></span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <?php endif; ?>
                                     
                                     <?php if ($aluno['cpf']): ?>
                                     <div class="row">

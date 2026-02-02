@@ -77,6 +77,20 @@ if (!function_exists('getPageUrl')) {
       </li>
 
       <li class="nav-item">
+        <a class="nav-link" href="<?php echo getPageUrl('financeiro/contratos/selecionar_aluno.php'); ?>">
+          <span class="menu-title">Contratos</span>
+          <i class="mdi mdi-file-document menu-icon"></i>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" href="<?php echo getPageUrl('financeiro/recibos/index.php'); ?>">
+          <span class="menu-title">Recibos</span>
+          <i class="mdi mdi-receipt menu-icon"></i>
+        </a>
+      </li>
+
+      <li class="nav-item">
         <a class="nav-link" href="<?php echo getPageUrl('financeiro/configuracoes.php'); ?>">
           <span class="menu-title">Configurações Avançadas</span>
           <i class="mdi mdi-cog menu-icon"></i>

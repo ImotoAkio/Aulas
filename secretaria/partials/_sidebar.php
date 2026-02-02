@@ -1,7 +1,7 @@
 <?php
 // Garantir que as funções estejam disponíveis
 if (!function_exists('getPageUrl')) {
-    require_once __DIR__ . '/../../config/database.php';
+  require_once __DIR__ . '/../../config/database.php';
 }
 ?>
 <div class="container-fluid page-body-wrapper">
@@ -12,11 +12,12 @@ if (!function_exists('getPageUrl')) {
         <a href="#" class="nav-link">
           <div class="nav-profile-image">
             <i class="mdi mdi-account-circle" style="font-size: 40px; color: #667eea;"></i>
-             <span class="login-status online"></span>
+            <span class="login-status online"></span>
             <!--change to offline or busy as needed-->
           </div>
           <div class="nav-profile-text d-flex flex-column">
-            <span class="font-weight-bold mb-2"><?= htmlspecialchars(explode(' ', $_SESSION['usuario_nome'] ?? 'Usuário')[0] . ' ' . (explode(' ', $_SESSION['usuario_nome'] ?? 'Usuário')[1] ?? '')) ?></span>
+            <span
+              class="font-weight-bold mb-2"><?= htmlspecialchars(explode(' ', $_SESSION['usuario_nome'] ?? 'Usuário')[0] . ' ' . (explode(' ', $_SESSION['usuario_nome'] ?? 'Usuário')[1] ?? '')) ?></span>
             <span class="text-secondary text-small">Secretaria</span>
           </div>
           <i class="mdi mdi-bookmark-check text-success nav-profile-badge"></i>
@@ -59,7 +60,7 @@ if (!function_exists('getPageUrl')) {
               <a class="nav-link" href="<?php echo getPageUrl('secretaria/cad/professor.php'); ?>">Professor</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="<?php echo getPageUrl('secretaria/cad/listar_alunos.php'); ?>">Aluno</a>
+              <a class="nav-link" href="<?php echo getPageUrl('secretaria/cad/aluno.php'); ?>">Aluno</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="<?php echo getPageUrl('secretaria/cad/listar_alunos.php'); ?>">Listar Alunos</a>
@@ -74,10 +75,12 @@ if (!function_exists('getPageUrl')) {
               <a class="nav-link" href="<?php echo getPageUrl('secretaria/cad/turmas.php'); ?>">Turmas</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="<?php echo getPageUrl('secretaria/cad/financeiro.php'); ?>">Usuário Financeiro</a>
+              <a class="nav-link" href="<?php echo getPageUrl('secretaria/cad/financeiro.php'); ?>">Usuário
+                Financeiro</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="<?php echo getPageUrl('secretaria/cad/sincronizar_nomes.php'); ?>">Sincronizar Nomes</a>
+              <a class="nav-link" href="<?php echo getPageUrl('secretaria/cad/sincronizar_nomes.php'); ?>">Sincronizar
+                Nomes</a>
             </li>
 
           </ul>
@@ -85,7 +88,8 @@ if (!function_exists('getPageUrl')) {
       </li>
 
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="collapse" href="#declaracoes" aria-expanded="false" aria-controls="declaracoes">
+        <a class="nav-link" data-bs-toggle="collapse" href="#declaracoes" aria-expanded="false"
+          aria-controls="declaracoes">
           <span class="menu-title">Declarações</span>
           <i class="mdi mdi-file-document menu-icon"></i>
         </a>
@@ -95,14 +99,16 @@ if (!function_exists('getPageUrl')) {
               <a class="nav-link" href="<?php echo getPageUrl('secretaria/declaracoes/professor.php'); ?>">Professor</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="<?php echo getPageUrl('secretaria/declaracoes/aluno.php'); ?>">Vínculo - Aluno</a>
+              <a class="nav-link" href="<?php echo getPageUrl('secretaria/declaracoes/aluno.php'); ?>">Vínculo -
+                Aluno</a>
             </li>
           </ul>
         </div>
       </li>
 
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="collapse" href="#pre-cadastros" aria-expanded="false" aria-controls="pre-cadastros">
+        <a class="nav-link" data-bs-toggle="collapse" href="#pre-cadastros" aria-expanded="false"
+          aria-controls="pre-cadastros">
           <span class="menu-title">Pré cadastros</span>
           <i class="mdi mdi-file-document menu-icon"></i>
         </a>
@@ -112,19 +118,23 @@ if (!function_exists('getPageUrl')) {
               <a class="nav-link" href="<?php echo getPageUrl('secretaria/pre_cadastro/criar.php'); ?>">Criar</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="<?php echo getPageUrl('secretaria/pre_cadastro/index.php'); ?>">Listar - Aluno</a>
+              <a class="nav-link" href="<?php echo getPageUrl('secretaria/pre_cadastro/index.php'); ?>">Listar -
+                Aluno</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="<?php echo getPageUrl('secretaria/pre_cadastro/efetivar.php'); ?>">Efetivar Matrículas</a>
             </li>
           </ul>
         </div>
       </li>
 
-
       <li class="nav-item">
-        <a class="nav-link" href="<?php echo getPageUrl('secretaria/configuracoes.php'); ?>">
-          <span class="menu-title">Configurações Avançadas</span>
-          <i class="mdi mdi-cog menu-icon"></i>
+        <a class="nav-link" href="<?php echo getPageUrl('secretaria/ensalamento/index.php'); ?>">
+          <span class="menu-title">Ensalamento</span>
+          <i class="mdi mdi-account-switch menu-icon"></i>
         </a>
       </li>
+
     </ul>
   </nav>
   <!-- partial -->

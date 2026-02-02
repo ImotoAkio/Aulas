@@ -14,63 +14,104 @@ if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo'] != 'coordenador') {
     exit();
 }
 
-// Initialize variables to avoid notices
+// Initialize variables
+$ano_letivo = $_GET['ano_letivo'] ?? date('Y');
 $turma_id = $_GET['turma_id'] ?? '';
 $disciplina_id = $_GET['disciplina_id'] ?? '';
-$alunos = [];
+$aluno_id = $_GET['aluno_id'] ?? '';
+
+$alunos_filtro = [];
 $turmas = [];
 $disciplinas = [];
+$dados = [];
+$modo_exibicao = ''; // 'aluno' ou 'turma'
 
-// Fetch all turmas
+// Fetch filter data
 try {
-    $turmas = $pdo->query("SELECT id, nome FROM turmas ORDER BY nome")->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    // Log the error instead of displaying it to the user.
-    error_log("Erro ao buscar turmas: " . $e->getMessage());
-    // Provide a user-friendly message
-    echo "<p class='error-message'>Erro ao carregar a página. Por favor, tente novamente mais tarde.</p>";
-    exit(); // Stop execution to prevent further errors.
-}
+    // Anos letivos disponíveis (baseado nas turmas)
+    $anos_stmt = $pdo->query("SELECT DISTINCT ano_letivo FROM turmas ORDER BY ano_letivo DESC");
+    $anos_disponiveis = $anos_stmt->fetchAll(PDO::FETCH_COLUMN);
+    if (empty($anos_disponiveis)) $anos_disponiveis = [date('Y')];
 
-// Fetch all disciplinas
-try {
+    // Turmas do ano selecionado
+    $turmas_stmt = $pdo->prepare("SELECT id, nome FROM turmas WHERE ano_letivo = ? ORDER BY nome");
+    $turmas_stmt->execute([$ano_letivo]);
+    $turmas = $turmas_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Disciplinas
     $disciplinas = $pdo->query("SELECT id, nome FROM disciplinas ORDER BY nome")->fetchAll(PDO::FETCH_ASSOC);
+
+    // Alunos para o filtro (se turma selecionada, filtra por turma, senão busca todos do ano)
+    $sql_alunos = "SELECT a.id, a.nome, t.nome as turma_nome 
+                   FROM alunos a 
+                   JOIN turmas t ON a.turma_id = t.id 
+                   WHERE t.ano_letivo = ? ";
+    $params_alunos = [$ano_letivo];
+    
+    if (!empty($turma_id)) {
+        $sql_alunos .= " AND a.turma_id = ?";
+        $params_alunos[] = $turma_id;
+    }
+    $sql_alunos .= " ORDER BY a.nome";
+    
+    $alunos_stmt = $pdo->prepare($sql_alunos);
+    $alunos_stmt->execute($params_alunos);
+    $alunos_filtro = $alunos_stmt->fetchAll(PDO::FETCH_ASSOC);
+
 } catch (PDOException $e) {
-    error_log("Erro ao buscar disciplinas: " . $e->getMessage());
-    echo "<p class='error-message'>Erro ao carregar a página. Por favor, tente novamente mais tarde.</p>";
-    exit();
+    error_log("Erro ao carregar filtros: " . $e->getMessage());
+    $erro = "Erro ao carregar filtros.";
 }
 
-// Fetch student data and grades if turma_id and disciplina_id are provided
-if (!empty($turma_id) && !empty($disciplina_id)) {
+// Processar a busca
+if (!empty($aluno_id)) {
+    // MODO ALUNO: Ver todas as notas de todas as matérias de um aluno
+    $modo_exibicao = 'aluno';
     try {
-        $alunos_stmt = $pdo->prepare("SELECT a.id, a.nome FROM alunos a WHERE a.turma_id = ?");
-        $alunos_stmt->execute([$turma_id]);
-        $alunos = $alunos_stmt->fetchAll(PDO::FETCH_ASSOC);
+        // Buscar dados do aluno e sua turma
+        $stmt_aluno = $pdo->prepare("SELECT a.nome, t.nome as turma_nome FROM alunos a JOIN turmas t ON a.turma_id = t.id WHERE a.id = ?");
+        $stmt_aluno->execute([$aluno_id]);
+        $info_aluno = $stmt_aluno->fetch(PDO::FETCH_ASSOC);
 
-        $dados = [];
-        foreach ($alunos as $a) {
-            $notas_stmt = $pdo->prepare("SELECT media_1, media_2, media_3, media_4 FROM notas WHERE aluno_id = ? AND turma_id = ? AND disciplina_id = ?");
-            $notas_stmt->execute([$a['id'], $turma_id, $disciplina_id]);
-            $notas = $notas_stmt->fetch(PDO::FETCH_ASSOC);
-            if ($notas) {
-                $dados[] = [
-                    'id' => $a['id'],
-                    'nome' => $a['nome'],
-                    'media_1' => $notas['media_1'],
-                    'media_2' => $notas['media_2'],
-                    'media_3' => $notas['media_3'],
-                    'media_4' => $notas['media_4'],
-                ];
-            }
-        }
+        // Buscar notas de todas as disciplinas (Agrupado por disciplina)
+        $sql = "SELECT d.nome as disciplina, 
+                       MAX(n.media_1) as media_1, 
+                       MAX(n.media_2) as media_2, 
+                       MAX(n.media_3) as media_3, 
+                       MAX(n.media_4) as media_4 
+                FROM disciplinas d 
+                LEFT JOIN notas n ON n.disciplina_id = d.id AND n.aluno_id = ? 
+                GROUP BY d.id, d.nome
+                ORDER BY d.nome";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$aluno_id]);
+        $dados = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
-        error_log("Erro ao buscar dados de notas: " . $e->getMessage());
-        echo "<p class='error-message'>Erro ao carregar dados de notas. Por favor, tente novamente mais tarde.</p>";
-        $dados = []; // Ensure $dados is empty to avoid errors in the table.
+        $erro = "Erro ao buscar notas do aluno: " . $e->getMessage();
+    }
+
+} elseif (!empty($turma_id) && !empty($disciplina_id)) {
+    // MODO TURMA: Ver notas de todos os alunos da turma em uma matéria
+    $modo_exibicao = 'turma';
+    try {
+        // Buscar notas de todos os alunos (Agrupado por aluno)
+        $sql = "SELECT a.id, a.nome, 
+                       MAX(n.media_1) as media_1, 
+                       MAX(n.media_2) as media_2, 
+                       MAX(n.media_3) as media_3, 
+                       MAX(n.media_4) as media_4 
+                FROM alunos a 
+                LEFT JOIN notas n ON n.aluno_id = a.id AND n.disciplina_id = ? 
+                WHERE a.turma_id = ? 
+                GROUP BY a.id, a.nome
+                ORDER BY a.nome";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$disciplina_id, $turma_id]);
+        $dados = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        $erro = "Erro ao buscar notas da turma: " . $e->getMessage();
     }
 }
-
 
 ?>
 
@@ -80,21 +121,13 @@ if (!empty($turma_id) && !empty($disciplina_id)) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Notas</title>
-    <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/mdi/css/materialdesignicons.min.css"); ?>"
-    <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/ti-icons/css/themify-icons.css"); ?>"
-    <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/css/vendor.bundle.base.css"); ?>"
-    <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/font-awesome/css/font-awesome.min.css"); ?>">
+    <title>Notas - Secretaria</title>
+    <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/mdi/css/materialdesignicons.min.css"); ?>">
+    <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/css/vendor.bundle.base.css"); ?>">
     <link rel="stylesheet" href="<?php echo getAssetUrl("assets/css/style.css"); ?>">
     <link rel="shortcut icon" href="<?php echo getAssetUrl("assets/images/favicon.png"); ?>">
     <style>
-        /* Style for error messages */
-        .error-message {
-            color: red;
-            font-weight: bold;
-            margin-top: 10px;
-            /* Add some spacing */
-        }
+        .select2-container { width: 100% !important; }
     </style>
 </head>
 
@@ -106,146 +139,180 @@ if (!empty($turma_id) && !empty($disciplina_id)) {
             <div class="main-panel">
                 <div class="content-wrapper">
                     <div class="page-header">
-                        <h3 class="page-title">Visualizar Notas </h3>
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item active" aria-current="page">Visualizar Notas</li>
-                            </ol>
-                        </nav>
+                        <h3 class="page-title">
+                            <span class="page-title-icon bg-gradient-primary text-white me-2">
+                                <i class="mdi mdi-format-list-numbered"></i>
+                            </span>
+                            Gestão de Notas
+                        </h3>
                     </div>
+
                     <div class="row">
-                        <div class="col-lg-12 grid-margin">
-                            <form method="GET" class="row mb-4">
+                        <div class="col-12 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title mb-4">Filtros de Busca</h4>
+                                    <form method="GET" class="row g-3 align-items-end">
+                                        <div class="col-md-2">
+                                            <label class="form-label">Ano Letivo</label>
+                                            <select name="ano_letivo" class="form-select" onchange="this.form.submit()">
+                                                <?php foreach ($anos_disponiveis as $ano): ?>
+                                                    <option value="<?= $ano ?>" <?= $ano == $ano_letivo ? 'selected' : '' ?>><?= $ano ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="col-md-3">
+                                            <label class="form-label">Turma</label>
+                                            <select name="turma_id" class="form-select" onchange="this.form.submit()">
+                                                <option value="">Todas as Turmas</option>
+                                                <?php foreach ($turmas as $t): ?>
+                                                    <option value="<?= $t['id'] ?>" <?= $turma_id == $t['id'] ? 'selected' : '' ?>><?= htmlspecialchars($t['nome']) ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label class="form-label">Aluno (Opcional)</label>
+                                            <select name="aluno_id" class="form-select">
+                                                <option value="">Selecione um aluno...</option>
+                                                <?php foreach ($alunos_filtro as $a): ?>
+                                                    <option value="<?= $a['id'] ?>" <?= $aluno_id == $a['id'] ? 'selected' : '' ?>>
+                                                        <?= htmlspecialchars($a['nome']) ?> <?= empty($turma_id) ? '('.$a['turma_nome'].')' : '' ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                            <small class="text-muted">Selecione para ver todas as matérias deste aluno.</small>
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <label class="form-label">Disciplina</label>
+                                            <select name="disciplina_id" class="form-select">
+                                                <option value="">Selecione...</option>
+                                                <?php foreach ($disciplinas as $d): ?>
+                                                    <option value="<?= $d['id'] ?>" <?= $disciplina_id == $d['id'] ? 'selected' : '' ?>><?= htmlspecialchars($d['nome']) ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                            <small class="text-muted">Obrigatório se não selecionar aluno.</small>
+                                        </div>
+
+                                        <div class="col-12 mt-3">
+                                            <button type="submit" class="btn btn-primary me-2">
+                                                <i class="mdi mdi-magnify"></i> Consultar
+                                            </button>
+                                            <a href="notas.php" class="btn btn-light">Limpar</a>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <?php if ($modo_exibicao == 'aluno' && !empty($dados)): ?>
+                            <div class="col-12 grid-margin stretch-card">
                                 <div class="card">
                                     <div class="card-body">
-                                        <h4 class="card-title">Selecione</h4>
-                                        <p class="card-description"> Escolha a<code>turma</code>e
-                                            a<code>disciplina</code>
-                                        </p>
-                                        <div class="template-demo">
-                                            <div class="dropdown">
-                                                <select name="turma_id" class="form-select" required>
-                                                    <option value="">Selecione</option>
-                                                    <?php foreach ($turmas as $t): ?>
-                                                        <option value="<?= $t['id'] ?>" <?= ($turma_id == $t['id'] ? 'selected' : '') ?>><?= $t['nome'] ?></option>
+                                        <div class="d-flex justify-content-between align-items-center mb-4">
+                                            <h4 class="card-title mb-0">Boletim: <?= htmlspecialchars($info_aluno['nome']) ?></h4>
+                                            <span class="badge bg-info"><?= htmlspecialchars($info_aluno['turma_nome']) ?></span>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table class="table table-hover table-bordered">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>Disciplina</th>
+                                                        <th class="text-center">1ª Unidade</th>
+                                                        <th class="text-center">2ª Unidade</th>
+                                                        <th class="text-center">3ª Unidade</th>
+                                                        <th class="text-center">4ª Unidade</th>
+                                                        <th class="text-center">Média Final</th>
+                                                        <th class="text-center">Situação</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php foreach ($dados as $d): 
+                                                        $notas = array_filter([$d['media_1'], $d['media_2'], $d['media_3'], $d['media_4']], fn($v) => $v !== null && $v > 0);
+                                                        $media = count($notas) > 0 ? array_sum($notas) / count($notas) : 0;
+                                                        $situacao = $media >= 6 ? '<span class="text-success">Aprovado</span>' : '<span class="text-warning">Em Recuperação</span>';
+                                                        if (count($notas) == 0) $situacao = '-';
+                                                    ?>
+                                                        <tr>
+                                                            <td class="fw-bold"><?= htmlspecialchars($d['disciplina']) ?></td>
+                                                            <td class="text-center"><?= $d['media_1'] > 0 ? $d['media_1'] : '-' ?></td>
+                                                            <td class="text-center"><?= $d['media_2'] > 0 ? $d['media_2'] : '-' ?></td>
+                                                            <td class="text-center"><?= $d['media_3'] > 0 ? $d['media_3'] : '-' ?></td>
+                                                            <td class="text-center"><?= $d['media_4'] > 0 ? $d['media_4'] : '-' ?></td>
+                                                            <td class="text-center fw-bold"><?= count($notas) > 0 ? number_format($media, 1) : '-' ?></td>
+                                                            <td class="text-center"><?= $situacao ?></td>
+                                                        </tr>
                                                     <?php endforeach; ?>
-                                                </select>
-                                            </div>
-
-                                            <div class="dropdown">
-                                                <select name="disciplina_id" class="form-select" required>
-                                                    <option value="">Selecione</option>
-                                                    <?php foreach ($disciplinas as $d): ?>
-                                                        <option value="<?= $d['id'] ?>" <?= ($disciplina_id == $d['id'] ? 'selected' : '') ?>><?= $d['nome'] ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                            <button type="submit"
-                                                class="btn btn-gradient-success btn-fw">Consultar</button>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="mt-4 text-end">
+                                            <a href="boletim/gerar_boletim.php?aluno_id=<?= $aluno_id ?>" target="_blank" class="btn btn-success">
+                                                <i class="mdi mdi-printer"></i> Imprimir Boletim
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
-                            </form>
-                        </div>
-
-                        <div class="col-lg-12 grid-margin stretch-card">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h4 class="card-title">Notas Por Aluno</h4>
-                                    <div class="table-responsive">
-                                        <table class="table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Aluno</th>
-                                                    <th>1ª Unidade</th>
-                                                    <th>2ª Unidade</th>
-                                                    <th>3ª Unidade</th>
-                                                    <th>4ª Unidade</th>
-                                                    <th>Média Final</th>
-                                                    <th>Boletim</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php if (empty($dados)): ?>
-                                                    <tr>
-                                                        <td colspan="7">Nenhum dado encontrado para a turma e disciplina
-                                                            selecionadas.</td>
-                                                    </tr>
-                                                <?php else: ?>
-                                                    <?php foreach ($dados as $d):
-                                                        $medias = array_filter([$d['media_1'], $d['media_2'], $d['media_3'], $d['media_4']], fn($v) => $v !== null);
-                                                        $media_final = count($medias) ? array_sum($medias) / count($medias) : '-';
-                                                        ?>
-                                                        <tr>
-                                                            <td><?= htmlspecialchars($d['nome']) ?></td>
-                                                            <td><?= htmlspecialchars($d['media_1'] ?? '-') ?></td>
-                                                            <td><?= htmlspecialchars($d['media_2'] ?? '-') ?></td>
-                                                            <td><?= htmlspecialchars($d['media_3'] ?? '-') ?></td>
-                                                            <td><?= htmlspecialchars($d['media_4'] ?? '-') ?></td>
-                                                            <td><?= is_numeric($media_final) ? number_format($media_final, 2) : '-' ?>
-                                                            </td>
-                                                            <td>
-                                                                <a href="boletim/gerar_boletim.php?aluno_id=<?= $d['id'] ?>"
-                                                                    target="_blank"
-                                                                    class="btn btn-sm btn-outline-secondary">Boletim PDF</a>
-                                                            </td>
-                                                        </tr>
-                                                    <?php endforeach; ?>
-                                                <?php endif; ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div class="text-center mt-4">
-                                        <a href="boletim/gerar_boletins_turma.php?turma_id=<?= $turma_id ?>&disciplina_id=<?= $disciplina_id ?>"
-                                            class="btn btn-success">Baixar Boletins de Todos</a>
-                                    </div>
-                                </div>
-
                             </div>
 
-                        </div>
+                        <?php elseif ($modo_exibicao == 'turma' && !empty($dados)): ?>
+                            <div class="col-12 grid-margin stretch-card">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h4 class="card-title mb-4">Notas da Turma</h4>
+                                        <div class="table-responsive">
+                                            <table class="table table-hover table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Aluno</th>
+                                                        <th class="text-center">1ª Unidade</th>
+                                                        <th class="text-center">2ª Unidade</th>
+                                                        <th class="text-center">3ª Unidade</th>
+                                                        <th class="text-center">4ª Unidade</th>
+                                                        <th class="text-center">Média</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php foreach ($dados as $d): 
+                                                        $notas = array_filter([$d['media_1'], $d['media_2'], $d['media_3'], $d['media_4']], fn($v) => $v !== null && $v > 0);
+                                                        $media = count($notas) > 0 ? array_sum($notas) / count($notas) : 0;
+                                                    ?>
+                                                        <tr>
+                                                            <td><?= htmlspecialchars($d['nome']) ?></td>
+                                                            <td class="text-center"><?= $d['media_1'] > 0 ? $d['media_1'] : '-' ?></td>
+                                                            <td class="text-center"><?= $d['media_2'] > 0 ? $d['media_2'] : '-' ?></td>
+                                                            <td class="text-center"><?= $d['media_3'] > 0 ? $d['media_3'] : '-' ?></td>
+                                                            <td class="text-center"><?= $d['media_4'] > 0 ? $d['media_4'] : '-' ?></td>
+                                                            <td class="text-center fw-bold"><?= count($notas) > 0 ? number_format($media, 1) : '-' ?></td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        <?php elseif ($_SERVER['REQUEST_METHOD'] == 'GET' && (isset($_GET['aluno_id']) || isset($_GET['turma_id']))): ?>
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    <i class="mdi mdi-information"></i> Nenhum registro encontrado para os filtros selecionados.
+                                    Certifique-se de selecionar um <strong>Aluno</strong> OU uma <strong>Turma e Disciplina</strong>.
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
                     </div>
-                    <?php include 'partials/_footer.php'; ?>
                 </div>
+                <?php include 'partials/_footer.php'; ?>
             </div>
         </div>
-        <script src="<?php echo getAssetUrl("assets/vendors/js/vendor.bundle.base.js"); ?>"</script>
-        <!-- jQuery -->
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <!-- Bootstrap JS -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="<?php echo getAssetUrl("assets/js/off-canvas.js"); ?>"</script>
-        <script src="<?php echo getAssetUrl("assets/js/misc.js"); ?>"</script>
-        <script src="<?php echo getAssetUrl("assets/js/settings.js"); ?>"</script>
-        <script src="<?php echo getAssetUrl("assets/js/todolist.js"); ?>"</script>
-        <script src="<?php echo getAssetUrl("assets/js/jquery.cookie.js"); ?>"</script>
-        <script>
-                const ctx = document.getElementById('graficoMedias').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                data: {
-                    labels: <?= json_encode(array_column($dados, 'nome')) ?>,
-                datasets: [{
-                    label: 'Média Final',
-                data: <?= json_encode(array_map(function ($d) {
-                    $m = array_filter([$d['media_1'], $d['media_2'], $d['media_3'], $d['media_4']], fn($v) => $v !== null);
-                    return count($m) ? round(array_sum($m) / count($m), 2) : 0;
-                }, $dados)) ?>,
-                backgroundColor: 'rgba(54, 162, 235, 0.7)'
-                }]
-            },
-                options: {
-                    responsive: true,
-                scales: {
-                    y: {
-                    beginAtZero: true,
-                max: 10
-                    }
-                }
-            }
-        });
-        </script>
-        </script>
-</body>
+    </div>
 
+    <script src="<?php echo getAssetUrl("assets/vendors/js/vendor.bundle.base.js"); ?>"></script>
+    <script src="<?php echo getAssetUrl("assets/js/off-canvas.js"); ?>"></script>
+    <script src="<?php echo getAssetUrl("assets/js/misc.js"); ?>"></script>
+</body>
 </html>

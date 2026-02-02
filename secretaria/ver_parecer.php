@@ -37,7 +37,8 @@ if (!$id_aluno || empty($periodo)) {
  * @param array $votos_campo Array associativo com as opções e suas contagens de votos.
  * @return string A opção vencedora ou a string de empate.
  */
-function getVencedor($votos_campo) {
+function getVencedor($votos_campo)
+{
     if (empty($votos_campo) || array_sum($votos_campo) === 0) {
         return "N/A (Sem votos)";
     }
@@ -137,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_parecer_glo
         // Adiciona os campos 'disposicao_aula' e 'desempenho_geral' também para re-checagem de empate
         $contadores_gerais_recheck['disposicao_aula'] = ['facilidade' => 0, 'dificuldade' => 0, 'interesse' => 0, 'desinteresse' => 0];
         $contadores_gerais_recheck['desempenho_geral'] = ['acima' => 0, 'dentro' => 0, 'abaixo' => 0];
-        
+
         foreach ($todos_pareceres as $parecer_individual) {
             // Contagem para campos gerais
             foreach ($contadores_gerais_recheck as $campo => $opcoes) {
@@ -154,15 +155,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_parecer_glo
             // e exigimos que a secretaria resolva se for o caso.
             // Precisamos definir as opções válidas para esses campos também, similar a $campos_enum_gerais
             $all_options_for_field = $campos_enum_gerais[$campo] ?? null; // Tenta usar as opções de $campos_enum_gerais
-            if ($campo == 'disposicao_aula') $all_options_for_field = ['facilidade', 'dificuldade', 'interesse', 'desinteresse'];
-            if ($campo == 'desempenho_geral') $all_options_for_field = ['acima', 'dentro', 'abaixo'];
+            if ($campo == 'disposicao_aula')
+                $all_options_for_field = ['facilidade', 'dificuldade', 'interesse', 'desinteresse'];
+            if ($campo == 'desempenho_geral')
+                $all_options_for_field = ['acima', 'dentro', 'abaixo'];
 
 
             if (strpos($vencedor_apurado, 'EMPATE') === 0) {
                 // Se há empate, verifica se a secretaria forneceu uma escolha final
                 $input_name = 'final_' . $campo;
                 $secretaria_choice = filter_input(INPUT_POST, $input_name, FILTER_SANITIZE_STRING);
-                
+
                 if (empty($secretaria_choice) || ($all_options_for_field && !in_array($secretaria_choice, $all_options_for_field))) {
                     $all_ties_resolved = false;
                     $_SESSION['feedback_message'] = ['type' => 'error', 'text' => 'Erro: Por favor, resolva todos os empates antes de finalizar o parecer. Empate em: ' . ucwords(str_replace('_', ' ', $campo))];
@@ -191,7 +194,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_parecer_glo
             $prof_info = $stmt_prof_info->fetch(PDO::FETCH_ASSOC);
 
             $nome_professor_designado = $prof_info['nome_professor'] ?? 'Professor Desconhecido';
-            
+
             $texto_observacoes_professores .= "**Professor " . htmlspecialchars($nome_professor_designado) . "** (Unidade {$parecer_individual['unidade']}°): ";
             $texto_observacoes_professores .= "Disposição Geral: **" . htmlspecialchars(ucfirst($parecer_individual['disposicao_aula'] ?: 'Não informada')) . "**. ";
             $texto_observacoes_professores .= "Desempenho Geral: **" . htmlspecialchars(ucfirst($parecer_individual['desempenho_geral'] ?: 'Não informado')) . "**. ";
@@ -292,7 +295,7 @@ try {
             $is_finalizado_geral = true;
             $intervencoes_salvas = $p['intervencoes'];
             $resultado_final_salvo = $p['resultado_final'];
-            
+
             // FIX: Create DateTime object from the correct database format (YYYY-MM-DD HH:MM:SS)
             // Use createFromFormat if there's any doubt about the exact input format from DB.
             // However, for TIMESTAMP, new DateTime() constructor should usually work.
@@ -350,266 +353,433 @@ if (isset($_SESSION['feedback_message'])) {
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Parecer Consolidado</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Plugins CSS -->
+    <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/mdi/css/materialdesignicons.min.css"); ?>">
+    <link rel="stylesheet" href="<?php echo getAssetUrl("assets/vendors/css/vendor.bundle.base.css"); ?>">
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="<?php echo getAssetUrl("assets/css/style.css"); ?>">
+    <link rel="shortcut icon" href="<?php echo getAssetUrl("assets/images/favicon.png"); ?>">
     <style>
-        body { font-family: 'Inter', sans-serif; margin: 0; padding: 20px; background-color: #f4f7f6; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
-        .container {
-            max-width: 900px;
-            width: 100%;
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
+        body {
+            background-color: #f4f7f6;
         }
-        h2, h3 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 25px;
-            font-size: 1.8em;
-            border-bottom: 2px solid #e0e0e0;
-            padding-bottom: 15px;
+
+        .container-scroller {
+            min-height: 100vh;
         }
-        .info-box {
-            background-color: #e7f3fe;
-            border-left: 6px solid #2196F3;
-            margin-bottom: 20px;
-            padding: 15px;
-            border-radius: 8px;
-            color: #0D47A1;
+
+        .content-wrapper {
+            padding: 2rem 1rem;
         }
-        .info-box p { margin: 5px 0; font-size: 0.95em; }
-        .section-title {
-            font-weight: bold;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #e0e0e0;
-            padding-bottom: 8px;
-            font-size: 1.3em;
-            color: #444;
-        }
-        .observation {
-            background-color: #f8faff;
-            border-left: 5px solid #6c757d;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .observation p { margin: 0; line-height: 1.5; font-size: 0.9em; }
-        .observation strong { color: #343a40; }
-        .vote-result { margin-bottom: 15px; background-color: #f0f8ff; padding: 12px; border-radius: 8px; border: 1px solid #cceeff; }
-        .vote-result p { margin: 0; font-size: 0.95em; }
-        .vote-result span { font-weight: bold; color: #007bff; }
-        .vote-result .empate { color: #dc3545; } /* Vermelho para empate */
-        .vote-result small { color: #666; font-size: 0.85em; }
-        .final-inputs select {
-            width: calc(100% - 20px);
-            padding: 10px;
-            border: 1px solid #ced4da;
-            border-radius: 8px;
-            box-sizing: border-box;
-            margin-bottom: 15px;
-            font-size: 1em;
-        }
-        .final-inputs select:focus {
-            border-color: #007bff;
-            outline: none;
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-        }
-        .button-group { text-align: center; margin-top: 30px; }
-        .button-group button, .button-group a {
-            background-color: #007bff;
-            color: white;
-            padding: 12px 25px;
+
+        .card-parecer {
             border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 1.1em;
-            font-weight: bold;
-            margin: 0 10px;
-            display: inline-block;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
         }
-        .button-group button:hover, .button-group a:hover {
-            background-color: #0056b3;
+
+        .card-header-custom {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px 15px 0 0;
+            text-align: center;
+        }
+
+        .card-header-custom h2 {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .card-header-custom p {
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+
+        .info-section {
+            background-color: #fff;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            border-left: 5px solid #2575fc;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+        }
+
+        .info-item {
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            color: #555;
+        }
+
+        .info-item strong {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #333;
+            margin: 2rem 0 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #eee;
+        }
+
+        .section-title i {
+            margin-right: 10px;
+            color: #2575fc;
+            font-size: 1.5rem;
+        }
+
+        .vote-card {
+            background-color: #fff;
+            border: 1px solid #eef2f7;
+            border-radius: 10px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            transition: transform 0.2s;
+        }
+
+        .vote-card:hover {
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
         }
-        .button-group button:active, .button-group a:active {
-            transform: translateY(0);
+
+        .vote-label {
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 0.5rem;
+            display: block;
         }
-        .button-group .generate-pdf-btn {
-            background-color: #6f42c1; /* Roxo para o botão de PDF */
-            box-shadow: 0 4px 10px rgba(111, 66, 193, 0.2);
+
+        .vote-winner {
+            font-size: 1.1rem;
+            color: #2575fc;
+            font-weight: 700;
         }
-        .button-group .generate-pdf-btn:hover {
-            background-color: #5936a8;
+
+        .vote-empate {
+            color: #dc3545;
         }
+
+        .vote-details {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 0.5rem;
+        }
+
+        .observation-card {
+            background-color: #f8f9fa;
+            border-left: 4px solid #6c757d;
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .prof-name {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .obs-text {
+            font-size: 0.95rem;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .form-select-custom {
+            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            width: 100%;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .form-select-custom:focus {
+            border-color: #2575fc;
+            box-shadow: 0 0 0 0.2rem rgba(37, 117, 252, 0.25);
+            outline: none;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
         .status-finalizado {
             background-color: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
-            padding: 15px;
-            border-radius: 8px;
+        }
+
+        .status-aberto {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+
+        .btn-action {
+            padding: 12px 30px;
+            font-weight: 600;
+            border-radius: 50px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+
+        .btn-finalize {
+            background: linear-gradient(45deg, #11998e, #38ef7d);
+            border: none;
+            color: white;
+        }
+
+        .btn-finalize:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(56, 239, 125, 0.4);
+        }
+
+        .btn-pdf {
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            border: none;
+            color: white;
+        }
+
+        .btn-pdf:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 75, 43, 0.4);
+        }
+
+        .feedback-alert {
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 2rem;
             text-align: center;
-            margin-bottom: 25px;
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-        .feedback-message-container {
-            padding: 10px 20px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            font-weight: bold;
-            text-align: center;
-        }
-        .feedback-message.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .feedback-message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        .disabled-form-text {
-            color: #999;
-            font-style: italic;
+            font-weight: 600;
         }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <h2>Parecer Consolidado</h2>
-        
-        <?php if ($is_finalizado_geral): // Usando a nova variável de controle de status ?>
-            <div class="status-finalizado">
-                <p>Este parecer foi **FINALIZADO** em <?php echo ($data_geracao_parecer_final_obj instanceof DateTime) ? $data_geracao_parecer_final_obj->format('d/m/Y H:i') : 'Data Inválida'; ?>.</p>
-                <p>As opções selecionadas e o texto final não podem mais ser alterados por aqui.</p>
-            </div>
-        <?php endif; ?>
+    <div class="container-scroller">
+        <div class="content-wrapper">
+            <div class="container">
+                <div class="card card-parecer">
+                    <div class="card-header-custom">
+                        <h2><i class="mdi mdi-file-document-box-check-outline"></i> Parecer Consolidado</h2>
+                        <p>Visualização e finalização do parecer pedagógico global</p>
 
-        <div class="info-box">
-            <p><strong>Aluno:</strong> <?php echo htmlspecialchars($aluno_info['nome_aluno']); ?></p>
-            <p><strong>Turma:</strong> <?php echo htmlspecialchars($aluno_info['nome_turma'] ?? 'N/A'); ?> (Ano Letivo: <?php echo htmlspecialchars($aluno_info['ano_letivo'] ?? 'N/A'); ?>)</p>
-            <p><strong>Período do Parecer:</strong> <?php echo htmlspecialchars($periodo); ?></p>
-            <p><strong>Status Geral:</strong> <?php echo $is_finalizado_geral ? 'Finalizado' : 'Em Aberto'; ?></p>
-        </div>
-
-        <form action="ver_parecer.php?id_aluno=<?php echo htmlspecialchars($id_aluno); ?>&periodo=<?php echo urlencode($periodo); ?>" method="POST">
-            <input type="hidden" name="id_aluno" value="<?php echo htmlspecialchars($id_aluno); ?>">
-            <input type="hidden" name="periodo" value="<?php echo htmlspecialchars($periodo); ?>">
-            <input type="hidden" name="finalizar_parecer_global" value="1">
-            
-            <h3 class="section-title">Apuração dos Votos Gerais dos Professores</h3>
-            <?php if (empty($todos_pareceres_do_aluno_no_periodo)): ?>
-                <p>Nenhum parecer individual encontrado para este aluno e período.</p>
-            <?php else: ?>
-                <?php foreach ($contadores_gerais as $campo => $votos): ?>
-                    <div class="vote-result">
-                        <p><strong><?php echo ucwords(str_replace('_', ' ', $campo)); ?>:</strong> 
-                            <?php 
-                            $vencedor_atual = getVencedor($votos);
-                            if (strpos($vencedor_atual, 'EMPATE') === 0 && !$is_finalizado_geral): ?>
-                                <span class="empate"><?php echo htmlspecialchars($vencedor_atual); ?></span> - Secretaria/Coordenação, por favor, selecione:
-                                <select name="final_<?php echo htmlspecialchars($campo); ?>" class="form-control" <?php echo $is_finalizado_geral ? 'disabled' : ''; ?>>
-                                    <option value="">Selecione...</option>
-                                    <?php 
-                                        $opcoes_empate = explode(', ', str_replace('EMPATE: ', '', $vencedor_atual));
-                                        foreach ($opcoes_empate as $opcao_empate): ?>
-                                    <option value="<?php echo htmlspecialchars(trim($opcao_empate)); ?>">
-                                        <?php echo htmlspecialchars(ucfirst(trim($opcao_empate))); ?>
-                                    </option>
-                                    <?php endforeach; ?>
-                                </select>
-                            <?php else: ?>
-                                <span>
-                                    <?php echo htmlspecialchars(ucfirst($vencedor_atual)); ?>
-                                </span>
-                                <?php if ($is_finalizado_geral && strpos($vencedor_atual, 'EMPATE') === 0): ?>
-                                    <p class="disabled-form-text"> (Opção final definida pela Secretaria/Coordenação:
-                                    <?php
-                                        // Aqui você precisaria extrair do $resultado_final_salvo se ele contiver o JSON da consolidação
-                                        $temp_consolidacao = json_decode($resultado_final_salvo ?? '', true);
-                                        echo htmlspecialchars(ucfirst($temp_consolidacao[$campo] ?? 'Não definida'));
-                                    ?>
-                                    )</p>
-                                <?php endif; ?>
-                            <?php endif; ?>
-                            <br>
-                            <small>(Votos: <?php 
-                                $votos_detalhe = [];
-                                foreach ($votos as $opcao => $contagem) {
-                                    if ($contagem > 0) { // Mostra apenas opções com votos
-                                        $votos_detalhe[] = ucfirst($opcao) . ": " . $contagem;
-                                    }
-                                }
-                                echo implode(" | ", $votos_detalhe ?: ['Nenhum voto registrado']); // Mensagem se não houver votos
-                            ?>)</small>
-                        </p>
-                    </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
-
-            <h3 class="section-title">Observações Gerais dos Professores</h3>
-            <?php if (empty($todos_pareceres_do_aluno_no_periodo)): ?>
-                <p>Nenhuma avaliação de professor encontrada para este aluno e período.</p>
-            <?php else: ?>
-                <?php foreach ($todos_pareceres_do_aluno_no_periodo as $parecer_individual): ?>
-                    <div class="observation">
-                        <p><strong>Professor:</strong> <?php echo htmlspecialchars($parecer_individual['nome_professor']); ?> (Unidade: <?php echo htmlspecialchars($parecer_individual['unidade']); ?>°)</p>
-                        <p>Disposição Geral na Aula: <strong><?php echo htmlspecialchars(ucfirst($parecer_individual['disposicao_aula'] ?: 'Não informada')); ?></strong></p>
-                        <p>Desempenho Geral: <strong><?php echo htmlspecialchars(ucfirst($parecer_individual['desempenho_geral'] ?: 'Não informado')); ?></strong></p>
-                        <p>Observações Gerais: <?php echo nl2br(htmlspecialchars($parecer_individual['obs_geral_professor'] ?: 'Nenhuma observação.')); ?></p>
-                        <?php if ($parecer_individual['status'] === 'finalizado_coordenador' || $parecer_individual['status'] === 'finalizado_professor' || $parecer_individual['status'] === 'pendente_coordenador'): ?>
-                            <p style="font-style: italic; color: green;">Este parecer individual está concluído pelo professor.</p>
+                        <?php if ($is_finalizado_geral): ?>
+                            <div class="status-badge status-finalizado">
+                                <i class="mdi mdi-check-circle"></i> FINALIZADO em
+                                <?php echo ($data_geracao_parecer_final_obj instanceof DateTime) ? $data_geracao_parecer_final_obj->format('d/m/Y H:i') : 'Data Inválida'; ?>
+                            </div>
+                        <?php else: ?>
+                            <div class="status-badge status-aberto">
+                                <i class="mdi mdi-clock-outline"></i> EM ABERTO
+                            </div>
                         <?php endif; ?>
                     </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
 
-            <h3 class="section-title">Intervenções Pedagógicas</h3>
-            <div class="final-inputs">
-                <select name="intervencoes_option" class="form-control" required <?php echo $is_finalizado_geral ? 'disabled' : ''; ?>>
-                    <?php foreach ($intervencoes_options as $key => $text): ?>
-                        <option value="<?php echo htmlspecialchars($key); ?>" <?php echo (isset($intervencoes_salvas) && $intervencoes_salvas == $text) ? 'selected' : ''; ?>>
-                            <?php echo htmlspecialchars($text); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
+                    <div class="card-body p-4">
+                        <?php if (isset($_SESSION['feedback_message'])):
+                            $msg = $_SESSION['feedback_message'];
+                            $alertClass = $msg['type'] == 'success' ? 'alert-success' : 'alert-danger';
+                            ?>
+                            <div class="alert <?php echo $alertClass; ?> feedback-alert">
+                                <?php echo htmlspecialchars($msg['text']); ?>
+                            </div>
+                            <?php unset($_SESSION['feedback_message']); ?>
+                        <?php endif; ?>
 
-            <h3 class="section-title">Resultado Final / Parecer Conclusivo (Secretaria/Coordenação)</h3>
-            <div class="final-inputs">
-                <select name="resultado_final_option" class="form-control" required <?php echo $is_finalizado_geral ? 'disabled' : ''; ?>>
-                    <?php foreach ($resultado_final_options as $key => $text): ?>
-                        <option value="<?php echo htmlspecialchars($key); ?>" <?php echo (isset($resultado_final_salvo) && $resultado_final_salvo == $text) ? 'selected' : ''; ?>>
-                            <?php echo htmlspecialchars($text); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-                <?php if ($is_finalizado_geral): ?>
-                    <p class="disabled-form-text">O texto completo foi gerado com base na opção selecionada.</p>
-                <?php endif; ?>
-            </div>
+                        <div class="info-section">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="info-item"><i class="mdi mdi-account"></i> <strong>Aluno:</strong>
+                                        <?php echo htmlspecialchars($aluno_info['nome_aluno']); ?></div>
+                                    <div class="info-item"><i class="mdi mdi-school"></i> <strong>Turma:</strong>
+                                        <?php echo htmlspecialchars($aluno_info['nome_turma'] ?? 'N/A'); ?></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-item"><i class="mdi mdi-calendar"></i> <strong>Ano Letivo:</strong>
+                                        <?php echo htmlspecialchars($aluno_info['ano_letivo'] ?? 'N/A'); ?></div>
+                                    <div class="info-item"><i class="mdi mdi-calendar-range"></i>
+                                        <strong>Período:</strong> <?php echo htmlspecialchars($periodo); ?></div>
+                                </div>
+                            </div>
+                        </div>
 
-            <div class="button-group">
-                <?php if (!$is_finalizado_geral && isset($_SESSION['usuario_id']) && ($_SESSION['tipo'] == 'coordenador' || $_SESSION['tipo'] == 'secretaria')): ?>
-                    <button type="submit" class="btn btn-gradient-primary me-2">Finalizar Parecer Global e Salvar</button>
-                <?php elseif ($is_finalizado_geral): ?>
-                    <a href="boletim/gerar_pdf_parecer.php?id_aluno=<?php echo htmlspecialchars($id_aluno); ?>&periodo=<?php echo urlencode($periodo); ?>" target="_blank" class="btn btn-gradient-success generate-pdf-btn">Gerar PDF do Parecer Global</a>
-                <?php else: ?>
-                    <p class="disabled-form-text">Você não tem permissão para finalizar este parecer.</p>
-                <?php endif; ?>
+                        <form
+                            action="ver_parecer.php?id_aluno=<?php echo htmlspecialchars($id_aluno); ?>&periodo=<?php echo urlencode($periodo); ?>"
+                            method="POST">
+                            <input type="hidden" name="id_aluno" value="<?php echo htmlspecialchars($id_aluno); ?>">
+                            <input type="hidden" name="periodo" value="<?php echo htmlspecialchars($periodo); ?>">
+                            <input type="hidden" name="finalizar_parecer_global" value="1">
+
+                            <div class="section-title">
+                                <i class="mdi mdi-vote"></i> Apuração dos Votos Gerais
+                            </div>
+
+                            <?php if (empty($todos_pareceres_do_aluno_no_periodo)): ?>
+                                <div class="alert alert-warning text-center">Nenhum parecer individual encontrado para este
+                                    aluno e período.</div>
+                            <?php else: ?>
+                                <div class="row">
+                                    <?php foreach ($contadores_gerais as $campo => $votos): ?>
+                                        <div class="col-md-6">
+                                            <div class="vote-card">
+                                                <span
+                                                    class="vote-label"><?php echo ucwords(str_replace('_', ' ', $campo)); ?></span>
+                                                <?php
+                                                $vencedor_atual = getVencedor($votos);
+                                                if (strpos($vencedor_atual, 'EMPATE') === 0 && !$is_finalizado_geral): ?>
+                                                    <span class="vote-winner vote-empate"><i class="mdi mdi-alert-circle"></i>
+                                                        <?php echo htmlspecialchars($vencedor_atual); ?></span>
+                                                    <div class="mt-2">
+                                                        <small class="text-danger">Resolva o empate:</small>
+                                                        <select name="final_<?php echo htmlspecialchars($campo); ?>"
+                                                            class="form-control form-control-sm mt-1" <?php echo $is_finalizado_geral ? 'disabled' : ''; ?>>
+                                                            <option value="">Selecione...</option>
+                                                            <?php
+                                                            $opcoes_empate = explode(', ', str_replace('EMPATE: ', '', $vencedor_atual));
+                                                            foreach ($opcoes_empate as $opcao_empate): ?>
+                                                                <option value="<?php echo htmlspecialchars(trim($opcao_empate)); ?>">
+                                                                    <?php echo htmlspecialchars(ucfirst(trim($opcao_empate))); ?>
+                                                                </option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                <?php else: ?>
+                                                    <span class="vote-winner">
+                                                        <?php echo htmlspecialchars(ucfirst($vencedor_atual)); ?>
+                                                    </span>
+                                                    <?php if ($is_finalizado_geral && strpos($vencedor_atual, 'EMPATE') === 0): ?>
+                                                        <div class="mt-1 text-muted small">
+                                                            <i class="mdi mdi-check"></i> Decisão Final:
+                                                            <?php
+                                                            $temp_consolidacao = json_decode($resultado_final_salvo ?? '', true);
+                                                            echo htmlspecialchars(ucfirst($temp_consolidacao[$campo] ?? 'Não definida'));
+                                                            ?>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                <?php endif; ?>
+
+                                                <div class="vote-details">
+                                                    <?php
+                                                    $votos_detalhe = [];
+                                                    foreach ($votos as $opcao => $contagem) {
+                                                        if ($contagem > 0) {
+                                                            $votos_detalhe[] = ucfirst($opcao) . ": " . $contagem;
+                                                        }
+                                                    }
+                                                    echo implode(" | ", $votos_detalhe ?: ['Nenhum voto']);
+                                                    ?>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php endif; ?>
+
+                            <div class="section-title">
+                                <i class="mdi mdi-comment-text-multiple"></i> Observações dos Professores
+                            </div>
+
+                            <?php if (empty($todos_pareceres_do_aluno_no_periodo)): ?>
+                                <p class="text-muted text-center">Nenhuma avaliação encontrada.</p>
+                            <?php else: ?>
+                                <?php foreach ($todos_pareceres_do_aluno_no_periodo as $parecer_individual): ?>
+                                    <div class="observation-card">
+                                        <span class="prof-name"><i class="mdi mdi-account-tie"></i>
+                                            <?php echo htmlspecialchars($parecer_individual['nome_professor']); ?> <small
+                                                class="text-muted">(Unidade:
+                                                <?php echo htmlspecialchars($parecer_individual['unidade']); ?>°)</small></span>
+                                        <div class="row mt-2">
+                                            <div class="col-md-6">
+                                                <p class="mb-1"><small><strong>Disposição:</strong>
+                                                        <?php echo htmlspecialchars(ucfirst($parecer_individual['disposicao_aula'] ?: 'N/A')); ?></small>
+                                                </p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p class="mb-1"><small><strong>Desempenho:</strong>
+                                                        <?php echo htmlspecialchars(ucfirst($parecer_individual['desempenho_geral'] ?: 'N/A')); ?></small>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <hr class="my-2">
+                                        <p class="obs-text mb-0">
+                                            <?php echo nl2br(htmlspecialchars($parecer_individual['obs_geral_professor'] ?: 'Nenhuma observação registrada.')); ?>
+                                        </p>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+
+                            <div class="section-title">
+                                <i class="mdi mdi-lightbulb-on"></i> Intervenções Pedagógicas
+                            </div>
+                            <select name="intervencoes_option" class="form-select-custom" required <?php echo $is_finalizado_geral ? 'disabled' : ''; ?>>
+                                <?php foreach ($intervencoes_options as $key => $text): ?>
+                                    <option value="<?php echo htmlspecialchars($key); ?>" <?php echo (isset($intervencoes_salvas) && $intervencoes_salvas == $text) ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($text); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+
+                            <div class="section-title">
+                                <i class="mdi mdi-gavel"></i> Parecer Conclusivo
+                            </div>
+                            <select name="resultado_final_option" class="form-select-custom" required <?php echo $is_finalizado_geral ? 'disabled' : ''; ?>>
+                                <?php foreach ($resultado_final_options as $key => $text): ?>
+                                    <option value="<?php echo htmlspecialchars($key); ?>" <?php echo (isset($resultado_final_salvo) && $resultado_final_salvo == $text) ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($text); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <?php if ($is_finalizado_geral): ?>
+                                <p class="text-muted small mt-2"><i class="mdi mdi-lock"></i> O texto completo foi gerado e
+                                    salvo com base na opção selecionada.</p>
+                            <?php endif; ?>
+
+                            <div class="text-center mt-5 mb-4">
+                                <?php if (!$is_finalizado_geral && isset($_SESSION['usuario_id']) && ($_SESSION['tipo'] == 'coordenador' || $_SESSION['tipo'] == 'secretaria')): ?>
+                                    <button type="submit" class="btn btn-action btn-finalize">
+                                        <i class="mdi mdi-check-all"></i> Finalizar Parecer Global
+                                    </button>
+                                <?php elseif ($is_finalizado_geral): ?>
+                                    <a href="boletim/gerar_pdf_parecer.php?id_aluno=<?php echo htmlspecialchars($id_aluno); ?>&periodo=<?php echo urlencode($periodo); ?>"
+                                        target="_blank" class="btn btn-action btn-pdf">
+                                        <i class="mdi mdi-file-pdf"></i> Baixar PDF
+                                    </a>
+                                <?php else: ?>
+                                    <div class="alert alert-secondary">Você não tem permissão para finalizar este parecer.
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-        </form>
+        </div>
     </div>
+
+    <script src="<?php echo getAssetUrl("assets/vendors/js/vendor.bundle.base.js"); ?>"></script>
+    <script src="<?php echo getAssetUrl("assets/js/off-canvas.js"); ?>"></script>
+    <script src="<?php echo getAssetUrl("assets/js/hoverable-collapse.js"); ?>"></script>
+    <script src="<?php echo getAssetUrl("assets/js/misc.js"); ?>"></script>
 </body>
+
 </html>

@@ -26,36 +26,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $codigo = substr(md5(uniqid() . time()), 0, 20);
             
             if ($tipo_cadastro === 'existente' && $aluno_existente_id) {
-                // Re-matrícula: atualizar aluno existente
+                // Re-matrícula: atualizar aluno existente (MANTÉM turma_id atual, não atualiza!)
                 $stmt = $pdo->prepare("
                     UPDATE alunos 
-                    SET status_cadastro = 'pre_cadastro', codigo_pre_cadastro = ?, turma_id = ?
+                    SET status_cadastro = 'pre_cadastro', codigo_pre_cadastro = ?
                     WHERE id = ?
                 ");
-                $stmt->execute([$codigo, $turma_id, $aluno_existente_id]);
+                $stmt->execute([$codigo, $aluno_existente_id]);
                 $aluno_id = $aluno_existente_id;
             } else {
-                // Novo aluno: inserir novo registro
+                // Novo aluno: inserir novo registro (turma_id NULL pois é pré-cadastro)
                 $stmt = $pdo->prepare("
                     INSERT INTO alunos (nome, turma_id, status_cadastro, codigo_pre_cadastro) 
-                    VALUES (?, ?, 'pre_cadastro', ?)
+                    VALUES (?, NULL, 'pre_cadastro', ?)
                 ");
-                $stmt->execute([$nome, $turma_id, $codigo]);
+                $stmt->execute([$nome, $codigo]);
                 $aluno_id = $pdo->lastInsertId();
             }
             
             // Inserir/atualizar registro de controle
             $stmt = $pdo->prepare("
-                INSERT INTO pre_cadastros_controle (aluno_id, codigo_link, criado_por, link_expiracao, observacoes, tipo_cadastro) 
-                VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL 30 DAY), ?, ?)
+                INSERT INTO pre_cadastros_controle (aluno_id, turma_futura_id, codigo_link, criado_por, link_expiracao, observacoes, tipo_cadastro) 
+                VALUES (?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 30 DAY), ?, ?)
                 ON DUPLICATE KEY UPDATE 
+                turma_futura_id = VALUES(turma_futura_id),
                 codigo_link = VALUES(codigo_link),
                 criado_por = VALUES(criado_por),
                 link_expiracao = VALUES(link_expiracao),
                 observacoes = VALUES(observacoes),
                 tipo_cadastro = VALUES(tipo_cadastro)
             ");
-            $stmt->execute([$aluno_id, $codigo, $_SESSION['usuario_id'], $observacoes, $tipo_cadastro]);
+            $stmt->execute([$aluno_id, $turma_id, $codigo, $_SESSION['usuario_id'], $observacoes, $tipo_cadastro]);
             
             $pdo->commit();
             
@@ -70,9 +71,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Buscar turmas para o formulário
+// Buscar anos letivos disponíveis
 try {
-    $stmt = $pdo->prepare("SELECT id, nome, ano_letivo FROM turmas ORDER BY nome");
+    $stmt = $pdo->query("SELECT DISTINCT ano_letivo FROM turmas ORDER BY ano_letivo DESC");
+    $anos_letivos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    $anos_letivos = [];
+}
+
+// Buscar turmas para o formulário (ordenado por ano letivo descendente e nome)
+try {
+    $stmt = $pdo->prepare("SELECT id, nome, ano_letivo FROM turmas ORDER BY ano_letivo DESC, nome");
     $stmt->execute();
     $turmas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
@@ -233,11 +242,28 @@ try {
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group">
+                                                    <label for="ano_letivo_filtro" class="form-label">Ano Letivo</label>
+                                                    <select class="form-control" id="ano_letivo_filtro" name="ano_letivo_filtro">
+                                                        <option value="">Todos os anos</option>
+                                                        <?php foreach ($anos_letivos as $ano): ?>
+                                                        <option value="<?php echo $ano['ano_letivo']; ?>">
+                                                            <?php echo htmlspecialchars($ano['ano_letivo']); ?>
+                                                        </option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                    <small class="form-text text-muted">
+                                                        <i class="mdi mdi-information"></i> Filtre as turmas por ano letivo
+                                                    </small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
                                                     <label for="turma_id" class="form-label">Turma Sugerida</label>
                                                     <select class="form-control" id="turma_id" name="turma_id">
                                                         <option value="">Selecione uma turma</option>
                                                         <?php foreach ($turmas as $turma): ?>
                                                         <option value="<?php echo $turma['id']; ?>" 
+                                                                data-ano="<?php echo $turma['ano_letivo']; ?>"
                                                                 <?php echo (isset($_POST['turma_id']) && $_POST['turma_id'] == $turma['id']) ? 'selected' : ''; ?>>
                                                             <?php echo htmlspecialchars($turma['nome']); ?>
                                                             <?php if ($turma['ano_letivo']): ?>
@@ -246,6 +272,9 @@ try {
                                                         </option>
                                                         <?php endforeach; ?>
                                                     </select>
+                                                    <small class="form-text text-muted">
+                                                        <i class="mdi mdi-school"></i> Turma para o ano letivo selecionado
+                                                    </small>
                                                 </div>
                                             </div>
                                         </div>
@@ -553,6 +582,51 @@ try {
                     alunoSelecionado = null;
                     alunoHidden.value = '';
                     nomeField.value = '';
+                });
+            }
+            
+            // Filtro de ano letivo para turmas
+            const anoLetivoFiltro = document.getElementById('ano_letivo_filtro');
+            const turmaSelect = document.getElementById('turma_id');
+            
+            if (anoLetivoFiltro && turmaSelect) {
+                anoLetivoFiltro.addEventListener('change', function() {
+                    const anoSelecionado = this.value;
+                    const options = turmaSelect.querySelectorAll('option');
+                    
+                    // Contar turmas visíveis
+                    let turmasVisiveis = 0;
+                    
+                    options.forEach(option => {
+                        if (option.value === '') {
+                            // Sempre mostrar a opção "Selecione"
+                            option.style.display = '';
+                            return;
+                        }
+                        
+                        const dataAno = option.getAttribute('data-ano');
+                        
+                        if (!anoSelecionado || dataAno === anoSelecionado) {
+                            option.style.display = '';
+                            turmasVisiveis++;
+                        } else {
+                            option.style.display = 'none';
+                        }
+                    });
+                    
+                    // Se a turma selecionada está oculta, limpar seleção
+                    const turmaSelecionada = turmaSelect.value;
+                    const turmaSelecionadaOption = turmaSelect.querySelector(`option[value="${turmaSelecionada}"]`);
+                    if (turmaSelecionada && turmaSelecionadaOption && turmaSelecionadaOption.style.display === 'none') {
+                        turmaSelect.value = '';
+                    }
+                    
+                    // Adicionar feedback visual
+                    const feedback = turmasVisiveis > 0 ? 
+                        `${turmasVisiveis} turma${turmasVisiveis > 1 ? 's' : ''} disponível${turmasVisiveis > 1 ? 'is' : ''}` :
+                        'Nenhuma turma disponível';
+                    
+                    console.log(`Ano ${anoSelecionado || 'Todos'}: ${feedback}`);
                 });
             }
             

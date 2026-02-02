@@ -1,7 +1,7 @@
 <?php
 // Garantir que as funções estejam disponíveis
 if (!function_exists('getPageUrl')) {
-    require_once __DIR__ . '/../../config/database.php';
+  require_once __DIR__ . '/../../config/database.php';
 }
 
 session_start();
@@ -9,23 +9,32 @@ require_once __DIR__ . '/../../config/database.php';
 
 // Verificar se o usuário está logado e é coordenador
 if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo'] != 'coordenador') {
-    require_once __DIR__ . '/../../config/database.php';
-    redirectTo('login.php');
-    exit();
+  require_once __DIR__ . '/../../config/database.php';
+  redirectTo('login.php');
+  exit();
 }
 
 // Buscar alunos com informações de turma
 $alunos = [];
 try {
-    $stmt = $pdo->query("
+  $stmt = $pdo->query("
         SELECT a.*, t.nome as turma_nome, t.ano_letivo 
         FROM alunos a 
         LEFT JOIN turmas t ON a.turma_id = t.id 
         ORDER BY a.nome_completo, a.nome
     ");
-    $alunos = $stmt->fetchAll();
+  $alunos = $stmt->fetchAll();
 } catch (PDOException $e) {
-    error_log("Erro ao buscar alunos: " . $e->getMessage());
+  error_log("Erro ao buscar alunos: " . $e->getMessage());
+}
+
+// Buscar turmas para o filtro
+$turmas_filtro = [];
+try {
+  $stmt = $pdo->query("SELECT id, nome, ano_letivo FROM turmas ORDER BY ano_letivo DESC, nome");
+  $turmas_filtro = $stmt->fetchAll();
+} catch (PDOException $e) {
+  error_log("Erro ao buscar turmas: " . $e->getMessage());
 }
 
 // Contar alunos com cadastro completo vs incompleto
@@ -34,11 +43,11 @@ $alunos_completos = 0;
 $alunos_incompletos = 0;
 
 foreach ($alunos as $aluno) {
-    if (!empty($aluno['nome_completo']) && !empty($aluno['data_nascimento']) && !empty($aluno['cpf'])) {
-        $alunos_completos++;
-    } else {
-        $alunos_incompletos++;
-    }
+  if (!empty($aluno['nome_completo']) && !empty($aluno['data_nascimento']) && !empty($aluno['cpf'])) {
+    $alunos_completos++;
+  } else {
+    $alunos_incompletos++;
+  }
 }
 ?>
 
@@ -65,47 +74,51 @@ foreach ($alunos as $aluno) {
   <link rel="stylesheet" href="<?php echo getAssetUrl("assets/css/style.css"); ?>">
   <!-- End layout styles -->
   <link rel="shortcut icon" href="<?php echo getAssetUrl("assets/images/favicon.png"); ?>" />
-  
+
   <style>
     .table td {
       vertical-align: middle;
     }
+
     .btn-group .btn {
       margin-right: 2px;
     }
+
     .btn-group .btn:last-child {
       margin-right: 0;
     }
+
     .badge {
       font-size: 0.75rem;
     }
+
     .table tbody tr:hover {
-      background-color: rgba(0,0,0,0.05);
+      background-color: rgba(0, 0, 0, 0.05);
     }
-    
+
     /* Estilos para a barra de pesquisa */
     .input-group-text {
       background-color: #f8f9fa;
       border-color: #ced4da;
     }
-    
+
     #buscarAluno {
       border-left: none;
     }
-    
+
     #buscarAluno:focus {
       border-color: #80bdff;
       box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
     }
-    
+
     #limparBusca {
       border-left: none;
     }
-    
+
     #limparBusca:hover {
       background-color: #e9ecef;
     }
-    
+
     #contadorResultados {
       font-weight: 500;
     }
@@ -127,7 +140,8 @@ foreach ($alunos as $aluno) {
             <h3 class="page-title"> Listar Alunos </h3>
             <nav aria-label="breadcrumb">
               <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href='<?php echo getPageUrl("secretaria/index.php"); ?>'>Dashboard</a></li>
+                <li class="breadcrumb-item"><a href='<?php echo getPageUrl("secretaria/index.php"); ?>'>Dashboard</a>
+                </li>
                 <li class="breadcrumb-item"><a href="#">Cadastros</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Listar Alunos</li>
               </ol>
@@ -199,7 +213,8 @@ foreach ($alunos as $aluno) {
                   <div class="row">
                     <div class="col-9">
                       <div class="d-flex align-items-center align-self-start">
-                        <h3 class="mb-0"><?= $total_alunos > 0 ? round(($alunos_completos / $total_alunos) * 100, 1) : 0 ?>%</h3>
+                        <h3 class="mb-0">
+                          <?= $total_alunos > 0 ? round(($alunos_completos / $total_alunos) * 100, 1) : 0 ?>%</h3>
                       </div>
                     </div>
                     <div class="col-3">
@@ -222,16 +237,36 @@ foreach ($alunos as $aluno) {
                   <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
                       <h4 class="card-title">Lista de Alunos</h4>
-                      <p class="card-description">Gerencie os cadastros dos alunos. Clique em "Editar" para completar informações faltantes.</p>
+                      <p class="card-description">Gerencie os cadastros dos alunos. Clique em "Editar" para completar
+                        informações faltantes.</p>
                     </div>
+
                     <div class="d-flex align-items-center">
+                      <div class="mr-3">
+                        <select class="form-control form-control-sm" id="filtroTurma" style="width: 200px;">
+                          <option value="">Todas as Turmas</option>
+                          <option value="Sem turma">Sem Turma</option>
+                          <?php foreach ($turmas_filtro as $t): ?>
+                            <option value="<?= htmlspecialchars($t['nome']) ?>"><?= htmlspecialchars($t['nome']) ?>
+                              (<?= $t['ano_letivo'] ?>)</option>
+                          <?php endforeach; ?>
+                        </select>
+                      </div>
+                      <div class="mr-3">
+                        <select class="form-control form-control-sm" id="filtroStatus" style="width: 150px;">
+                          <option value="">Todos os Status</option>
+                          <option value="Completo">Completo</option>
+                          <option value="Incompleto">Incompleto</option>
+                        </select>
+                      </div>
                       <div class="input-group" style="width: 300px;">
                         <div class="input-group-prepend">
                           <span class="input-group-text">
                             <i class="mdi mdi-magnify"></i>
                           </span>
                         </div>
-                        <input type="text" class="form-control" id="buscarAluno" placeholder="Buscar por nome, CPF ou turma...">
+                        <input type="text" class="form-control" id="buscarAluno"
+                          placeholder="Buscar por nome, CPF ou turma...">
                         <div class="input-group-append">
                           <button class="btn btn-outline-secondary" type="button" id="limparBusca" title="Limpar busca">
                             <i class="mdi mdi-close"></i>
@@ -240,14 +275,14 @@ foreach ($alunos as $aluno) {
                       </div>
                     </div>
                   </div>
-                  
+
                   <!-- Contador de resultados -->
                   <div class="mb-3">
                     <small class="text-muted">
                       <span id="contadorResultados"><?= $total_alunos ?></span> aluno(s) encontrado(s)
                     </small>
                   </div>
-                  
+
                   <div class="table-responsive">
                     <table class="table table-striped" id="tabelaAlunos">
                       <thead>
@@ -280,7 +315,8 @@ foreach ($alunos as $aluno) {
                             </td>
                             <td>
                               <div>
-                                <span class="font-weight-bold"><?= htmlspecialchars($aluno['turma_nome'] ?? 'Sem turma') ?></span>
+                                <span
+                                  class="font-weight-bold"><?= htmlspecialchars($aluno['turma_nome'] ?? 'Sem turma') ?></span>
                                 <br>
                                 <small class="text-muted"><?= htmlspecialchars($aluno['ano_letivo'] ?? 'N/A') ?></small>
                               </div>
@@ -301,20 +337,17 @@ foreach ($alunos as $aluno) {
                             </td>
                             <td>
                               <div class="btn-group" role="group">
-                                <a href="<?php echo getPageUrl('secretaria/cad/editar_aluno.php?id=' . $aluno['id']); ?>" 
-                                   class="btn btn-outline-primary btn-sm" 
-                                   title="Editar">
+                                <a href="<?php echo getPageUrl('secretaria/cad/editar_aluno.php?id=' . $aluno['id']); ?>"
+                                  class="btn btn-outline-primary btn-sm" title="Editar">
                                   <i class="mdi mdi-pencil"></i>
                                 </a>
-                                <a href="<?php echo getPageUrl('secretaria/cad/visualizar_aluno.php?id=' . $aluno['id']); ?>" 
-                                   class="btn btn-outline-info btn-sm" 
-                                   title="Visualizar">
+                                <a href="<?php echo getPageUrl('secretaria/cad/visualizar_aluno.php?id=' . $aluno['id']); ?>"
+                                  class="btn btn-outline-info btn-sm" title="Visualizar">
                                   <i class="mdi mdi-eye"></i>
                                 </a>
-                                <a href="<?php echo getPageUrl('secretaria/cad/excluir_aluno.php?id=' . $aluno['id']); ?>" 
-                                   class="btn btn-outline-danger btn-sm" 
-                                   title="Excluir"
-                                   onclick="return confirm('Tem certeza que deseja excluir este aluno?')">
+                                <a href="<?php echo getPageUrl('secretaria/cad/excluir_aluno.php?id=' . $aluno['id']); ?>"
+                                  class="btn btn-outline-danger btn-sm" title="Excluir"
+                                  onclick="return confirm('Tem certeza que deseja excluir este aluno?')">
                                   <i class="mdi mdi-delete"></i>
                                 </a>
                               </div>
@@ -371,9 +404,9 @@ foreach ($alunos as $aluno) {
 
   <script>
     // Aguardar carregamento completo da página
-    $(document).ready(function() {
+    $(document).ready(function () {
       console.log('Página carregada, inicializando...');
-      
+
       // Verificar se jQuery está funcionando
       if (typeof $ === 'undefined') {
         console.error('jQuery não carregado!');
@@ -381,7 +414,7 @@ foreach ($alunos as $aluno) {
         buscaFallback();
         return;
       }
-      
+
       // Verificar se DataTable está disponível
       if (typeof $.fn.DataTable === 'undefined') {
         console.error('DataTable não carregado!');
@@ -389,9 +422,9 @@ foreach ($alunos as $aluno) {
         buscaFallback();
         return;
       }
-      
+
       console.log('jQuery e DataTable carregados, inicializando tabela...');
-      
+
       try {
         // Inicializar DataTable
         var table = $('#tabelaAlunos').DataTable({
@@ -427,13 +460,13 @@ foreach ($alunos as $aluno) {
           "dom": '<"top"f>rt<"bottom"lip><"clear">',
           "lengthMenu": [[10, 20, 50, 100], [10, 20, 50, 100]]
         });
-        
+
         console.log('DataTable inicializado com sucesso');
-        
+
         // Função de busca personalizada
         function buscarAlunos(termo) {
           console.log('Buscando por:', termo);
-          
+
           if (termo.length === 0) {
             // Se não há termo, mostrar todos
             table.search('').draw();
@@ -441,91 +474,114 @@ foreach ($alunos as $aluno) {
             // Buscar em todas as colunas (nome, CPF, turma)
             table.search(termo).draw();
           }
-          
+
           // Atualizar contador de resultados
-          var totalFiltrado = table.rows({search: 'applied'}).count();
+          var totalFiltrado = table.rows({ search: 'applied' }).count();
           $('#contadorResultados').text(totalFiltrado);
-          
+
           // Mostrar mensagem se não houver resultados
           if (totalFiltrado === 0 && termo.length > 0) {
             $('#contadorResultados').html('<span class="text-warning">Nenhum aluno encontrado para "' + termo + '"</span>');
           }
-          
+
           console.log('Resultados encontrados:', totalFiltrado);
         }
-        
+
         // Event listener para o campo de busca
-        $('#buscarAluno').on('keyup', function() {
+        $('#buscarAluno').on('keyup', function () {
           var termo = $(this).val();
           buscarAlunos(termo);
         });
-        
+
+        // Event listeners para os filtros
+        $('#filtroTurma').on('change', function () {
+          var val = $(this).val();
+          // Coluna 1 é a Turma
+          table.column(1).search(val ? val : '', true, false).draw();
+
+          // Atualizar contador
+          var totalFiltrado = table.rows({ search: 'applied' }).count();
+          $('#contadorResultados').text(totalFiltrado);
+        });
+
+        $('#filtroStatus').on('change', function () {
+          var val = $(this).val();
+          // Coluna 2 é o Status
+          table.column(2).search(val ? val : '', true, false).draw();
+
+          // Atualizar contador
+          var totalFiltrado = table.rows({ search: 'applied' }).count();
+          $('#contadorResultados').text(totalFiltrado);
+        });
+
         // Event listener para o botão limpar
-        $('#limparBusca').on('click', function() {
+        $('#limparBusca').on('click', function () {
           console.log('Limpando busca...');
           $('#buscarAluno').val('');
+          $('#filtroTurma').val('').trigger('change');
+          $('#filtroStatus').val('').trigger('change');
           buscarAlunos('');
           $('#buscarAluno').focus();
         });
-        
+
         // Event listener para Enter no campo de busca
-        $('#buscarAluno').on('keypress', function(e) {
+        $('#buscarAluno').on('keypress', function (e) {
           if (e.which === 13) { // Enter
             e.preventDefault();
             buscarAlunos($(this).val());
           }
         });
-        
+
         // Atualizar contador quando a tabela for redimensionada
-        table.on('draw', function() {
-          var totalFiltrado = table.rows({search: 'applied'}).count();
+        table.on('draw', function () {
+          var totalFiltrado = table.rows({ search: 'applied' }).count();
           $('#contadorResultados').text(totalFiltrado);
         });
-        
+
         // Focar no campo de busca quando a página carregar
-        setTimeout(function() {
+        setTimeout(function () {
           $('#buscarAluno').focus();
           console.log('Campo de busca focado');
         }, 500);
-        
+
         console.log('Event listeners configurados');
-        
+
       } catch (error) {
         console.error('Erro ao inicializar DataTable:', error);
         // Usar busca fallback
         buscaFallback();
       }
     });
-    
+
     // Fallback: Busca JavaScript vanilla caso DataTable falhe
     function buscaFallback() {
       console.log('Usando busca fallback...');
-      
+
       const campoBusca = document.getElementById('buscarAluno');
       const contador = document.getElementById('contadorResultados');
       const tabela = document.getElementById('tabelaAlunos');
-      
+
       if (!campoBusca || !tabela) {
         console.error('Elementos não encontrados para busca fallback');
         return;
       }
-      
+
       const tbody = tabela.getElementsByTagName('tbody')[0];
       if (!tbody) {
         console.error('Tbody não encontrado');
         return;
       }
-      
+
       const linhas = tbody.getElementsByTagName('tr');
-      
-      campoBusca.addEventListener('keyup', function() {
+
+      campoBusca.addEventListener('keyup', function () {
         const termo = this.value.toLowerCase();
         let totalVisivel = 0;
-        
+
         for (let i = 0; i < linhas.length; i++) {
           const linha = linhas[i];
           const texto = linha.textContent.toLowerCase();
-          
+
           if (texto.includes(termo)) {
             linha.style.display = '';
             totalVisivel++;
@@ -533,24 +589,24 @@ foreach ($alunos as $aluno) {
             linha.style.display = 'none';
           }
         }
-        
+
         contador.textContent = totalVisivel;
-        
+
         if (totalVisivel === 0 && termo.length > 0) {
           contador.innerHTML = '<span class="text-warning">Nenhum aluno encontrado para "' + termo + '"</span>';
         }
       });
-      
+
       // Botão limpar
       const botaoLimpar = document.getElementById('limparBusca');
       if (botaoLimpar) {
-        botaoLimpar.addEventListener('click', function() {
+        botaoLimpar.addEventListener('click', function () {
           campoBusca.value = '';
           campoBusca.dispatchEvent(new Event('keyup'));
           campoBusca.focus();
         });
       }
-      
+
       console.log('Busca fallback configurada');
     }
   </script>

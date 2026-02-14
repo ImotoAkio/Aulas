@@ -37,7 +37,12 @@ tar -czf "$BACKUP_DIR/files_backup_$DATE.tar.gz" . --exclude='./backups' --exclu
 
 # 4. Atualizar Código (Via Git)
 echo "⬇️  Baixando atualizações..."
+git stash
 git pull origin main
+git stash pop
+# Resolve conflitos automaticamente no database.php mantendo o local (se possível) ou avisa
+# Se houver conflito, o stash pop avisa.
+
 # OU se for upload manual, pule esta etapa
 
 # 5. Rodar Migração de Banco de Dados
